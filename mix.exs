@@ -62,6 +62,9 @@ defmodule Naboo.Mixfile do
       {:phoenix_live_reload, "~> 1.3", only: :dev},
       {:jason, "~> 1.2"},
 
+      # Authentication
+      {:argon2_elixir, "~> 2.3", override: true},
+
       # GraphQL
       {:absinthe, "~> 1.6"},
       {:absinthe_plug, "~> 1.5.8"},

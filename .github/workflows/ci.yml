@@ -2,8 +2,6 @@ name: CI
 
 on:
   push:
-    branches:
-      - canon
   pull_request:
     branches:
       - "**"
@@ -70,4 +68,3 @@ jobs:
       - run: make check
       - run: make lint
       - run: make test
-      - run: make build DOCKER_IMAGE_TAG=latest

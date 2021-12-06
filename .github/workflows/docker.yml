@@ -1,0 +1,21 @@
+name: docker
+
+on:
+  push:
+    branches:
+      - canon
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        otp-version: [24.1.2]
+        elixir-version: [1.12.3]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          env-file: .env.test
+
+      - run: make build DOCKER_IMAGE_TAG=latest

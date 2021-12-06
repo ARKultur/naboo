@@ -1,10 +1,8 @@
 defmodule NabooWeb.Endpoint do
   use Sentry.PlugCapture
   use Phoenix.Endpoint, otp_app: :naboo
-
-  require Logger
-
   alias Plug.Conn
+  require Logger
 
   @plug_ssl Plug.SSL.init(rewrite_on: [:x_forwarded_proto])
 
