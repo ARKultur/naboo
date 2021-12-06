@@ -15,8 +15,7 @@ alias Naboo.Repo
 
 %Account{
   email: "sheev.palpatine@naboo.net",
-  # FIXME should be set to encrypted password once it is implemented
-  encrypted_password: "sidious",
+  password: "sidious",
   is_admin: true,
   name: "darth sidious",
   auth_token: "M4y7h3F0rc3B3W17hY0u"

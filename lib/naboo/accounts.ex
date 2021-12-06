@@ -9,6 +9,24 @@ defmodule Naboo.Accounts do
   alias Naboo.Accounts.Account
 
   @doc """
+  Checks if an account is logged in.
+
+  ## Examples
+
+    iex> is_logged_in(account_logged_in)
+    true
+
+    iex> is_logged_in(account_not_logged_in)
+    false
+  """
+  def is_logged_in(account) do
+    case account.auth_token do
+      nil -> false
+      _ -> true
+    end
+  end
+
+  @doc """
   Returns the list of accounts.
 
   ## Examples
@@ -52,6 +70,22 @@ defmodule Naboo.Accounts do
 
   """
   def get_account(id), do: Repo.get(Account, id)
+
+  @doc """
+  Safely gets a single account, expecting an email.
+
+  Returns nil if the Account does not exist.
+
+  ## Examples
+
+      iex> get_account(something@email.com)
+      %Account{}
+
+      iex> get_account!(doesnt.exit@email.com)
+      nil
+
+  """
+  def get_account_by_email(email), do: Repo.get(Account, email: email)
 
   @doc """
   Gets a single account.

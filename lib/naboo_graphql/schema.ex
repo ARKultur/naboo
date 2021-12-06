@@ -8,11 +8,9 @@ defmodule NabooGraphQL.Schema do
   import_types(NabooGraphQL.Application.Types)
 
   mutation do
-    import_fields(:application_queries)
-
     @desc "Create a new account"
     field :create_account, :account do
-      arg(:encrypted_password, non_null(:string))
+      arg(:password, non_null(:string))
       arg(:email, non_null(:string))
       arg(:name, non_null(:string))
 
@@ -24,6 +22,14 @@ defmodule NabooGraphQL.Schema do
       arg(:id, non_null(:id))
 
       resolve(&AccountResolver.delete_account/3)
+    end
+
+    @desc "Logs in user and provides a fresh auth_token."
+    field :login, :account do
+      arg(:email, non_null(:string))
+      arg(:password, non_null(:string))
+
+      resolve(&AccountResolver.login/3)
     end
   end
 
@@ -43,13 +49,6 @@ defmodule NabooGraphQL.Schema do
     field(:is_admin, non_null(:string))
     field(:auth_token, non_null(:string))
   end
-
-  # Even if having an empty mutation block is valid and works in Ansinthe, it
-  # causes a Javascript error in GraphiQL so uncomment it when you add the
-  # first mutation.
-  #
-  # mutation do
-  # end
 
   def context(context) do
     Map.put(context, :loader, Dataloader.add_source(Dataloader.new(), Repo, Dataloader.Ecto.new(Repo)))
