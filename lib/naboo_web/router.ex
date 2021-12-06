@@ -1,6 +1,13 @@
 defmodule NabooWeb.Router do
   use Phoenix.Router
 
+  pipeline :api do
+    plug(:accepts, ["json"])
+  end
+
+  # this might be useful if we want a hello-world page for the
+  # back, or some documentation about the routes server by
+  # the back-end
   pipeline :browser do
     plug(:accepts, ["html", "json"])
 
@@ -14,10 +21,14 @@ defmodule NabooWeb.Router do
     plug(:put_layout, {NabooWeb.Layouts.View, :app})
   end
 
-  scope "/", NabooWeb do
-    pipe_through(:browser)
+  scope "/" do
+    pipe_through(:api)
 
-    get("/", Home.Controller, :index, as: :home)
+    forward("/graphiql", Absinthe.Plug.GraphiQL,
+      schema: NabooWeb.Schema,
+      interface: :simple,
+      context: %{pubsub: NabooWeb.Endpoint}
+    )
   end
 
   # The session will be stored in the cookie and signed,
