@@ -8,4 +8,6 @@ erl_crash.dump
 *.beam
 /config/*.secret.exs
 .elixir_ls/
+assets/package-lock.json
+assets/node_modules
 tmp/

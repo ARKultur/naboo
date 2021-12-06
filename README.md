@@ -24,6 +24,12 @@ envup () {
 
 # in the command-line
 
+## installing dependencies
+make dependencies
+
+## exporting ENV variables
 envup .env.test
+
+## running server
 ENV=dev mix phx.server
 ```
