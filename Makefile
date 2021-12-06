@@ -88,7 +88,7 @@ sync-translations: ## Synchronize translations with Accent
 
 .PHONY: test
 test: ## Run the test suite
-	mix test
+	MIX_ENV=test mix test
 
 # Check, lint and format targets
 # ------------------------------

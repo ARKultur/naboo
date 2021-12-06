@@ -14,7 +14,8 @@ defmodule Naboo.AccountsFixtures do
         email: "some email",
         encrypted_password: "some encrypted_password",
         is_admin: true,
-        name: "some name"
+        name: "some name",
+        auth_token: "some auth_token"
       })
       |> Naboo.Accounts.create_account()
 
