@@ -38,6 +38,22 @@ defmodule Naboo.Accounts do
   def find_by_auth_token!(token), do: Repo.get!(Account, auth_token: token)
 
   @doc """
+  Safely gets a single account.
+
+  Returns nil if the Account does not exist.
+
+  ## Examples
+
+      iex> get_account(123)
+      %Account{}
+
+      iex> get_account!(456)
+      nil
+
+  """
+  def get_account(id), do: Repo.get(Account, id)
+
+  @doc """
   Gets a single account.
 
   Raises `Ecto.NoResultsError` if the Account does not exist.

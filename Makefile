@@ -88,7 +88,6 @@ sync-translations: ## Synchronize translations with Accent
 
 .PHONY: test
 test: ## Run the test suite
-	mix ecto.reset
 	mix test
 
 # Check, lint and format targets
@@ -125,7 +124,7 @@ format: ## Format project files
 	cd assets && npx stylelint $(STYLES_PATTERN) --fix --quiet
 
 .PHONY: lint
-lint: lint-elixir lint-scripts lint-styles ## Lint project files
+lint: lint-elixir ## lint-scripts lint-styles  Lint project files
 
 .PHONY: lint-elixir
 lint-elixir:

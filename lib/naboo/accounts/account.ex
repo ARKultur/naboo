@@ -20,6 +20,6 @@ defmodule Naboo.Accounts.Account do
   def changeset(account, attrs) do
     account
     |> cast(attrs, [:email, :encrypted_password, :name, :is_admin, :auth_token])
-    |> validate_required([:email, :encrypted_password, :name, :is_admin, :auth_token])
+    |> validate_required([:email, :encrypted_password, :name])
   end
 end
