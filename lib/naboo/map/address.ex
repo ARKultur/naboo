@@ -3,12 +3,12 @@ defmodule Naboo.Map.Address do
   import Ecto.Changeset
 
   schema "addresses" do
-    field(:city, :string)
-    field(:country, :string)
-    field(:country_code, :string)
-    field(:postcode, :string)
-    field(:state, :string)
-    field(:state_district, :string)
+    field :city, :string
+    field :country, :string
+    field :country_code, :string
+    field :postcode, :string
+    field :state, :string
+    field :state_district, :string
 
     timestamps()
   end

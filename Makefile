@@ -88,6 +88,7 @@ sync-translations: ## Synchronize translations with Accent
 
 .PHONY: test
 test: ## Run the test suite
+	mix ecto.reset
 	mix test
 
 # Check, lint and format targets
