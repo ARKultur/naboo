@@ -60,7 +60,6 @@ targets:
 prepare:
 	mix deps.get
 	npm ci --prefix assets
-	mix ecto.reset
 
 .PHONY: build
 build: ## Build the Docker image for the OTP release
