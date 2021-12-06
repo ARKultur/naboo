@@ -1,0 +1,22 @@
+name: linter
+
+on:
+  push:
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  docker-build:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: install dependencies
+      run:  make dependencies
+
+    - name: run checks
+      run: echo "y" | make check
