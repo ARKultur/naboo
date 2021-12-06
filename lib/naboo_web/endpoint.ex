@@ -2,6 +2,8 @@ defmodule NabooWeb.Endpoint do
   use Sentry.PlugCapture
   use Phoenix.Endpoint, otp_app: :naboo
 
+  require Logger
+
   alias Plug.Conn
 
   @plug_ssl Plug.SSL.init(rewrite_on: [:x_forwarded_proto])
@@ -71,7 +73,7 @@ defmodule NabooWeb.Endpoint do
   # sobelow_skip ["XSS.SendResp"]
   defp ping(%{request_path: "/ping"} = conn, _opts) do
     version = Application.get_env(:naboo, :version)
-    response = Jason.encode!(%{status: "ok", version: version})
+    response = Jason.encode!(%{status: "pong", version: version})
 
     conn
     |> Conn.put_resp_header("content-type", "application/json")
