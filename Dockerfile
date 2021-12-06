@@ -96,7 +96,7 @@ RUN apk update --no-cache && \
     apk upgrade --no-cache && \
     apk add --no-cache bash openssl libgcc libstdc++ ncurses-libs
 
-WORKDIR /opt/elixir_boilerplate
+WORKDIR /opt/naboo
 
 # Copy the OTP binary from the build step
 COPY --from=otp-builder /build/_build/prod/${APP_NAME}-${APP_VERSION}.tar.gz .
@@ -108,9 +108,9 @@ COPY priv/scripts/docker-entrypoint.sh /usr/local/bin
 RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
 
 # Create non-root user
-RUN adduser -D elixir_boilerplate && \
-    chown -R elixir_boilerplate: /opt/elixir_boilerplate
-USER elixir_boilerplate
+RUN adduser -D naboo && \
+    chown -R naboo: /opt/naboo
+USER naboo
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["start"]
