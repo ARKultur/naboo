@@ -64,6 +64,7 @@ jobs:
         with:
           env-file: .env.test
 
+      - run: make header
       - run: make prepare
       - run: make check
       - run: make lint

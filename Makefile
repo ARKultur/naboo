@@ -60,6 +60,7 @@ targets:
 prepare:
 	mix deps.get
 	npm ci --prefix assets
+	mix ecto.reset
 
 .PHONY: build
 build: ## Build the Docker image for the OTP release
@@ -88,7 +89,7 @@ sync-translations: ## Synchronize translations with Accent
 
 .PHONY: test
 test: ## Run the test suite
-	MIX_ENV=test mix test
+	mix test
 
 # Check, lint and format targets
 # ------------------------------
