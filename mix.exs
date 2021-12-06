@@ -1,9 +1,9 @@
-defmodule ElixirBoilerplate.Mixfile do
+defmodule Naboo.Mixfile do
   use Mix.Project
 
   def project do
     [
-      app: :elixir_boilerplate,
+      app: :naboo,
       version: "0.0.1",
       elixir: "~> 1.12",
       erlang: "~> 24.1",
@@ -22,7 +22,7 @@ defmodule ElixirBoilerplate.Mixfile do
 
   def application do
     [
-      mod: {ElixirBoilerplate.Application, []},
+      mod: {Naboo.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -61,6 +61,9 @@ defmodule ElixirBoilerplate.Mixfile do
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_live_reload, "~> 1.3", only: :dev},
       {:jason, "~> 1.2"},
+
+      # Authentication
+      {:argon2_elixir, "~> 2.3", override: true},
 
       # GraphQL
       {:absinthe, "~> 1.6"},
@@ -105,9 +108,9 @@ defmodule ElixirBoilerplate.Mixfile do
 
   defp releases do
     [
-      elixir_boilerplate: [
-        version: {:from_app, :elixir_boilerplate},
-        applications: [elixir_boilerplate: :permanent],
+      naboo: [
+        version: {:from_app, :naboo},
+        applications: [naboo: :permanent],
         include_executables_for: [:unix],
         steps: [:assemble, :tar]
       ]
