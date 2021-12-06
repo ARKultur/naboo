@@ -5,7 +5,7 @@ APP_NAME = `grep -Eo 'app: :\w*' mix.exs | cut -d ':' -f 3`
 APP_VERSION = `grep -Eo 'version: "[0-9\.]*"' mix.exs | cut -d '"' -f 2`
 GIT_REVISION = `git rev-parse HEAD`
 DOCKER_IMAGE_TAG ?= $(APP_VERSION)
-DOCKER_REGISTRY ?=
+DOCKER_REGISTRY ?=`echo https://hub.docker.com/repository/docker/bogdzn/naboo`
 DOCKER_LOCAL_IMAGE = $(APP_NAME):$(DOCKER_IMAGE_TAG)
 DOCKER_REMOTE_IMAGE = $(DOCKER_REGISTRY)/$(DOCKER_LOCAL_IMAGE)
 
@@ -94,7 +94,7 @@ test: ## Run the test suite
 # ------------------------------
 
 .PHONY: check
-check: check-format check-unused-dependencies check-dependencies-security check-code-security check-code-coverage ## Run various checks on project files
+check: check-format check-unused-dependencies check-dependencies-security check-code-security # check-code-coverage ## Run various checks on project files
 
 .PHONY: check-code-coverage
 check-code-coverage:
