@@ -59,7 +59,7 @@ targets:
 .PHONY: prepare
 prepare:
 	mix deps.get
-	npm --prefix assets
+	npm install --prefix assets
 
 .PHONY: build
 build: ## Build the Docker image for the OTP release
