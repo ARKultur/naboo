@@ -33,6 +33,12 @@ envup .env.test
 ENV=dev mix phx.server
 ```
 
+### Check available API routes
+
+```bash
+MIX_ENV=prod mix phx.routes
+```
+
 ### Test your queries
 
 As we use graphQL to manage our queries, you can have an interface to test
