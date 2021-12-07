@@ -10,7 +10,8 @@ defmodule NabooWeb.SessionController do
     if Authentication.get_current_account(conn) do
       redirect(conn, to: Helpers.account_path(conn, :show))
     else
-      render(conn, :new, changeset: Accounts.change_account(),
+      render(conn, :new,
+        changeset: Accounts.change_account(),
         action: Helpers.session_path(conn, :create)
       )
     end

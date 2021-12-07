@@ -40,7 +40,7 @@ defmodule Naboo.AccountsTest do
         email: "some updated email",
         password: "some updated password",
         is_admin: false,
-        name: "some updated name",
+        name: "some updated name"
       }
 
       assert {:ok, %Account{} = account} = Accounts.update_account(account, update_attrs)

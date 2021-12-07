@@ -6,19 +6,20 @@ defmodule NabooWeb.AccountControllerTest do
 
   alias Naboo.Accounts.Account
 
+  @palpatine %{"email" => "sheev.palpatine@naboo.net", "encrypted_password" => nil, "id" => 1, "is_admin" => true, "name" => "darth sidious"}
+
   @create_attrs %{
     email: "some email",
-    encrypted_password: "some encrypted_password",
-    is_admin: true,
+    password: "some password",
+    password_confirmation: "some password",
     name: "some name"
   }
   @update_attrs %{
     email: "some updated email",
-    encrypted_password: "some updated encrypted_password",
+    password: "some updated password",
     is_admin: false,
     name: "some updated name"
   }
-  @invalid_attrs %{email: nil, encrypted_password: nil, is_admin: nil, name: nil}
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -27,7 +28,7 @@ defmodule NabooWeb.AccountControllerTest do
   describe "index" do
     test "lists all accounts", %{conn: conn} do
       conn = get(conn, Helpers.account_path(conn, :index))
-      assert json_response(conn, 200)["data"] == []
+      assert json_response(conn, 200)["data"] == [@palpatine]
     end
   end
 
@@ -41,15 +42,9 @@ defmodule NabooWeb.AccountControllerTest do
       assert %{
                "id" => ^id,
                "email" => "some email",
-               "encrypted_password" => "some encrypted_password",
-               "is_admin" => true,
+               "is_admin" => false,
                "name" => "some name"
              } = json_response(conn, 200)["data"]
-    end
-
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Helpers.account_path(conn, :create), account: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
@@ -65,15 +60,9 @@ defmodule NabooWeb.AccountControllerTest do
       assert %{
                "id" => ^id,
                "email" => "some updated email",
-               "encrypted_password" => "some updated encrypted_password",
                "is_admin" => false,
                "name" => "some updated name"
              } = json_response(conn, 200)["data"]
-    end
-
-    test "renders errors when data is invalid", %{conn: conn, account: account} do
-      conn = put(conn, Helpers.account_path(conn, :update, account), account: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
