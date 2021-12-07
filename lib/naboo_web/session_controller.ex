@@ -28,7 +28,7 @@ defmodule NabooWeb.SessionController do
 
       _err ->
         Logger.info("Attempted to connect #{email} but it didn't work.")
-        send_resp(conn, :no_content, "")
+        send_resp(conn, 404, "not found")
     end
   end
 
