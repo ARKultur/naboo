@@ -8,7 +8,7 @@ defmodule Naboo.AccountsTest do
 
     import Naboo.AccountsFixtures
 
-    @invalid_attrs %{email: nil, password: nil, is_admin: nil, name: nil, auth_token: nil}
+    @invalid_attrs %{email: nil, password: nil, is_admin: nil, name: nil}
 
     test "list_accounts/0 returns all accounts" do
       assert Accounts.list_accounts() != nil
@@ -20,7 +20,7 @@ defmodule Naboo.AccountsTest do
     end
 
     test "create_account/1 with valid data creates a account" do
-      valid_attrs = %{email: "some email", password: "some password", is_admin: true, name: "some name", auth_token: "some auth_token"}
+      valid_attrs = %{email: "some email", password: "some password", is_admin: true, name: "some name"}
 
       assert {:ok, %Account{} = account} = Accounts.create_account(valid_attrs)
       assert account.email == "some email"
@@ -41,7 +41,6 @@ defmodule Naboo.AccountsTest do
         password: "some updated password",
         is_admin: false,
         name: "some updated name",
-        auth_token: "some auth_token"
       }
 
       assert {:ok, %Account{} = account} = Accounts.update_account(account, update_attrs)

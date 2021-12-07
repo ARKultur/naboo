@@ -5,13 +5,10 @@ defmodule Naboo.Accounts.Account do
   @derive {Jason.Encoder, only: [:is_admin, :name, :email, :updated_at]}
   schema "accounts" do
     field(:email, :string)
-
     field(:encrypted_password, :string)
     field(:password, :string, virtual: true)
-
     field(:is_admin, :boolean, default: false)
     field(:name, :string)
-    field(:auth_token, :string)
 
     timestamps()
   end
@@ -19,7 +16,7 @@ defmodule Naboo.Accounts.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:email, :password, :name, :is_admin, :auth_token])
+    |> cast(attrs, [:email, :password, :name, :is_admin])
     |> validate_required([:email, :password, :name])
     |> unique_constraint(:name)
     |> unique_constraint(:email)

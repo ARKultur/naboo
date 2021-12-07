@@ -20,14 +20,20 @@ defmodule NabooWeb.Router do
 
     plug(:put_layout, {NabooWeb.Layouts.View, :app})
   end
+
   scope "/" do
-    pipe_through(:api)
+    pipe_through([:api])
 
-    get("/", NabooWeb.AuthController, :index)
-    post("/login", NabooWeb.AuthController, :new)
-    post("/logout", NabooWeb.AuthController, :delete)
-    post("/register", NabooWeb.AuthController, :create)
+    get("/register", NabooWeb.RegistrationController, :new)
+    post("/register", NabooWeb.AccountController, :create)
 
+    get("/login", NabooWeb.SessionController, :new)
+    post("/login", NabooWeb.SessionController, :create)
+
+    get("/logout", NabooWeb.SessionController, :delete)
+    post("/logout", NabooWeb.SessionController, :delete)
+
+    resources("/account", NabooWeb.AccountController)
   end
 
   # The session will be stored in the cookie and signed,
