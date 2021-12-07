@@ -2,7 +2,7 @@ defmodule Naboo.Accounts.Account do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Jason.Encoder, only: [:is_admin, :name, :description, :updated_at]}
+  @derive {Jason.Encoder, only: [:is_admin, :name, :email, :updated_at]}
   schema "accounts" do
     field(:email, :string)
 
