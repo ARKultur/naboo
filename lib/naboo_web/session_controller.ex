@@ -3,8 +3,9 @@ defmodule NabooWeb.SessionController do
 
   alias Naboo.Accounts
   alias Naboo.Authentication
-  alias Naboo.Json
   alias NabooWeb.Router.Helpers
+
+  require Logger
 
   def new(conn, _params) do
     if Authentication.get_current_account(conn) do
@@ -26,7 +27,8 @@ defmodule NabooWeb.SessionController do
         |> redirect(to: Helpers.account_path(conn, :show))
 
       _err ->
-        Json.send_json(conn, 404, "could not find user")
+        Logger.info("Attempted to connect #{email} but it didn't work.")
+        send_resp(conn, :no_content, "")
     end
   end
 
