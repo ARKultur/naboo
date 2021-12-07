@@ -27,6 +27,33 @@ defmodule Naboo.Accounts do
   end
 
   @doc """
+  Registers an account.
+
+  ## Example
+
+  iex> register(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
+    "password" => "anak1n", "password_confirmation" => anak1n"})
+  %Account{}
+
+  iex> register(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
+    "password" => "anakin", "password_confirmation" => anak1n"})
+  {:error, :wrong_parameters}
+
+  iex> register("Some wrong value")
+  {:error, :wrong_parameters}
+
+  """
+  def register(%{"name" => n, "email" => e, "password" => p, "password_confirmation" => p}) do
+    %Account{}
+    |> Account.changeset(%{name: n, email: e, password: p})
+    |> Naboo.Repo.insert()
+  end
+
+  def register(_) do
+    {:error, :wrong_parameters}
+  end
+
+  @doc """
   Returns the list of accounts.
 
   ## Examples
@@ -54,6 +81,22 @@ defmodule Naboo.Accounts do
 
   """
   def find_by_auth_token!(token), do: Repo.get!(Account, auth_token: token)
+
+  @doc """
+  Gets a single account.
+
+  Raises `Ecto.NoResultsError` if the Account does not exist.
+
+  ## Examples
+
+      iex> find_by_email!(123)
+      %Account{}
+
+      iex> find_by_email!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def find_by_email!(email), do: Repo.get!(Account, email: email)
 
   @doc """
   Safely gets a single account.

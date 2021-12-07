@@ -13,11 +13,10 @@
 alias Naboo.Accounts.Account
 alias Naboo.Repo
 
-%Account{
+Repo.insert!(%Account{
   email: "sheev.palpatine@naboo.net",
   password: "sidious",
   is_admin: true,
   name: "darth sidious",
   auth_token: "M4y7h3F0rc3B3W17hY0u"
-}
-|> Repo.insert!()
+})

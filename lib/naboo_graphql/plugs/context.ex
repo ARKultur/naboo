@@ -29,8 +29,7 @@ defmodule NabooGraphQL.Plugs.Context do
   end
 
   def authorize(auth_token) do
-    Naboo.Accounts.find_by_auth_token!(auth_token: auth_token)
-    |> case do
+    case Naboo.Accounts.find_by_auth_token!(auth_token: auth_token) do
       nil -> {:error, "Invalid authorization token"}
       user -> {:ok, user.id}
     end

@@ -64,6 +64,7 @@ defmodule Naboo.Mixfile do
 
       # Authentication
       {:argon2_elixir, "~> 2.3", override: true},
+      {:guardian, "~> 2.1"},
 
       # GraphQL
       {:absinthe, "~> 1.6"},

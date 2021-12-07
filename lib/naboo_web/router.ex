@@ -3,13 +3,6 @@ defmodule NabooWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
-  end
-
-  # this might be useful if we want a hello-world page for the
-  # back, or some documentation about the routes server by
-  # the back-end
-  pipeline :browser do
-    plug(:accepts, ["html", "json"])
 
     plug(:session)
     plug(:fetch_session)
@@ -17,12 +10,15 @@ defmodule NabooWeb.Router do
 
     plug(:protect_from_forgery)
     plug(NabooWeb.ContentSecurityPolicy)
-
-    plug(:put_layout, {NabooWeb.Layouts.View, :app})
   end
 
   scope "/" do
     pipe_through(:api)
+
+    get("/status", NabooWeb.AuthController, :index)
+    post("/login", NabooWeb.AuthController, :new)
+    post("/logout", NabooWeb.AuthController, :delete)
+    post("/register", NabooWeb.AuthController, :create)
 
     forward("/graphiql", Absinthe.Plug.GraphiQL,
       schema: NabooWeb.Schema,

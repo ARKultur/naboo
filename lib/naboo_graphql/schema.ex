@@ -23,14 +23,6 @@ defmodule NabooGraphQL.Schema do
 
       resolve(&AccountResolver.delete_account/3)
     end
-
-    @desc "Logs in user and provides a fresh auth_token."
-    field :login, :account do
-      arg(:email, non_null(:string))
-      arg(:password, non_null(:string))
-
-      resolve(&AccountResolver.login/3)
-    end
   end
 
   query do
