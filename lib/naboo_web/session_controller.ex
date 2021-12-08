@@ -19,16 +19,14 @@ defmodule NabooWeb.SessionController do
   end
 
   def create(conn, %{"account" => %{"email" => email, "password" => password}}) do
-    case email |> Accounts.find_by_email!() |> Authentication.authenticate(password) do
-      {:ok, account} ->
-        conn
-        |> Authentication.log_in(account)
-        |> put_session(:account_id, account.id)
-        |> redirect(to: Helpers.account_path(conn, :show))
-
-      _err ->
-        Logger.info("Attempted to connect #{email} but it didn't work.")
-        send_resp(conn, 404, "not found")
+    with {:ok, account} <- Accounts.find_by_email!(email),
+         {:ok, _} <- Authentication.authenticate(email, password),
+         {:ok, token, conn} <- Authentication.log_in(conn, account) do
+      conn
+      |> put_session(:account_id, account.id)
+      |> render("token.json", token: token)
+    else
+      _error -> send_resp(conn, 401, "could not authenticate")
     end
   end
 

@@ -20,6 +20,13 @@ config :naboo, Naboo.Gettext, default_locale: "en"
 
 config :naboo, NabooWeb.ContentSecurityPolicy, allow_unsafe_scripts: false
 
+config :guardian, NabooWeb.Guardian,
+  issuer: :naboo,
+  secret_key: System.get_env("GUARDIAN_SECRET"),
+  ttl: {3, :days},
+  allowed_drift: 2000,
+  verify_issuer: true
+
 config :esbuild,
   version: "0.13.13",
   default: [

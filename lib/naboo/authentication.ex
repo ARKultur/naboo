@@ -3,6 +3,7 @@ defmodule Naboo.Authentication do
 
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
+  alias NabooWeb.Guardian
 
   def subject_for_token(resource, _claims) do
     {:ok, to_string(resource.id)}
@@ -16,11 +17,17 @@ defmodule Naboo.Authentication do
   end
 
   def log_out(conn) do
+    # TODO once GuardianDB is implemented, we could revoke the token here
     __MODULE__.Plug.sign_out(conn)
   end
 
   def log_in(conn, account) do
-    __MODULE__.Plug.sign_in(conn, account)
+    with conn <- __MODULE__.Plug.sign_in(conn, account),
+         {:ok, token, _claims} <- Guardian.encode_and_sign(account) do
+      {:ok, token, conn}
+    else
+      _err -> {:ko, :unauthorized}
+    end
   end
 
   def get_current_account(conn) do

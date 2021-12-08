@@ -106,7 +106,7 @@ check-dependencies-security:
 
 .PHONY: check-code-security
 check-code-security:
-	mix sobelow --config
+	mix sobelow --skip --config
 
 .PHONY: check-format
 check-format:

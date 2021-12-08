@@ -5,6 +5,11 @@ defmodule NabooWeb.Router do
     plug(:accepts, ["json"])
   end
 
+  pipeline :api_auth do
+    plug(:accepts, ["json"])
+    plug(NabooWeb.Guardian.AuthPipeline)
+  end
+
   # this might be useful if we want a hello-world page for the
   # back, or some documentation about the routes server by
   # the back-end
@@ -21,7 +26,7 @@ defmodule NabooWeb.Router do
     plug(:put_layout, {NabooWeb.Layouts.View, :app})
   end
 
-  scope "/" do
+  scope "/api" do
     pipe_through([:api])
 
     get("/register", NabooWeb.RegistrationController, :new)

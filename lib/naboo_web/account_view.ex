@@ -2,6 +2,12 @@ defmodule NabooWeb.AccountView do
   use Phoenix.View, root: "lib/naboo_web", path: "home/templates", namespace: NabooWeb
   alias NabooWeb.AccountView
 
+  def render("token.json", token: token) do
+    %{
+      jwt: token
+    }
+  end
+
   def render("index.json", %{accounts: accounts}) do
     %{data: render_many(accounts, AccountView, "account.json")}
   end

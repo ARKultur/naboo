@@ -23,7 +23,7 @@ defmodule Naboo.Mixfile do
   def application do
     [
       mod: {Naboo.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :guardian]
     ]
   end
 
