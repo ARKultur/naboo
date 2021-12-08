@@ -59,7 +59,7 @@ targets:
 .PHONY: prepare
 prepare:
 	mix deps.get
-	npm ci --prefix assets
+	npm install --prefix assets
 
 .PHONY: build
 build: ## Build the Docker image for the OTP release
@@ -88,7 +88,6 @@ sync-translations: ## Synchronize translations with Accent
 
 .PHONY: test
 test: ## Run the test suite
-	mix ecto.reset
 	mix test
 
 # Check, lint and format targets
@@ -107,7 +106,7 @@ check-dependencies-security:
 
 .PHONY: check-code-security
 check-code-security:
-	mix sobelow --config
+	mix sobelow --skip --config
 
 .PHONY: check-format
 check-format:
@@ -122,10 +121,9 @@ check-unused-dependencies:
 format: ## Format project files
 	mix format
 	cd assets && npx prettier --write $(PRETTIER_FILES_PATTERN)
-	cd assets && npx stylelint $(STYLES_PATTERN) --fix --quiet
 
 .PHONY: lint
-lint: lint-elixir lint-scripts lint-styles ## Lint project files
+lint: lint-elixir ## lint-scripts lint-styles  Lint project files
 
 .PHONY: lint-elixir
 lint-elixir:

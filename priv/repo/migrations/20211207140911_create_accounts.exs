@@ -3,10 +3,9 @@ defmodule Naboo.Repo.Migrations.CreateAccounts do
 
   def change do
     create table(:accounts) do
+      add(:name, :string)
       add(:email, :string)
       add(:encrypted_password, :string)
-      add(:name, :string)
-      add(:auth_token, :string)
       add(:is_admin, :boolean, default: false, null: false)
 
       timestamps()

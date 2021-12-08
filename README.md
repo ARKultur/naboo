@@ -23,7 +23,6 @@ envup () {
 
 
 # in the command-line
-
 ## installing dependencies
 make dependencies
 
@@ -32,4 +31,32 @@ envup .env.test
 
 ## running server
 ENV=dev mix phx.server
+```
+
+### Check available API routes
+
+```bash
+MIX_ENV=prod mix phx.routes
+```
+
+### Test your queries
+
+As we use graphQL to manage our queries, you can have an interface to test
+your queries.
+
+```bash
+MIX_ENV=dev mix phx.server
+```
+
+Go to `https://localhost:4001/graphql/hub`, then try a query, like so:
+
+```graphql
+{
+  allAccounts {
+    id
+    email
+    name
+    isAdmin
+  }
+}
 ```

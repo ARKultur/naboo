@@ -5,6 +5,11 @@ defmodule NabooWeb.Router do
     plug(:accepts, ["json"])
   end
 
+  pipeline :api_auth do
+    plug(:accepts, ["json"])
+    plug(NabooWeb.Guardian.AuthPipeline)
+  end
+
   # this might be useful if we want a hello-world page for the
   # back, or some documentation about the routes server by
   # the back-end
@@ -18,17 +23,20 @@ defmodule NabooWeb.Router do
     plug(:protect_from_forgery)
     plug(NabooWeb.ContentSecurityPolicy)
 
-    plug(:put_layout, {NabooWeb.Layouts.View, :app})
+    plug(:put_layout, {NabooWeb.Layouts.View, :naboo})
   end
 
-  scope "/" do
+  scope "/api" do
     pipe_through(:api)
 
-    forward("/graphiql", Absinthe.Plug.GraphiQL,
-      schema: NabooWeb.Schema,
-      interface: :simple,
-      context: %{pubsub: NabooWeb.Endpoint}
-    )
+    resources("/account", NabooWeb.AccountController, only: [:create, :show, :index])
+    post("/login", NabooWeb.SessionController, :sign_in)
+  end
+
+  scope "/api" do
+    pipe_through(:api_auth)
+
+    resources("/account", NabooWeb.AccountController, only: [:update, :delete])
   end
 
   # The session will be stored in the cookie and signed,

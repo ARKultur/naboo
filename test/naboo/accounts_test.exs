@@ -8,7 +8,7 @@ defmodule Naboo.AccountsTest do
 
     import Naboo.AccountsFixtures
 
-    @invalid_attrs %{email: nil, encrypted_password: nil, is_admin: nil, name: nil, auth_token: nil}
+    @invalid_attrs %{email: nil, password: nil, is_admin: nil, name: nil}
 
     test "list_accounts/0 returns all accounts" do
       assert Accounts.list_accounts() != nil
@@ -16,17 +16,17 @@ defmodule Naboo.AccountsTest do
 
     test "get_account!/1 returns the account with given id" do
       account = account_fixture()
-      assert Accounts.get_account!(account.id) == account
+      assert Accounts.get_account!(account.id).id == account.id
     end
 
     test "create_account/1 with valid data creates a account" do
-      valid_attrs = %{email: "some email", encrypted_password: "some encrypted_password", is_admin: true, name: "some name", auth_token: "some auth_token"}
+      valid_attrs = %{email: "some email", password: "some password", is_admin: true, name: "some name"}
 
       assert {:ok, %Account{} = account} = Accounts.create_account(valid_attrs)
       assert account.email == "some email"
-      assert account.encrypted_password == "some encrypted_password"
       assert account.is_admin == true
       assert account.name == "some name"
+      assert account.encrypted_password != nil
     end
 
     test "create_account/1 with invalid data returns error changeset" do
@@ -38,23 +38,22 @@ defmodule Naboo.AccountsTest do
 
       update_attrs = %{
         email: "some updated email",
-        encrypted_password: "some updated encrypted_password",
+        password: "some updated password",
         is_admin: false,
-        name: "some updated name",
-        auth_token: "some auth_token"
+        name: "some updated name"
       }
 
       assert {:ok, %Account{} = account} = Accounts.update_account(account, update_attrs)
       assert account.email == "some updated email"
-      assert account.encrypted_password == "some updated encrypted_password"
       assert account.is_admin == false
       assert account.name == "some updated name"
+      assert account.encrypted_password != nil
     end
 
     test "update_account/2 with invalid data returns error changeset" do
       account = account_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.update_account(account, @invalid_attrs)
-      assert account == Accounts.get_account!(account.id)
+      assert account.id == Accounts.get_account!(account.id).id
     end
 
     test "delete_account/1 deletes the account" do

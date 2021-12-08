@@ -7,6 +7,15 @@ defmodule NabooGraphQL.Router do
     plug(:match)
     plug(:dispatch)
 
+    if Mix.env() != :prod do
+      forward("/hub",
+        to: Absinthe.Plug.GraphiQL,
+        schema: NabooGraphQL.Schema,
+        interface: :simple,
+        context: %{pubsub: NabooWeb.Endpoint}
+      )
+    end
+
     forward("/",
       to: Absinthe.Plug,
       init_opts: [
@@ -16,8 +25,6 @@ defmodule NabooGraphQL.Router do
       ]
     )
   end
-
-  plug(NabooGraphQL.Plugs.Context)
 
   plug(:match)
   plug(:dispatch)

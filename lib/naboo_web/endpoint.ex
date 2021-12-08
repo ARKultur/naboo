@@ -12,7 +12,6 @@ defmodule NabooWeb.Endpoint do
   plug(:canonical_host)
   plug(:force_ssl)
   plug(:cors)
-  plug(:basic_auth)
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -103,16 +102,6 @@ defmodule NabooWeb.Endpoint do
     opts = Corsica.init(Application.get_env(:naboo, Corsica))
 
     Corsica.call(conn, opts)
-  end
-
-  defp basic_auth(conn, _opts) do
-    basic_auth_config = Application.get_env(:naboo, :basic_auth)
-
-    if basic_auth_config[:username] do
-      Plug.BasicAuth.basic_auth(conn, basic_auth_config)
-    else
-      conn
-    end
   end
 
   # Splitting routers in separate modules has a negative side effect:

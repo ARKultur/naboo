@@ -5,8 +5,6 @@ common_checks = [
   {Credo.Check.Consistency.SpaceInParentheses},
   {Credo.Check.Consistency.TabsOrSpaces},
   {Credo.Check.Design.AliasUsage, if_called_more_often_than: 2, if_nested_deeper_than: 1},
-  {Credo.Check.Design.TagTODO},
-  {Credo.Check.Design.TagFIXME},
   {Credo.Check.Readability.AliasOrder},
   {Credo.Check.Readability.FunctionNames},
   {Credo.Check.Readability.LargeNumbers},
@@ -47,9 +45,7 @@ common_checks = [
   {Credo.Check.Warning.UnusedTupleOperation},
   {Credo.Check.Warning.OperationWithConstantResult},
   {CredoEnvvar.Check.Warning.EnvironmentVariablesAtCompileTime},
-  {CredoNaming.Check.Warning.AvoidSpecificTermsInModuleNames, terms: ["Manager", "Fetcher", "Builder", "Persister", "Serializer", ~r/^Helpers?$/i, ~r/^Utils?$/i]},
-  {CredoNaming.Check.Consistency.ModuleFilename,
-   excluded_paths: ["config", "mix.exs", "priv", "test/support"], acronyms: [{"NabooGraphQL", "naboo_graphql"}, {"GraphQL", "graphql"}]}
+  {CredoNaming.Check.Warning.AvoidSpecificTermsInModuleNames, terms: ["Manager", "Fetcher", "Builder", "Persister", "Serializer", ~r/^Helpers?$/i, ~r/^Utils?$/i]}
 ]
 
 %{

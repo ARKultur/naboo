@@ -23,7 +23,7 @@ defmodule Naboo.Mixfile do
   def application do
     [
       mod: {Naboo.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :guardian]
     ]
   end
 
@@ -38,7 +38,7 @@ defmodule Naboo.Mixfile do
       ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.reset", "test"]
     ]
   end
 
@@ -64,6 +64,7 @@ defmodule Naboo.Mixfile do
 
       # Authentication
       {:argon2_elixir, "~> 2.3", override: true},
+      {:guardian, "~> 2.1"},
 
       # GraphQL
       {:absinthe, "~> 1.6"},

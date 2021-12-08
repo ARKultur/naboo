@@ -9,6 +9,51 @@ defmodule Naboo.Accounts do
   alias Naboo.Accounts.Account
 
   @doc """
+  Checks if an account is logged in.
+
+  ## Examples
+
+    iex> is_logged_in(account_logged_in)
+    true
+
+    iex> is_logged_in(account_not_logged_in)
+    false
+  """
+  def is_logged_in(account) do
+    case account.auth_token do
+      nil -> false
+      _ -> true
+    end
+  end
+
+  @doc """
+  Registers an account.
+
+  ## Example
+
+  iex> register(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
+    "password" => "anak1n", "password_confirmation" => anak1n"})
+  %Account{}
+
+  iex> register(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
+    "password" => "anakin", "password_confirmation" => anak1n"})
+  {:error, :wrong_parameters}
+
+  iex> register("Some wrong value")
+  {:error, :wrong_parameters}
+
+  """
+  def register(%{"name" => n, "email" => e, "password" => p, "password_confirmation" => p}) do
+    %Account{}
+    |> Account.changeset(%{name: n, email: e, password: p})
+    |> Naboo.Repo.insert()
+  end
+
+  def register(_) do
+    {:error, :wrong_parameters}
+  end
+
+  @doc """
   Returns the list of accounts.
 
   ## Examples
@@ -28,14 +73,50 @@ defmodule Naboo.Accounts do
 
   ## Examples
 
-      iex> find_by_auth_token!(123)
-      %Account{}
+      iex> find_by_email!(123)
+      {:ok, %Account{}}
 
-      iex> find_by_auth_token!(456)
+      iex> find_by_email!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def find_by_auth_token!(token), do: Repo.get!(Account, auth_token: token)
+  def find_by_email!(email) do
+    Repo.get_by(Account, email: email)
+  end
+
+  @doc """
+  Safely gets a single account.
+
+  Returns nil if the Account does not exist.
+
+  ## Examples
+
+      iex> get_account(123)
+      %Account{}
+
+      iex> get_account!(456)
+      nil
+
+  """
+  def get_account(id), do: Repo.get(Account, id)
+
+  @doc """
+  Safely gets a single account, expecting an email.
+
+  Returns nil if the Account does not exist.
+
+  ## Examples
+
+      iex> get_account(something@email.com)
+      %Account{}
+
+      iex> get_account!(doesnt.exit@email.com)
+      nil
+
+  """
+  def get_account_by_email(email) do
+    Repo.get_by(Account, email: email)
+  end
 
   @doc """
   Gets a single account.
@@ -114,7 +195,7 @@ defmodule Naboo.Accounts do
       %Ecto.Changeset{data: %Account{}}
 
   """
-  def change_account(%Account{} = account, attrs \\ %{}) do
+  def change_account(%Account{} = account \\ %{}, attrs \\ %{}) do
     Account.changeset(account, attrs)
   end
 end
