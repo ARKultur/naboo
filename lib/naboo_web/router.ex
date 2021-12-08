@@ -23,22 +23,20 @@ defmodule NabooWeb.Router do
     plug(:protect_from_forgery)
     plug(NabooWeb.ContentSecurityPolicy)
 
-    plug(:put_layout, {NabooWeb.Layouts.View, :app})
+    plug(:put_layout, {NabooWeb.Layouts.View, :naboo})
   end
 
   scope "/api" do
-    pipe_through([:api])
+    pipe_through(:api)
 
-    get("/register", NabooWeb.RegistrationController, :new)
-    post("/register", NabooWeb.AccountController, :create)
+    resources("/account", NabooWeb.AccountController, only: [:create, :show, :index])
+    post("/login", NabooWeb.SessionController, :sign_in)
+  end
 
-    get("/login", NabooWeb.SessionController, :new)
-    post("/login", NabooWeb.SessionController, :create)
+  scope "/api" do
+    pipe_through(:api_auth)
 
-    get("/logout", NabooWeb.SessionController, :delete)
-    post("/logout", NabooWeb.SessionController, :delete)
-
-    resources("/account", NabooWeb.AccountController)
+    resources("/account", NabooWeb.AccountController, only: [:update, :delete])
   end
 
   # The session will be stored in the cookie and signed,

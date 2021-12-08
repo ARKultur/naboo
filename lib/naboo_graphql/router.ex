@@ -26,8 +26,6 @@ defmodule NabooGraphQL.Router do
     )
   end
 
-  plug(NabooGraphQL.Plugs.Context)
-
   plug(:match)
   plug(:dispatch)
 

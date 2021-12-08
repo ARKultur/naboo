@@ -73,30 +73,16 @@ defmodule Naboo.Accounts do
 
   ## Examples
 
-      iex> find_by_auth_token!(123)
-      %Account{}
-
-      iex> find_by_auth_token!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def find_by_auth_token!(token), do: Repo.get!(Account, auth_token: token)
-
-  @doc """
-  Gets a single account.
-
-  Raises `Ecto.NoResultsError` if the Account does not exist.
-
-  ## Examples
-
       iex> find_by_email!(123)
-      %Account{}
+      {:ok, %Account{}}
 
       iex> find_by_email!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def find_by_email!(email), do: Repo.get!(Account, email: email)
+  def find_by_email!(email) do
+    Repo.get_by(Account, email: email)
+  end
 
   @doc """
   Safely gets a single account.
@@ -128,7 +114,9 @@ defmodule Naboo.Accounts do
       nil
 
   """
-  def get_account_by_email(email), do: Repo.get(Account, email: email)
+  def get_account_by_email(email) do
+    Repo.get_by(Account, email: email)
+  end
 
   @doc """
   Gets a single account.

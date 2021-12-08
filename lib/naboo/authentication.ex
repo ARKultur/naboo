@@ -5,6 +5,8 @@ defmodule Naboo.Authentication do
   alias Naboo.Accounts.Account
   alias NabooWeb.Guardian
 
+  require Logger
+
   def subject_for_token(resource, _claims) do
     {:ok, to_string(resource.id)}
   end
@@ -35,22 +37,14 @@ defmodule Naboo.Authentication do
   end
 
   def authenticate(%Account{} = account, password) do
-    authenticate(
-      account,
-      password,
-      Argon2.verify_pass(password, account.encrypted_password)
-    )
+    authenticate(account, password, Argon2.verify_pass(password, account.encrypted_password))
   end
 
-  def authenticate(nil, password) do
-    authenticate(nil, password, Argon2.no_user_verify())
-  end
-
-  defp authenticate(account, _password, true) do
-    {:ok, account}
-  end
+  def authenticate(nil, password), do: authenticate(nil, password, Argon2.no_user_verify())
+  defp authenticate(account, _password, true), do: {:ok, account}
 
   defp authenticate(_account, _password, false) do
+    Logger.debug("invalid creds")
     {:error, :invalid_credentials}
   end
 
