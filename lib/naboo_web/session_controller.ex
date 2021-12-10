@@ -10,8 +10,6 @@ defmodule NabooWeb.SessionController do
     with account <- Accounts.get_account_by_email(email),
          {:ok, _} <- Authentication.authenticate(account, password),
          {:ok, token, conn} <- Authentication.log_in(conn, account) do
-      # TODO save token to user so that it can be checked in middleware
-
       render(conn, "token.json", token: token)
     else
       _error -> send_resp(conn, 403, "could not authenticate")

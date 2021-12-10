@@ -29,7 +29,6 @@ defmodule NabooWeb.Router do
     pipe_through(:api)
 
     post("/login", NabooWeb.SessionController, :sign_in)
-
     resources("/account", NabooWeb.AccountController, only: [:create, :show, :index])
   end
 

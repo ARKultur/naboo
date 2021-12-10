@@ -28,6 +28,7 @@ defmodule NabooGraphQL.Router do
 
   plug(:match)
   plug(:dispatch)
+  plug(NabooWeb.Guardian.AuthPipeline)
 
   forward("/graphql", to: GraphQL)
 
