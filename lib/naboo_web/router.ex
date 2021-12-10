@@ -29,14 +29,14 @@ defmodule NabooWeb.Router do
     pipe_through(:api)
 
     post("/login", NabooWeb.SessionController, :sign_in)
-    resources("/account", NabooWeb.AccountController, only: [:create, :show, :index])
+    resources("/account", NabooWeb.AccountController, only: [:create])
   end
 
   scope "/api" do
     pipe_through([:api, :api_auth])
 
     get("/protected-ping", NabooWeb.PingController, :index)
-    resources("/account", NabooWeb.AccountController, only: [:update, :delete])
+    resources("/account", NabooWeb.AccountController, only: [:update, :delete, :show, :index])
   end
 
   # The session will be stored in the cookie and signed,

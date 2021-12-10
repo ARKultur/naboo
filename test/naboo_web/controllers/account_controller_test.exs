@@ -1,6 +1,8 @@
 defmodule NabooWeb.AccountControllerTest do
   use NabooWeb.ConnCase
 
+  alias Naboo.Accounts
+  alias NabooWeb.Guardian
   alias NabooWeb.Router.Helpers
 
   @create_attrs %{
@@ -11,7 +13,15 @@ defmodule NabooWeb.AccountControllerTest do
   }
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    user = Accounts.get_account(1)
+    {:ok, jwt, _claims} = Guardian.encode_and_sign(user)
+
+    conn =
+      conn
+      |> put_req_header("accept", "application/json")
+      |> put_req_header("authorization", "Bearer #{jwt}")
+
+    {:ok, conn: conn}
   end
 
   describe "create account" do
