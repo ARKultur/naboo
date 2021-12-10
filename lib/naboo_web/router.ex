@@ -6,7 +6,6 @@ defmodule NabooWeb.Router do
   end
 
   pipeline :api_auth do
-    plug(:accepts, ["json"])
     plug(NabooWeb.Guardian.AuthPipeline)
   end
 
@@ -29,14 +28,15 @@ defmodule NabooWeb.Router do
   scope "/api" do
     pipe_through(:api)
 
-    resources("/account", NabooWeb.AccountController, only: [:create, :show, :index])
     post("/login", NabooWeb.SessionController, :sign_in)
+    resources("/account", NabooWeb.AccountController, only: [:create])
   end
 
   scope "/api" do
-    pipe_through(:api_auth)
+    pipe_through([:api, :api_auth])
 
-    resources("/account", NabooWeb.AccountController, only: [:update, :delete])
+    get("/protected-ping", NabooWeb.PingController, :index)
+    resources("/account", NabooWeb.AccountController, only: [:update, :delete, :show, :index])
   end
 
   # The session will be stored in the cookie and signed,

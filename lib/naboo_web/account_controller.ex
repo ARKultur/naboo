@@ -36,7 +36,9 @@ defmodule NabooWeb.AccountController do
     account = Accounts.get_account!(id)
 
     with {:ok, %Account{}} <- Accounts.delete_account(account) do
-      send_resp(conn, :no_content, "")
+      conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(200, "account deleted")
     end
   end
 end
