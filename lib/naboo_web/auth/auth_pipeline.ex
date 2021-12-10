@@ -4,6 +4,6 @@ defmodule NabooWeb.Guardian.AuthPipeline do
     module: NabooWeb.Guardian,
     error_handler: NabooWeb.Guardian.AuthErrorHandler
 
-  plug(Guardian.Plug.VerifyHeader)
+  plug(Guardian.Plug.VerifyHeader, scheme: "Bearer")
   plug(Guardian.Plug.EnsureAuthenticated)
 end

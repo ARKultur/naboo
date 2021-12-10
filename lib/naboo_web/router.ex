@@ -28,7 +28,7 @@ defmodule NabooWeb.Router do
   scope "/api" do
     pipe_through(:api)
 
-    post "/login", NabooWeb.SessionController, :sign_in
+    post("/login", NabooWeb.SessionController, :sign_in)
 
     resources("/account", NabooWeb.AccountController, only: [:create, :show, :index])
   end
@@ -36,7 +36,7 @@ defmodule NabooWeb.Router do
   scope "/api" do
     pipe_through([:api, :api_auth])
 
-    get("/protected-ping", NabooWeb.PingController, only: :index)
+    get("/protected-ping", NabooWeb.PingController, :index)
     resources("/account", NabooWeb.AccountController, only: [:update, :delete])
   end
 
