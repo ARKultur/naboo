@@ -6,7 +6,6 @@ defmodule NabooWeb.Router do
   end
 
   pipeline :api_auth do
-    plug(:accepts, ["json"])
     plug(NabooWeb.Guardian.AuthPipeline)
   end
 
@@ -29,13 +28,15 @@ defmodule NabooWeb.Router do
   scope "/api" do
     pipe_through(:api)
 
+    post "/login", NabooWeb.SessionController, :sign_in
+
     resources("/account", NabooWeb.AccountController, only: [:create, :show, :index])
-    post("/login", NabooWeb.SessionController, :sign_in)
   end
 
   scope "/api" do
-    pipe_through(:api_auth)
+    pipe_through([:api, :api_auth])
 
+    get("/protected-ping", NabooWeb.PingController, only: :index)
     resources("/account", NabooWeb.AccountController, only: [:update, :delete])
   end
 

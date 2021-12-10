@@ -9,7 +9,6 @@ defmodule NabooWeb.Endpoint do
   socket("/socket", NabooWeb.Socket)
 
   plug(:ping)
-  plug(:canonical_host)
   plug(:force_ssl)
   plug(:cors)
 
@@ -79,14 +78,6 @@ defmodule NabooWeb.Endpoint do
   end
 
   defp ping(conn, _opts), do: conn
-
-  defp canonical_host(%{request_path: "/health"} = conn, _opts), do: conn
-
-  defp canonical_host(conn, _opts) do
-    opts = PlugCanonicalHost.init(canonical_host: Application.get_env(:naboo, :canonical_host))
-
-    PlugCanonicalHost.call(conn, opts)
-  end
 
   defp force_ssl(%{request_path: "/health"} = conn, _opts), do: conn
 
