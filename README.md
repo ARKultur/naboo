@@ -24,7 +24,7 @@ envup () {
 
 # in the command-line
 ## installing dependencies
-make dependencies
+./scripts/install_dev_env.sh
 
 ## exporting ENV variables
 envup .env.test
@@ -60,3 +60,30 @@ Go to `https://localhost:4001/graphql/hub`, then try a query, like so:
   }
 }
 ```
+
+## authentication
+
+We use [Guardian](https://github.com/ueberauth/guardian) to generate JWT tokens.
+To log in, we can use the `POST /api/login` route with such `json` field:
+
+```json
+{
+	"email": "sheev.palpatine@naboo.net",
+	"password": "sidious"
+}
+```
+
+You should receive a JWT token, like this:
+
+```json
+{
+	"jwt": "some_jwt_token"
+}
+```
+
+Then, you can test if you're correclty authenticated using the `GET /api/protected-ping`
+route, setting in your Request Hearder the following key:
+`Authorization: Bearer some_jwt_token`.
+The API should then respond `pong!`
+
+
