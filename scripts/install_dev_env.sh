@@ -1,5 +1,16 @@
 #!/bin/bash
 
+export MIX_ENV=dev
+
+envup () {
+    if [ -f ${1} ]; then
+        set -o allexport
+        export $(grep -v '#.*' ${1} | xargs)
+        set +o allexport
+    else echo "Could not find ${1}"
+    fi
+}
+
 install_elixir_with_asdf () {
     echo "installing ASDF dependencies..."
     sudo apt-get install -y \
@@ -34,6 +45,8 @@ install_postgresql () {
     sudo -u postgres createdb ${USER}
     sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
 }
+
+envup .env.${MIX_ENV}
 
 install_elixir_with_asdf
 install_postgresql
