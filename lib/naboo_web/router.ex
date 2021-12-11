@@ -37,6 +37,7 @@ defmodule NabooWeb.Router do
 
     get("/protected-ping", NabooWeb.PingController, :index)
     resources("/account", NabooWeb.AccountController, only: [:update, :delete, :show, :index])
+    resources("/map/address", NabooWeb.AddressController)
   end
 
   # The session will be stored in the cookie and signed,
