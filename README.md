@@ -30,7 +30,7 @@ envup () {
 envup .env.test
 
 ## running server
-ENV=dev mix phx.server
+MIX_ENV=dev mix phx.server
 ```
 
 ### Check available API routes
