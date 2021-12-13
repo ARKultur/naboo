@@ -63,10 +63,22 @@ prepare:
 
 .PHONY: build
 build: ## Build the Docker image for the OTP release
-	docker build --build-arg APP_NAME=$(APP_NAME) --build-arg APP_VERSION=$(APP_VERSION) --rm --tag $(DOCKER_LOCAL_IMAGE) .
+	docker build --build-arg APP_NAME=$(APP_NAME) \
+		--build-arg APP_VERSION=$(APP_VERSION)\
+		--build-arg APP_ENV=prod \
+		--rm --tag $(DOCKER_LOCAL_IMAGE) .
+
+.PHONY: docker-dev
+docker-dev: ## Build the Docker image for dev purposes
+	docker build \
+		--build-arg APP_NAME=$(APP_NAME) \
+		--build-arg APP_VERSION=$(APP_VERSION)\
+		--build-arg APP_ENV=dev \
+		--rm --tag $(DOCKER_LOCAL_IMAGE) .
+	docker run --net=host --env-file=".env.dev" ${DOCKER_LOCAL_IMAGE}
 
 .PHONY: push
-push: ## Push the Docker image to the registry
+push: build ## Push the Docker image to the registry
 	docker tag $(DOCKER_LOCAL_IMAGE) $(DOCKER_REMOTE_IMAGE)
 	docker push $(DOCKER_REMOTE_IMAGE)
 

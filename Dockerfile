@@ -2,7 +2,9 @@
 #
 FROM hexpm/elixir:1.12.3-erlang-24.1.2-alpine-3.14.2 AS otp-dependencies
 
-ENV MIX_ENV=prod
+ARG APP_ENV
+
+ENV MIX_ENV=${APP_ENV}
 
 WORKDIR /build
 
@@ -15,21 +17,24 @@ RUN mix local.rebar --force && \
 
 # Install hex dependencies
 COPY mix.* ./
-RUN mix deps.get --only prod
+RUN mix deps.get
 
 #
 # Step 2 - npm dependencies + build the JS/CSS assets
 #
 FROM node:14.18-alpine3.14 AS js-builder
 
-ENV NODE_ENV=prod
+ARG APP_ENV
+
+ENV NODE_ENV=${APP_ENV}
 
 WORKDIR /build
 
 # Install Alpine dependencies
 RUN apk update --no-cache && \
     apk upgrade --no-cache && \
-    apk add --no-cache git
+    apk add --no-cache \
+    git
 
 # Copy hex dependencies
 COPY --from=otp-dependencies /build/deps deps
@@ -48,14 +53,19 @@ ARG APP_VERSION
 
 ENV APP_NAME=${APP_NAME} \
     APP_VERSION=${APP_VERSION} \
-    MIX_ENV=prod
+    MIX_ENV=dev
 
 WORKDIR /build
 
 # Install Alpine dependencies
 RUN apk update --no-cache && \
     apk upgrade --no-cache && \
-    apk add --no-cache git
+    apk add --no-cache \
+    git \
+    make \
+    erlang-dev \
+    musl \
+    build-base
 
 # Install Erlang dependencies
 RUN mix local.rebar --force && \
@@ -87,19 +97,22 @@ FROM alpine:3.14.2
 
 ARG APP_NAME
 ARG APP_VERSION
+ARG APP_ENV
 
 ENV APP_NAME=${APP_NAME} \
-    APP_VERSION=${APP_VERSION}
+    APP_VERSION=${APP_VERSION} \
+    MIX_ENV=${APP_ENV}
 
 # Install Alpine dependencies
 RUN apk update --no-cache && \
     apk upgrade --no-cache && \
-    apk add --no-cache bash openssl libgcc libstdc++ ncurses-libs
+    apk add --no-cache bash openssl libgcc libstdc++ ncurses-libs inotify-tools
 
 WORKDIR /opt/naboo
 
+
 # Copy the OTP binary from the build step
-COPY --from=otp-builder /build/_build/prod/${APP_NAME}-${APP_VERSION}.tar.gz .
+COPY --from=otp-builder /build/_build/${APP_ENV}/${APP_NAME}-${APP_VERSION}.tar.gz .
 RUN tar -xvzf ${APP_NAME}-${APP_VERSION}.tar.gz && \
     rm ${APP_NAME}-${APP_VERSION}.tar.gz
 
