@@ -9,6 +9,11 @@ defmodule Naboo.Repo.Migrations.CreateAddresses do
       add(:postcode, :string)
       add(:country, :string)
       add(:country_code, :string)
+      add(:place_id, :string)
+      add(:osm_id, :string)
+      add(:latitude, :string)
+      add(:longitude, :string)
+      add(:display_name, :string)
 
       timestamps()
     end

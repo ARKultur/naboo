@@ -11,7 +11,12 @@ defmodule NabooWeb.AddressControllerTest do
     country_code: "some country_code",
     postcode: "some postcode",
     state: "some state",
-    state_district: "some state_district"
+    state_district: "some state_district",
+    display_name: "some display_name",
+    latitude: "some latitude",
+    longitude: "some longitude",
+    osm_id: "some osm_id",
+    place_id: "some place_id"
   }
 
   @update_attrs %{
@@ -20,7 +25,12 @@ defmodule NabooWeb.AddressControllerTest do
     country_code: "some updated country_code",
     postcode: "some updated postcode",
     state: "some updated state",
-    state_district: "some updated state_district"
+    state_district: "some updated state_district",
+    display_name: "some updated display_name",
+    latitude: "some updated latitude",
+    longitude: "some updated longitude",
+    osm_id: "some updated osm_id",
+    place_id: "some updated place_id"
   }
 
   setup %{conn: conn} do
@@ -45,7 +55,12 @@ defmodule NabooWeb.AddressControllerTest do
                "country_code" => "some country_code",
                "postcode" => "some postcode",
                "state" => "some state",
-               "state_district" => "some state_district"
+               "state_district" => "some state_district",
+               "display_name" => "some display_name",
+               "latitude" => "some latitude",
+               "longitude" => "some longitude",
+               "osm_id" => "some osm_id",
+               "place_id" => "some place_id"
              } = json_response(conn, 201)["data"]
     end
   end
@@ -64,7 +79,12 @@ defmodule NabooWeb.AddressControllerTest do
                "country_code" => "some updated country_code",
                "postcode" => "some updated postcode",
                "state" => "some updated state",
-               "state_district" => "some updated state_district"
+               "state_district" => "some updated state_district",
+               "display_name" => "some updated display_name",
+               "latitude" => "some updated latitude",
+               "longitude" => "some updated longitude",
+               "osm_id" => "some updated osm_id",
+               "place_id" => "some updated place_id"
              } = json_response(conn, 200)["data"]
     end
   end

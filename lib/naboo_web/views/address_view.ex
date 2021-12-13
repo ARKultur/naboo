@@ -18,7 +18,12 @@ defmodule NabooWeb.AddressView do
       postcode: address.postcode,
       country_code: address.country_code,
       city: address.city,
-      country: address.country
+      country: address.country,
+      place_id: address.place_id,
+      osm_id: address.osm_id,
+      display_name: address.display_name,
+      latitude: address.latitude,
+      longitude: address.longitude
     }
   end
 end

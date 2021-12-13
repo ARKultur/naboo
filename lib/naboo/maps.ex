@@ -11,7 +11,7 @@ defmodule Naboo.Maps do
   @doc """
   Gets a single address.
 
-  Raises `Ecto.NoResultsError` if the Address does not exist.
+  Raises `Ecto.NoResultsError` if the Node does not exist.
 
   ## Examples
 
@@ -23,6 +23,22 @@ defmodule Naboo.Maps do
 
   """
   def get_address!(id), do: Repo.get!(Address, id)
+
+  @doc """
+  Gets a single address.
+
+  Returns nil if the Node does not exist.
+
+  ## Examples
+
+      iex> get_address(123)
+      %Address{}
+
+      iex> get_address(456)
+      nil
+
+  """
+  def get_address(id), do: Repo.get(Address, id)
 
   @doc """
   Returns the list of addresses.
@@ -98,7 +114,7 @@ defmodule Naboo.Maps do
       %Ecto.Changeset{data: %Address{}}
 
   """
-  def change_address(%Address{} = address \\ %{}, attrs \\ %{}) do
+  def change_address(%Address{} = address, attrs \\ %{}) do
     Address.changeset(address, attrs)
   end
 end
