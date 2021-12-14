@@ -9,10 +9,6 @@ defmodule Naboo.ReleaseTasks do
     for repo <- repos() do
       {:ok, _, _} = Migrator.with_repo(repo, &Migrator.run(&1, :up, all: true))
     end
-
-    if File.exists?("./seeds.exs") do
-      Code.eval_file("./seeds.exs")
-    end
   end
 
   def rollback(repo, version) do
