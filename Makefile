@@ -5,9 +5,7 @@ APP_NAME = `grep -Eo 'app: :\w*' mix.exs | cut -d ':' -f 3`
 APP_VERSION = `grep -Eo 'version: "[0-9\.]*"' mix.exs | cut -d '"' -f 2`
 GIT_REVISION = `git rev-parse HEAD`
 DOCKER_IMAGE_TAG ?= $(APP_VERSION)
-DOCKER_REGISTRY ?=`echo https://hub.docker.com/repository/docker/bogdzn/naboo`
 DOCKER_LOCAL_IMAGE = $(APP_NAME):$(DOCKER_IMAGE_TAG)
-DOCKER_REMOTE_IMAGE = $(DOCKER_REGISTRY)/$(DOCKER_LOCAL_IMAGE)
 
 # Linter and formatter configuration
 # ----------------------------------
@@ -66,21 +64,15 @@ build: ## Build the Docker image for the OTP release
 	docker build --build-arg APP_NAME=$(APP_NAME) \
 		--build-arg APP_VERSION=$(APP_VERSION)\
 		--build-arg APP_ENV=prod \
-		--rm --tag $(DOCKER_LOCAL_IMAGE) .
+		--rm --tag $(DOCKER_LOCAL_IMAGE)-prod .
 
-.PHONY: docker-dev
-docker-dev: ## Build the Docker image for dev purposes
+.PHONY: build-dev
+build-dev: ## Build the Docker image for dev purposes
 	docker build \
 		--build-arg APP_NAME=$(APP_NAME) \
 		--build-arg APP_VERSION=$(APP_VERSION)\
 		--build-arg APP_ENV=dev \
-		--rm --tag $(DOCKER_LOCAL_IMAGE) .
-	docker run --net=host --env-file=".env.dev" ${DOCKER_LOCAL_IMAGE}
-
-.PHONY: push
-push: build ## Push the Docker image to the registry
-	docker tag $(DOCKER_LOCAL_IMAGE) $(DOCKER_REMOTE_IMAGE)
-	docker push $(DOCKER_REMOTE_IMAGE)
+		--rm --tag $(DOCKER_LOCAL_IMAGE)-dev .
 
 # Development targets
 # -------------------
