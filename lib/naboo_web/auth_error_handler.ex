@@ -8,5 +8,6 @@ defmodule NabooWeb.AuthErrorHandler do
     conn
     |> put_resp_content_type("application/json")
     |> send_resp(401, "authentication error")
+    |> halt()
   end
 end

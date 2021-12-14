@@ -14,6 +14,7 @@ defmodule Naboo.Map.Address do
     field(:longitude, :string)
     field(:osm_id, :string)
     field(:place_id, :string)
+    field(:description, :string)
 
     timestamps()
   end
@@ -21,7 +22,7 @@ defmodule Naboo.Map.Address do
   @doc false
   def changeset(address, attrs) do
     address
-    |> cast(attrs, [:city, :state_district, :state, :postcode, :country, :country_code, :display_name, :latitude, :longitude, :osm_id, :place_id])
-    |> validate_required([:city, :state_district, :state, :postcode, :country, :country_code, :display_name, :latitude, :longitude, :osm_id, :place_id])
+    |> cast(attrs, [:city, :description, :state_district, :state, :postcode, :country, :country_code, :display_name, :latitude, :longitude, :osm_id, :place_id])
+    |> validate_required([:city, :description, :state_district, :state, :postcode, :country, :country_code, :display_name, :latitude, :longitude, :osm_id, :place_id])
   end
 end

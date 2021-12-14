@@ -39,6 +39,7 @@ defmodule NabooWeb.AccountController do
       conn
       |> put_resp_content_type("application/json")
       |> send_resp(200, "account deleted")
+      |> halt()
     end
   end
 end

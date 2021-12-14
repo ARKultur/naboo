@@ -23,7 +23,8 @@ defmodule NabooWeb.AddressView do
       osm_id: address.osm_id,
       display_name: address.display_name,
       latitude: address.latitude,
-      longitude: address.longitude
+      longitude: address.longitude,
+      description: address.description
     }
   end
 end

@@ -2,7 +2,8 @@
 #
 FROM hexpm/elixir:1.12.3-erlang-24.1.2-alpine-3.14.2 AS otp-dependencies
 
-ENV MIX_ENV=prod
+ARG APP_ENV
+ENV MIX_ENV=${APP_ENV}
 
 WORKDIR /build
 
@@ -15,21 +16,23 @@ RUN mix local.rebar --force && \
 
 # Install hex dependencies
 COPY mix.* ./
-RUN mix deps.get --only prod
+RUN mix deps.get
 
 #
 # Step 2 - npm dependencies + build the JS/CSS assets
 #
 FROM node:14.18-alpine3.14 AS js-builder
 
-ENV NODE_ENV=prod
+ARG APP_ENV
+ENV NODE_ENV=${APP_ENV}
 
 WORKDIR /build
 
 # Install Alpine dependencies
 RUN apk update --no-cache && \
     apk upgrade --no-cache && \
-    apk add --no-cache git
+    apk add --no-cache \
+    git
 
 # Copy hex dependencies
 COPY --from=otp-dependencies /build/deps deps
@@ -43,19 +46,23 @@ RUN npm ci --prefix assets --no-audit --no-color --unsafe-perm --progress=false 
 #
 FROM hexpm/elixir:1.12.3-erlang-24.1.2-alpine-3.14.2 AS otp-builder
 
-ARG APP_NAME
 ARG APP_VERSION
 
-ENV APP_NAME=${APP_NAME} \
-    APP_VERSION=${APP_VERSION} \
-    MIX_ENV=prod
+ENV APP_VERSION=${APP_VERSION} \
+    MIX_ENV=dev
 
 WORKDIR /build
 
 # Install Alpine dependencies
 RUN apk update --no-cache && \
     apk upgrade --no-cache && \
-    apk add --no-cache git
+    apk add --no-cache \
+    git \
+    make \
+    erlang-dev \
+    musl \
+    build-base \
+    inotify-tools
 
 # Install Erlang dependencies
 RUN mix local.rebar --force && \
@@ -64,53 +71,16 @@ RUN mix local.rebar --force && \
 # Copy hex dependencies
 COPY mix.* ./
 COPY --from=otp-dependencies /build/deps deps
-RUN mix deps.compile
 
-# Compile codebase
+# Copy files
 COPY config config
 COPY lib lib
 COPY priv priv
-RUN mix compile
+RUN mix deps.compile
 
 # Copy assets from step 1
 COPY --from=js-builder /build/assets assets
 RUN mix assets.deploy
+RUN chmod a+x /build/priv/scripts/docker-entrypoint.sh
 
-# Build OTP release
-COPY rel rel
-RUN mix release
-
-#
-# Step 4 - build a lean runtime container
-#
-FROM alpine:3.14.2
-
-ARG APP_NAME
-ARG APP_VERSION
-
-ENV APP_NAME=${APP_NAME} \
-    APP_VERSION=${APP_VERSION}
-
-# Install Alpine dependencies
-RUN apk update --no-cache && \
-    apk upgrade --no-cache && \
-    apk add --no-cache bash openssl libgcc libstdc++ ncurses-libs
-
-WORKDIR /opt/naboo
-
-# Copy the OTP binary from the build step
-COPY --from=otp-builder /build/_build/prod/${APP_NAME}-${APP_VERSION}.tar.gz .
-RUN tar -xvzf ${APP_NAME}-${APP_VERSION}.tar.gz && \
-    rm ${APP_NAME}-${APP_VERSION}.tar.gz
-
-# Copy Docker entrypoint
-COPY priv/scripts/docker-entrypoint.sh /usr/local/bin
-RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
-
-# Create non-root user
-RUN adduser -D naboo && \
-    chown -R naboo: /opt/naboo
-USER naboo
-
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["start"]
+ENTRYPOINT ["/build/priv/scripts/docker-entrypoint.sh"]

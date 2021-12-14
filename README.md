@@ -6,6 +6,9 @@ This is the ARKultur's back-end, all written in Elixir. :^)
 
 ### dev
 
+A simple `docker-compose up --build` should suffice.
+If it's not the case, please read the documentation below.
+
 To build and run a dev version, you will need to export the data present in `.env.dev`.
 I have a little function you can put in your `.bashrc` to export data to your environnemnt.
 Use it as a function or it will not work:
