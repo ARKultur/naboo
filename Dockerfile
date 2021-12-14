@@ -109,15 +109,16 @@ RUN apk update --no-cache && \
     apk add --no-cache bash openssl libgcc libstdc++ ncurses-libs inotify-tools
 
 WORKDIR /opt/naboo
-
+EXPOSE 4000
 
 # Copy the OTP binary from the build step
 COPY --from=otp-builder /build/_build/${APP_ENV}/${APP_NAME}-${APP_VERSION}.tar.gz .
 RUN tar -xvzf ${APP_NAME}-${APP_VERSION}.tar.gz && \
     rm ${APP_NAME}-${APP_VERSION}.tar.gz
 
-# Copy Docker entrypoint
+# Copy Docker entrypoint and seeds script
 COPY priv/scripts/docker-entrypoint.sh /usr/local/bin
+COPY priv/repo/seeds.exs /usr/local/bin/seeds.exs
 RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
 
 # Create non-root user
