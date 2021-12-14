@@ -61,7 +61,7 @@ prepare:
 
 .PHONY: build
 build: ## Build the Docker image for the OTP release
-	docker build --build-arg APP_NAME=$(APP_NAME) \
+	docker build \
 		--build-arg APP_VERSION=$(APP_VERSION)\
 		--build-arg APP_ENV=prod \
 		--rm --tag $(DOCKER_LOCAL_IMAGE)-prod .
@@ -69,7 +69,6 @@ build: ## Build the Docker image for the OTP release
 .PHONY: build-dev
 build-dev: ## Build the Docker image for dev purposes
 	docker build \
-		--build-arg APP_NAME=$(APP_NAME) \
 		--build-arg APP_VERSION=$(APP_VERSION)\
 		--build-arg APP_ENV=dev \
 		--rm --tag $(DOCKER_LOCAL_IMAGE)-dev .

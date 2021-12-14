@@ -68,4 +68,5 @@ jobs:
       - run: make prepare
       - run: make check
       - run: make lint
-      - run: make test
+      - run: make coverage
+      - run: make build-dev

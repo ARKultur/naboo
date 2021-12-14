@@ -3,7 +3,6 @@
 FROM hexpm/elixir:1.12.3-erlang-24.1.2-alpine-3.14.2 AS otp-dependencies
 
 ARG APP_ENV
-
 ENV MIX_ENV=${APP_ENV}
 
 WORKDIR /build
@@ -25,7 +24,6 @@ RUN mix deps.get
 FROM node:14.18-alpine3.14 AS js-builder
 
 ARG APP_ENV
-
 ENV NODE_ENV=${APP_ENV}
 
 WORKDIR /build
@@ -48,11 +46,9 @@ RUN npm ci --prefix assets --no-audit --no-color --unsafe-perm --progress=false 
 #
 FROM hexpm/elixir:1.12.3-erlang-24.1.2-alpine-3.14.2 AS otp-builder
 
-ARG APP_NAME
 ARG APP_VERSION
 
-ENV APP_NAME=${APP_NAME} \
-    APP_VERSION=${APP_VERSION} \
+ENV APP_VERSION=${APP_VERSION} \
     MIX_ENV=dev
 
 WORKDIR /build
@@ -65,7 +61,8 @@ RUN apk update --no-cache && \
     make \
     erlang-dev \
     musl \
-    build-base
+    build-base \
+    inotify-tools
 
 # Install Erlang dependencies
 RUN mix local.rebar --force && \
@@ -74,57 +71,16 @@ RUN mix local.rebar --force && \
 # Copy hex dependencies
 COPY mix.* ./
 COPY --from=otp-dependencies /build/deps deps
-RUN mix deps.compile
 
-# Compile codebase
+# Copy files
 COPY config config
 COPY lib lib
 COPY priv priv
-RUN mix compile
+RUN mix deps.compile
 
 # Copy assets from step 1
 COPY --from=js-builder /build/assets assets
 RUN mix assets.deploy
+RUN chmod a+x /build/priv/scripts/docker-entrypoint.sh
 
-# Build OTP release
-COPY rel rel
-RUN mix release
-
-#
-# Step 4 - build a lean runtime container
-#
-FROM alpine:3.14.2
-
-ARG APP_NAME
-ARG APP_VERSION
-ARG APP_ENV
-
-ENV APP_NAME=${APP_NAME} \
-    APP_VERSION=${APP_VERSION} \
-    MIX_ENV=${APP_ENV}
-
-# Install Alpine dependencies
-RUN apk update --no-cache && \
-    apk upgrade --no-cache && \
-    apk add --no-cache bash openssl libgcc libstdc++ ncurses-libs inotify-tools
-
-WORKDIR /opt/naboo
-EXPOSE 4000
-
-# Copy the OTP binary from the build step
-COPY --from=otp-builder /build/_build/${APP_ENV}/${APP_NAME}-${APP_VERSION}.tar.gz .
-RUN tar -xvzf ${APP_NAME}-${APP_VERSION}.tar.gz && \
-    rm ${APP_NAME}-${APP_VERSION}.tar.gz
-
-# Copy Docker entrypoint and seeds script
-COPY priv/scripts/docker-entrypoint.sh /usr/local/bin
-COPY priv/repo/seeds.exs /usr/local/bin/seeds.exs
-RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
-
-# Create non-root user
-RUN adduser -D naboo && \
-    chown -R naboo: /opt/naboo
-USER naboo
-
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["start"]
+ENTRYPOINT ["/build/priv/scripts/docker-entrypoint.sh"]
