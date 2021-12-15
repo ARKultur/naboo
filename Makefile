@@ -64,7 +64,7 @@ build: ## Build the Docker image for the OTP release
 	docker build \
 		--build-arg APP_VERSION=$(APP_VERSION)\
 		--build-arg APP_ENV=prod \
-		--rm --tag $(DOCKER_LOCAL_IMAGE)-prod .
+		--rm --tag $(DOCKER_LOCAL_IMAGE) .
 
 .PHONY: build-dev
 build-dev: ## Build the Docker image for dev purposes

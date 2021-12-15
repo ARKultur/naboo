@@ -1,6 +1,6 @@
 # Step 1 - hex dependencies
 #
-FROM hexpm/elixir:1.12.3-erlang-24.1.2-alpine-3.14.2 AS otp-dependencies
+FROM hexpm/elixir:1.13.0-erlang-24.0.3-alpine-3.14.0 AS otp-dependencies
 
 ARG APP_ENV
 ENV MIX_ENV=${APP_ENV}
@@ -8,15 +8,16 @@ ENV MIX_ENV=${APP_ENV}
 WORKDIR /build
 
 # Install Alpine dependencies
-RUN apk add --no-cache git
+RUN apk add --no-cache git \
+    make \
+    build-base
 
-# Install Erlang dependencies
-RUN mix local.rebar --force && \
-    mix local.hex --force
-
-# Install hex dependencies
 COPY mix.* ./
-RUN mix deps.get
+
+# Install Erlang && hex dependencies
+RUN mix local.rebar --force && \
+    mix local.hex --force && \
+    mix deps.get
 
 #
 # Step 2 - npm dependencies + build the JS/CSS assets
@@ -44,7 +45,7 @@ RUN npm ci --prefix assets --no-audit --no-color --unsafe-perm --progress=false 
 #
 # Step 3 - build the OTP binary
 #
-FROM hexpm/elixir:1.12.3-erlang-24.1.2-alpine-3.14.2 AS otp-builder
+FROM hexpm/elixir:1.13.0-erlang-24.0.3-alpine-3.14.0 AS otp-builder
 
 ARG APP_VERSION
 
@@ -58,15 +59,10 @@ RUN apk update --no-cache && \
     apk upgrade --no-cache && \
     apk add --no-cache \
     git \
-    make \
     erlang-dev \
-    musl \
+    make \
     build-base \
     inotify-tools
-
-# Install Erlang dependencies
-RUN mix local.rebar --force && \
-    mix local.hex --force
 
 # Copy hex dependencies
 COPY mix.* ./
@@ -76,11 +72,13 @@ COPY --from=otp-dependencies /build/deps deps
 COPY config config
 COPY lib lib
 COPY priv priv
-RUN mix deps.compile
 
 # Copy assets from step 1
 COPY --from=js-builder /build/assets assets
-RUN mix assets.deploy
-RUN chmod a+x /build/priv/scripts/docker-entrypoint.sh
+
+# Install Erlang dependencies && deploy assets
+RUN mix local.rebar --force && \
+    mix local.hex --force && \
+    mix assets.deploy
 
 ENTRYPOINT ["/build/priv/scripts/docker-entrypoint.sh"]
