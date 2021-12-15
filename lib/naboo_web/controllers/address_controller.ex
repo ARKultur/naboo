@@ -39,6 +39,7 @@ defmodule NabooWeb.AddressController do
       conn
       |> put_resp_content_type("application/json")
       |> send_resp(200, "address deleted")
+      |> halt()
     end
   end
 end

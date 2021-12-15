@@ -14,6 +14,7 @@ defmodule Naboo.Repo.Migrations.CreateAddresses do
       add(:latitude, :string)
       add(:longitude, :string)
       add(:display_name, :string)
+      add(:description, :string)
 
       timestamps()
     end

@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   application:
-    image: naboo:0.1
+    image: bogdzn/naboo:0.0.1-dev
     container_name: naboo
     env_file: .env.dev
     environment:

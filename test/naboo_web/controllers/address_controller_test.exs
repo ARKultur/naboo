@@ -16,7 +16,8 @@ defmodule NabooWeb.AddressControllerTest do
     latitude: "some latitude",
     longitude: "some longitude",
     osm_id: "some osm_id",
-    place_id: "some place_id"
+    place_id: "some place_id",
+    description: "some description"
   }
 
   @update_attrs %{
@@ -30,7 +31,8 @@ defmodule NabooWeb.AddressControllerTest do
     latitude: "some updated latitude",
     longitude: "some updated longitude",
     osm_id: "some updated osm_id",
-    place_id: "some updated place_id"
+    place_id: "some updated place_id",
+    description: "some updated description"
   }
 
   setup %{conn: conn} do
@@ -60,7 +62,8 @@ defmodule NabooWeb.AddressControllerTest do
                "latitude" => "some latitude",
                "longitude" => "some longitude",
                "osm_id" => "some osm_id",
-               "place_id" => "some place_id"
+               "place_id" => "some place_id",
+               "description" => "some description"
              } = json_response(conn, 201)["data"]
     end
   end
@@ -84,7 +87,8 @@ defmodule NabooWeb.AddressControllerTest do
                "latitude" => "some updated latitude",
                "longitude" => "some updated longitude",
                "osm_id" => "some updated osm_id",
-               "place_id" => "some updated place_id"
+               "place_id" => "some updated place_id",
+               "description" => "some updated description"
              } = json_response(conn, 200)["data"]
     end
   end

@@ -12,17 +12,26 @@ defmodule NabooWeb.SessionController do
          {:ok, token, conn} <- Authentication.log_in(conn, account) do
       render(conn, "token.json", token: token)
     else
-      _error -> send_resp(conn, 403, "could not authenticate")
+      _error ->
+        conn
+        |> put_resp_header("content-type", "application/json")
+        |> send_resp(403, "could not authenticate")
+        |> halt()
     end
   end
 
   def sign_in(conn, _params) do
-    send_resp(conn, 401, "wrong parameters")
+    conn
+    |> put_resp_header("content-type", "application/json")
+    |> send_resp(401, "wrong parameters")
+    |> halt()
   end
 
   def delete(conn, _params) do
     conn
     |> Authentication.log_out()
+    |> put_resp_header("content-type", "application/json")
     |> send_resp(200, "disconnected.")
+    |> halt()
   end
 end
