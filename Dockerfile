@@ -17,8 +17,7 @@ COPY mix.* ./
 # Install Erlang && hex dependencies
 RUN mix local.rebar --force && \
     mix local.hex --force && \
-    mix deps.get && \
-    mix deps.compile
+    mix deps.get
 
 #
 # Step 2 - npm dependencies + build the JS/CSS assets
