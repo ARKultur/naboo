@@ -40,6 +40,7 @@ COPY --from=otp-dependencies /build/deps deps
 
 # Install npm dependencies
 COPY assets assets
+RUN npm i
 RUN npm ci --prefix assets --no-audit --no-color --unsafe-perm --progress=false --loglevel=error
 
 #
