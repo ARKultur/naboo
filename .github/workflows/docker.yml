@@ -16,7 +16,8 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 14.18
-        run: npm install -g
+
+      - run: npm install -g
 
       - name: Log in to DockerHub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
