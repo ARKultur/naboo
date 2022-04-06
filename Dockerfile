@@ -40,8 +40,7 @@ COPY --from=otp-dependencies /build/deps deps
 
 # Install npm dependencies
 COPY assets assets
-RUN npm i --prefix assets
-RUN npm ci --prefix assets --no-audit --no-color --unsafe-perm --progress=false --loglevel=error
+RUN npm i --prefix assets && npm ci --prefix assets --no-audit --no-color --unsafe-perm --progress=false --loglevel=error
 
 #
 # Step 3 - build the OTP binary
