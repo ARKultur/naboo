@@ -5,7 +5,7 @@ defmodule Naboo.Mixfile do
     [
       app: :naboo,
       version: "0.0.1",
-      elixir: "~> 1.12",
+      elixir: "~> 1.13",
       erlang: "~> 24.1",
       elixirc_paths: elixirc_paths(Mix.env()),
       test_paths: ["test"],
