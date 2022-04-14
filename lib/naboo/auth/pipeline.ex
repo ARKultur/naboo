@@ -1,4 +1,4 @@
-defmodule Naboo.Auth.Pipeline do
+defmodule Naboo.Auth.Guardian.Pipeline do
   use Guardian.Plug.Pipeline,
     otp_app: :naboo,
     module: Naboo.Auth.Guardian,

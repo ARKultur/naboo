@@ -10,7 +10,7 @@ defmodule Naboo.Auth.Guardian do
 
   def resource_from_claims(claims) do
     id = claims["sub"]
-    Accounts.get_account(id)
+    Accounts.Controller.get_account(id)
   end
 
   def subject_for_token(_), do: {:error, :unknown_parameters}

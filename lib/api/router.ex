@@ -16,7 +16,7 @@ defmodule NabooAPI.Router do
       )
     end
 
-    plug(Naboo.Guardian.AuthPipeline)
+    plug(Naboo.Auth.Guardian.Pipeline)
 
     forward("/",
       to: Absinthe.Plug,

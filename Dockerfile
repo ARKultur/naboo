@@ -57,5 +57,11 @@ COPY config config
 COPY lib lib
 COPY priv priv
 
+# Copying files for test and CI
+COPY coveralls.json coveralls.json
+COPY .credo.exs .credo.exs
+COPY .sobelow-conf .
+COPY .formatter.exs .
+
 RUN mix assets.deploy
 ENTRYPOINT ["/build/priv/docker-entrypoint.sh"]

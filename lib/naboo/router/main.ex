@@ -8,10 +8,6 @@ defmodule Naboo.Router.Main do
     plug(:fetch_flash)
   end
 
-  pipeline :api_auth do
-    plug(Naboo.Auth.Guardian.Pipeline)
-  end
-
   scope "/api" do
 
   end

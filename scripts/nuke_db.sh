@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 echo "This script will destroy the database. Are you sure you want to delete this database ?"
 read -p "Press [Enter] key to continue..."
