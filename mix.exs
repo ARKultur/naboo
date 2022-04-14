@@ -4,7 +4,7 @@ defmodule Naboo.Mixfile do
   def project do
     [
       app: :naboo,
-      version: "0.0.1",
+      version: "0.2.0",
       elixir: "~> 1.13",
       erlang: "~> 24.1",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -12,7 +12,7 @@ defmodule Naboo.Mixfile do
       test_pattern: "**/*_test.exs",
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
-      compilers: [:gettext] ++ Mix.compilers(),
+      compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
@@ -33,7 +33,6 @@ defmodule Naboo.Mixfile do
   defp aliases do
     [
       "assets.deploy": [
-        "esbuild default --minify",
         "phx.digest"
       ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
@@ -44,13 +43,8 @@ defmodule Naboo.Mixfile do
 
   defp deps do
     [
-      # Assets bundling
-      {:esbuild, "~> 0.3", runtime: Mix.env() == :dev},
-
-      # HTTP Client
+      # HTTP
       {:hackney, "~> 1.18"},
-
-      # HTTP server
       {:plug_cowboy, "~> 2.5"},
       {:plug_canonical_host, "~> 2.0"},
       {:corsica, "~> 1.1"},
@@ -66,23 +60,19 @@ defmodule Naboo.Mixfile do
       {:argon2_elixir, "~> 2.3", override: true},
       {:guardian, "~> 2.1"},
 
-      # GraphQL
+      # GraphQL & Databases
       {:absinthe, "~> 1.6"},
       {:absinthe_plug, "~> 1.5.8"},
       {:dataloader, "~> 1.0"},
       {:absinthe_error_payload, "~> 1.1"},
-
-      # Database
       {:ecto_sql, "~> 3.7"},
       {:postgrex, "~> 0.15"},
 
-      # Translations
-      {:gettext, "~> 0.18"},
+      # Health
+      {:plug_checkup, "~> 0.6"},
 
-      # Errors
+      # Errors & Monitoring
       {:sentry, "~> 8.0"},
-
-      # Monitoring
       {:new_relic_agent, "~> 1.27"},
       {:new_relic_absinthe, "~> 0.0"},
 
@@ -90,19 +80,12 @@ defmodule Naboo.Mixfile do
       {:credo, "~> 1.5", only: [:dev, :test], override: true},
       {:credo_envvar, "~> 0.1", only: [:dev, :test], runtime: false},
       {:credo_naming, "~> 1.0", only: [:dev, :test], runtime: false},
-
-      # Security check
       {:sobelow, "~> 0.11", only: [:dev, :test], runtime: true},
       {:mix_audit, "~> 1.0", only: [:dev, :test], runtime: false},
 
-      # Health
-      {:plug_checkup, "~> 0.6"},
-
-      # Test factories
+      # Unit testing
       {:ex_machina, "~> 2.7", only: :test},
       {:faker, "~> 0.16", only: :test},
-
-      # Test coverage
       {:excoveralls, "~> 0.14", only: :test}
     ]
   end

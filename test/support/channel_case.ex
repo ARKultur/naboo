@@ -1,4 +1,4 @@
-defmodule NabooWeb.ChannelCase do
+defmodule Naboo.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -17,7 +17,7 @@ defmodule NabooWeb.ChannelCase do
 
   alias Ecto.Adapters.SQL.Sandbox
   alias Naboo.Repo
-  alias NabooWeb.Endpoint
+  alias Naboo.Endpoint
 
   using do
     quote do

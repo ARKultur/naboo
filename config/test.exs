@@ -18,6 +18,6 @@ config :naboo, Naboo.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   url: TestEnvironment.get_database_url()
 
-config :naboo, NabooWeb.Endpoint, server: false
+config :naboo, Naboo.Endpoint, server: false
 
 config :logger, level: :warn

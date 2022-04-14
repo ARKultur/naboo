@@ -21,8 +21,12 @@ defmodule Naboo.Map.Address do
 
   @doc false
   def changeset(address, attrs) do
+    atoms = [:city, :description, :state_district, :state,
+      :postcode, :country, :country_code, :display_name, :latitude, :longitude,
+      :osm_id, :place_id]
+
     address
-    |> cast(attrs, [:city, :description, :state_district, :state, :postcode, :country, :country_code, :display_name, :latitude, :longitude, :osm_id, :place_id])
-    |> validate_required([:city, :description, :state_district, :state, :postcode, :country, :country_code, :display_name, :latitude, :longitude, :osm_id, :place_id])
+    |> cast(attrs, atoms)
+    |> validate_required(atoms)
   end
 end

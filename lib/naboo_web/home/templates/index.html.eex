@@ -1,3 +1,0 @@
-<div class="home">
-  <p><strong>Message:</strong> <%= @message %></p>
-</div>

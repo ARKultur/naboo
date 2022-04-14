@@ -22,3 +22,5 @@ priv/static/favicon-*.ico
 priv/static/robots-*.txt
 priv/static/robots-*.gz
 priv/static/robots.txt.gz
+priv/static/security.txt.gz
+priv/static/security-*

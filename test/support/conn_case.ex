@@ -1,4 +1,4 @@
-defmodule NabooWeb.ConnCase do
+defmodule Naboo.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -17,7 +17,7 @@ defmodule NabooWeb.ConnCase do
 
   alias Ecto.Adapters.SQL.Sandbox
   alias Naboo.Repo
-  alias NabooWeb.Endpoint
+  alias Naboo.Endpoint
   alias Phoenix.ConnTest
 
   using do
@@ -26,7 +26,7 @@ defmodule NabooWeb.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
 
-      import NabooWeb.Router.Helpers
+      import Naboo.Router.Helpers
 
       # The default endpoint for testing
       @endpoint Endpoint
