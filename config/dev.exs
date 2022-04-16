@@ -8,10 +8,9 @@ config :naboo, Naboo.Endpoint,
   ],
   live_reload: [
     patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
-      ~r{lib/naboo/.*(ee?x)$}
-      ~r{lib/api/.*(ee?x)$}
-      ~r{lib/health/.*(ee?x)$}
+      ~r{lib/naboo/.*(ee?x)$},
+      ~r{lib/api/.*(ee?x)$},
+      ~r{lib/health/.*(ee?x)$},
     ]
   ]
 

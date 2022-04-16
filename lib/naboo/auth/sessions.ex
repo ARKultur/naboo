@@ -1,9 +1,9 @@
 defmodule Naboo.Auth.Sessions do
   use Guardian, otp_app: :naboo
 
-  alias Naboo.Accounts
+  alias Naboo.Accounts.AccountManager
   alias Naboo.Accounts.Account
-  alias Naboo.Guardian
+  alias Naboo.Auth.Guardian
 
   require Logger
 
@@ -12,7 +12,7 @@ defmodule Naboo.Auth.Sessions do
   end
 
   def resource_from_claims(%{"sub" => id}) do
-    case Accounts.get_account(id) do
+    case AccountManager.get_account(id) do
       nil -> {:error, :resource_not_found}
       account -> {:ok, account}
     end

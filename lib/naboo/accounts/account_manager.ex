@@ -1,4 +1,4 @@
-defmodule Naboo.Accounts.Controller do
+defmodule Naboo.Accounts.AccountManager do
   @moduledoc """
   The Accounts context.
   """

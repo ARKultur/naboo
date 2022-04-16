@@ -7,12 +7,6 @@ GIT_REVISION = `git rev-parse HEAD`
 DOCKER_IMAGE_TAG ?= $(APP_VERSION)
 DOCKER_LOCAL_IMAGE = $(APP_NAME):$(DOCKER_IMAGE_TAG)
 
-# Linter and formatter configuration
-# ----------------------------------
-
-PRETTIER_FILES_PATTERN = '*.config.js' '{js,css,scripts}/**/*.{js,graphql,scss,css}'
-STYLES_PATTERN = 'css'
-
 # Introspection targets
 # ---------------------
 
@@ -35,14 +29,8 @@ header:
 	@printf "\033[33m%-23s\033[0m" "DOCKER_IMAGE_TAG"
 	@printf "\033[35m%s\033[0m" $(DOCKER_IMAGE_TAG)
 	@echo ""
-	@printf "\033[33m%-23s\033[0m" "DOCKER_REGISTRY"
-	@printf "\033[35m%s\033[0m" $(DOCKER_REGISTRY)
-	@echo ""
 	@printf "\033[33m%-23s\033[0m" "DOCKER_LOCAL_IMAGE"
 	@printf "\033[35m%s\033[0m" $(DOCKER_LOCAL_IMAGE)
-	@echo ""
-	@printf "\033[33m%-23s\033[0m" "DOCKER_REMOTE_IMAGE"
-	@printf "\033[35m%s\033[0m" $(DOCKER_REMOTE_IMAGE)
 	@echo "\n"
 
 .PHONY: targets
@@ -55,9 +43,13 @@ targets:
 # -------------
 
 .PHONY: prepare
-prepare:
-	mix deps.get
-	npm install --prefix assets
+prepare: dependencies
+	bash ./scripts/setup_db.sh
+
+.PHONY: cleanup
+cleanup: ## Cleans the whole project, as if it was just cloned
+	echo "" | bash ./scripts/nuke_db.sh
+	rm -rf _build deps tmp
 
 .PHONY: build
 build: ## Build the Docker image for the OTP release
@@ -77,17 +69,12 @@ build-dev: ## Build the Docker image for dev purposes
 # -------------------
 
 .PHONY: run
-run: ## Run the server inside an IEx shell
+run: prepare ## Run the server inside an IEx shell
 	iex -S mix phx.server
 
 .PHONY: dependencies
 dependencies: ## Install dependencies
 	mix deps.get
-	npm install --prefix assets
-
-.PHONY: sync-translations
-sync-translations: ## Synchronize translations with Accent
-	npx accent sync
 
 .PHONY: test
 test: ## Run the test suite
@@ -114,7 +101,6 @@ check-code-security:
 .PHONY: check-format
 check-format:
 	mix format --check-formatted
-	cd assets && npx prettier --check $(PRETTIER_FILES_PATTERN)
 
 .PHONY: check-unused-dependencies
 check-unused-dependencies:
@@ -123,20 +109,11 @@ check-unused-dependencies:
 .PHONY: format
 format: ## Format project files
 	mix format
-	cd assets && npx prettier --write $(PRETTIER_FILES_PATTERN)
 
 .PHONY: lint
-lint: lint-elixir ## lint-scripts lint-styles  Lint project files
+lint: lint-elixir
 
 .PHONY: lint-elixir
 lint-elixir:
 	mix compile --warnings-as-errors --force
 	mix credo || true
-
-.PHONY: lint-scripts
-lint-scripts:
-	cd assets && npx browserslist@latest --update-db && npx eslint . || true
-
-.PHONY: lint-styles
-lint-styles:
-	cd assets && npx stylelint --syntax scss $(STYLES_PATTERN) || true

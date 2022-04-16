@@ -1,4 +1,4 @@
-defmodule Naboo.Router.Main do
+defmodule NabooAPI.Router.Urls do
   use Phoenix.Router
 
   pipeline :api do
@@ -8,8 +8,22 @@ defmodule Naboo.Router.Main do
     plug(:fetch_flash)
   end
 
-  scope "/api" do
+  pipeline :api_auth do
+    plug(Naboo.Auth.Guardian.Pipeline)
+  end
 
+
+  scope "/api" do
+    pipe_through (:api)
+
+    scope "/v1" do
+
+      post("/login", NabooAPI.Controllers.Auth.Session, :sign_in)
+      resources("/account", NabooAPI.Controllers.Auth.Account, only: [:create])
+
+      pipe_through (:api_auth)
+      resources("/account", NabooAPI.Controllers.Auth.Account, only: [:update, :delete, :show, :index])
+    end
   end
 
   # The session will be stored in the cookie and signed,

@@ -1,4 +1,4 @@
-defmodule NabooAPI.Router do
+defmodule NabooAPI.Router.GraphQL do
   use Plug.Router
 
   defmodule API do

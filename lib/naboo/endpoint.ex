@@ -47,9 +47,9 @@ defmodule Naboo.Endpoint do
   plug(Plug.Head)
 
   plug(NabooHealth.Router)
-  plug(NabooAPI.Router)
+  plug(NabooAPI.Router.GraphQL)
   plug(:halt_if_sent)
-  plug(Naboo.Router.Main)
+  plug(NabooAPI.Router.Urls)
 
   @doc """
   Callback invoked for dynamically configuring the endpoint.
