@@ -26,6 +26,15 @@ jobs:
     env:
       MIX_ENV: test
       DATABASE_URL: postgres://postgres:postgres@localhost/naboo_test
+      CORS_ALLOWED_ORIGINS: "*"
+      DEBUG_ERRORS: true
+      PORT: 4000
+      SECRET_KEY_BASE: "9ysxf4gGDgu7bRRdR7Pe2MHlXNXTFkyoggvW3R8vOK9xWhMznGWh95chlfT2ebi4"
+      SESSION_KEY: "naboo"
+      SESSION_SIGNING_SALT: "Gkk+m51xhgOmih90vLGIv3kElBU9uJpuUQE1jcp657KYnJKf1dzhMjQWRHDtXenm"
+      GUARDIAN_SECRET: "Gkk+m51xhgOmih90vLGIv3kElBU9uJpuUQE1jcp657KYnJKf1dzhMjQWRHDtXenm"
+      DATABASE_POOL_SIZE: 20
+      CANONICAL_URL: http://localhost:4000
 
     steps:
       - uses: actions/checkout@v2
@@ -59,14 +68,11 @@ jobs:
           key: ${{ runner.os }}-npm-${{ hashFiles(format('{0}/assets/package-lock.json', github.workspace)) }}
           restore-keys: |
             ${{ runner.os }}-npm-
-      - name: Setup environment variables
-        uses: c-py/action-dotenv-to-setenv@v2
-        with:
-          env-file: .env.test
 
       - run: make header
-      - run: make prepare
+      - run: make dependencies
       - run: make check
       - run: make lint
       - run: make test
       - run: make build-dev
+

@@ -10,12 +10,20 @@ on:
 jobs:
   push:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v3
 
       - uses: actions/setup-node@v2
         with:
           node-version: 14.18
+
+      - name: Start containers
+        run: docker-compose -f "docker-compose.yml" up -d --build
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker-compose.yml" down
 
       - run: npm install
 
@@ -24,13 +32,13 @@ jobs:
         with:
           username: ${{ secrets.LOGIN_DOCKERHUB_TEST }}
           password: ${{ secrets.PASSWORD_DOCKERHUB_TEST }}
-      
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
           images: arkulturtest/naboo
-      
+
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
