@@ -3,9 +3,9 @@
 export MIX_ENV=dev
 
 envup () {
-    if [ -f ${1} ]; then
+    if [ -f "${1}" ]; then
         set -o allexport
-        export $(grep -v '#.*' ${1} | xargs)
+        export "$(grep -v '#.*' "${1}" | xargs)"
         set +o allexport
     else echo "Could not find ${1}"
     fi
@@ -29,9 +29,9 @@ install_elixir_with_asdf () {
 
     echo "installing ASDF"
     git clone https://github.com/asdf-vm/asdf.git ~/.asdf
-    echo '. $HOME/.asdf/asdf.sh' >> ~/.bashrc
-    echo '. $HOME/.asdf/completions/asdf.bash' >> ~/.bashrc
-    source ~/.bashrc
+    echo ". $HOME/.asdf/asdf.sh" >> ~/.bashrc
+    echo ". $HOME/.asdf/completions/asdf.bash" >> ~/.bashrc
+    source "${HOME}"/.bashrc
 
     cp .tool-versions ~
     asdf plugin-update --all

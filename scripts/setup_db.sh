@@ -1,9 +1,9 @@
 #!/bin/env bash
 
 envup () {
-    if [ -f ${1} ]; then
+    if [ -f "${1}" ]; then
         set -o allexport
-        export $(grep -v '#.*' ${1} | xargs)
+        export "$(grep -v '#.*' "${1}" | xargs)"
         set +o allexport
     else echo "Could not find ${1}"
     fi
@@ -32,7 +32,7 @@ install_postgresql () {
 ecto_create () {
     MIX_ENV=${1}
 
-    envup .env.${MIX_ENV} && mix ecto.create
+    envup .env."${MIX_ENV}" && mix ecto.create
 }
 
 install_postgresql || exit 1
