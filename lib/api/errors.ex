@@ -14,7 +14,7 @@ defmodule NabooAPI.Errors do
   ```
   """
 
-  #FIXME: this should be in JSON format, not HTML
+  # FIXME: this should be in JSON format, not HTML
 
   def error_messages(changeset) do
     changeset

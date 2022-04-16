@@ -10,7 +10,7 @@ config :naboo, Naboo.Endpoint,
     patterns: [
       ~r{lib/naboo/.*(ee?x)$},
       ~r{lib/api/.*(ee?x)$},
-      ~r{lib/health/.*(ee?x)$},
+      ~r{lib/health/.*(ee?x)$}
     ]
   ]
 

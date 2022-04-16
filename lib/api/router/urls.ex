@@ -12,16 +12,14 @@ defmodule NabooAPI.Router.Urls do
     plug(Naboo.Auth.Guardian.Pipeline)
   end
 
-
   scope "/api" do
-    pipe_through (:api)
+    pipe_through(:api)
 
     scope "/v1" do
-
       post("/login", NabooAPI.Controllers.Auth.Session, :sign_in)
       resources("/account", NabooAPI.Controllers.Auth.Account, only: [:create])
 
-      pipe_through (:api_auth)
+      pipe_through(:api_auth)
       resources("/account", NabooAPI.Controllers.Auth.Account, only: [:update, :delete, :show, :index])
     end
   end

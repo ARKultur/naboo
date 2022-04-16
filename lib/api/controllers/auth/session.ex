@@ -34,5 +34,4 @@ defmodule NabooAPI.Controllers.Auth.Session do
     |> send_resp(200, "disconnected.")
     |> halt()
   end
-
 end

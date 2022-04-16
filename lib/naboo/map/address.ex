@@ -21,9 +21,7 @@ defmodule Naboo.Map.Address do
 
   @doc false
   def changeset(address, attrs) do
-    atoms = [:city, :description, :state_district, :state,
-      :postcode, :country, :country_code, :display_name, :latitude, :longitude,
-      :osm_id, :place_id]
+    atoms = [:city, :description, :state_district, :state, :postcode, :country, :country_code, :display_name, :latitude, :longitude, :osm_id, :place_id]
 
     address
     |> cast(attrs, atoms)
