@@ -1,5 +1,5 @@
 defmodule NabooAPI.Errors do
-  alias NabooAPI.Errors.Views
+  alias NabooAPI.Views.Errors
 
   @doc """
   Generates a human-readable block containing all errors in a changeset. Errors
@@ -22,7 +22,7 @@ defmodule NabooAPI.Errors do
   defp convert_errors_to_json(errors, schema) do
     errors = Enum.reduce(errors, [], &convert_error_field(&1, &2, schema))
 
-    Views.render("error_messages.json", %{errors: errors})
+    Errors.render("error_messages.json", %{errors: errors})
   end
 
   defp convert_error_field({field, errors}, memo, schema) when is_list(errors) do
