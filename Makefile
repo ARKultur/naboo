@@ -49,7 +49,7 @@ prepare: dependencies
 .PHONY: cleanup
 cleanup: ## Cleans the whole project, as if it was just cloned
 	echo "" | bash ./scripts/nuke_db.sh
-	rm -rf _build deps tmp
+	rm -rf _build deps tmp mix.lock .elixir_ls
 
 .PHONY: build
 build: ## Build the Docker image for the OTP release
