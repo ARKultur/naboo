@@ -1,19 +1,19 @@
 defmodule NabooAPI.Resolvers.AccountResolver do
-  alias Naboo.Accounts.Controller
+  alias Naboo.Accounts.AccountManager
 
   def all_accounts(_root, _args, _info) do
-    accounts = Controller.list_accounts()
+    accounts = AccountManager.list_accounts()
     {:ok, accounts}
   end
 
   def get_user(_root, %{id: id}, _do) do
-    Controller.get_account(id)
+    AccountManager.get_account(id)
   end
 
   def delete_account(_root, %{id: id}, _info) do
-    case Controller.get_account!(id) do
+    case AccountManager.get_account!(id) do
       {:ok, account} ->
-        Controller.delete_account(account)
+        AccountManager.delete_account(account)
 
       _ ->
         {:error, "could not find account"}
@@ -21,7 +21,7 @@ defmodule NabooAPI.Resolvers.AccountResolver do
   end
 
   def create_account(_root, args, _info) do
-    case Controller.create_account(args) do
+    case AccountManager.create_account(args) do
       {:ok, account} ->
         {:ok, account}
 

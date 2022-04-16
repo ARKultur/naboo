@@ -40,6 +40,8 @@ RUN apk update --no-cache && \
     git \
     erlang-dev \
     make \
+    bash \
+    postgresql-client \
     build-base \
     inotify-tools
 
