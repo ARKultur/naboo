@@ -72,7 +72,5 @@ jobs:
       - run: make header
       - run: make dependencies
       - run: make check
-      - run: make lint
-      - run: make test
       - run: make build-dev
 
