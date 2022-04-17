@@ -10,7 +10,7 @@ config :phoenix, :json_library, Jason
 
 config :naboo, Naboo.Endpoint,
   pubsub_server: Naboo.PubSub,
-  render_errors: [view: Naboo.Views.Errors, accepts: ~w(json)]
+  render_errors: [view: NabooAPI.Views.Errors, accepts: ~w(json)]
 
 config :naboo, Naboo.Repo, start_apps_before_migration: [:ssl]
 

@@ -9,7 +9,7 @@ defmodule Naboo.Mixfile do
       erlang: "~> 24.1",
       elixirc_paths: elixirc_paths(Mix.env()),
       test_paths: ["test"],
-      test_pattern: "**/*_test.exs",
+      test_pattern: "**/*_tests.exs",
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
       compilers: Mix.compilers(),

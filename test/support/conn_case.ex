@@ -26,7 +26,7 @@ defmodule Naboo.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
 
-      import Naboo.Router.Helpers
+      import NabooAPI.Router.Urls.Helpers
 
       # The default endpoint for testing
       @endpoint Endpoint

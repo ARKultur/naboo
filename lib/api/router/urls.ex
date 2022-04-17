@@ -31,8 +31,8 @@ defmodule NabooAPI.Router.Urls do
     opts =
       Plug.Session.init(
         store: :cookie,
-        key: Application.get_env(:naboo, __MODULE__)[:session_key],
-        signing_salt: Application.get_env(:naboo, __MODULE__)[:session_signing_salt]
+        key: Application.fetch_env!(:naboo, __MODULE__)[:session_key],
+        signing_salt: Application.fetch_env!(:naboo, __MODULE__)[:session_signing_salt]
       )
 
     Plug.Session.call(conn, opts)
