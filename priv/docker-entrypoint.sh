@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
- Following regex is based on https://www.rfc-editor.org/rfc/rfc3986#appendix-B with
+# Following regex is based on https://www.rfc-editor.org/rfc/rfc3986#appendix-B with
 # additional sub-expressions to split authority into userinfo, host and port
 #
 readonly URI_REGEX='^(([^:/?#]+):)?(//((([^:/?#]+)@)?([^:/?#]+)(:([0-9]+))?))?(/([^?#]*))(\?([^#]*))?(#(.*))?'
