@@ -1,7 +1,7 @@
 defmodule NabooAPI.Controllers.Auth.Registration do
   use Phoenix.Controller
 
-  alias Naboo.Accounts.AccountManager
+  alias Naboo.Accounts
   alias Naboo.Auth.Sessions
   alias NabooAPI.Router.Urls.Helpers
 
@@ -10,7 +10,7 @@ defmodule NabooAPI.Controllers.Auth.Registration do
       redirect(conn, to: "/api/v1/account/:id")
     else
       render(conn, :new,
-        changeset: AccountManager.change_account(),
+        changeset: Accounts.change_account(),
         action: Helpers.account_path(conn, :create)
       )
     end

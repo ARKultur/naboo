@@ -77,7 +77,7 @@ config :naboo, Naboo.Endpoint,
   static_url: Environment.get_endpoint_url_config(static_uri),
   url: Environment.get_endpoint_url_config(canonical_uri)
 
-config :naboo, Naboo.Router,
+config :naboo, NabooAPI.Router.Urls,
   session_key: Environment.get("SESSION_KEY"),
   session_signing_salt: Environment.get("SESSION_SIGNING_SALT")
 

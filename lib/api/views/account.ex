@@ -1,5 +1,5 @@
-defmodule NabooAPI.Views.Account do
-  use Phoenix.View, root: "lib/api", namespace: NabooAPI
+defmodule NabooAPI.Controllers.Auth.AccountView do
+  use Phoenix.View, root: "lib/", namespace: NabooAPI
 
   def render("index.json", %{accounts: accounts}) do
     %{data: render_many(accounts, Account, "account.json")}

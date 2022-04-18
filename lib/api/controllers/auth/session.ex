@@ -1,13 +1,13 @@
 defmodule NabooAPI.Controllers.Auth.Session do
   use Phoenix.Controller
 
-  alias Naboo.Accounts.AccountManager
+  alias Naboo.Accounts
   alias Naboo.Auth.Sessions
 
   require Logger
 
   def sign_in(conn, %{"email" => email, "password" => password}) do
-    with account <- AccountManager.get_account_by_email(email),
+    with account <- Accounts.get_account_by_email(email),
          {:ok, _} <- Sessions.authenticate(account, password),
          {:ok, token, conn} <- Sessions.log_in(conn, account) do
       render(conn, "token.json", token: token)

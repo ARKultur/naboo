@@ -16,7 +16,7 @@ defmodule Naboo.AccountsFixtures do
         is_admin: true,
         name: "some name"
       })
-      |> Naboo.Accounts.AccountManager.create_account()
+      |> Naboo.Accounts.create_account()
 
     account
   end

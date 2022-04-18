@@ -1,7 +1,7 @@
 defmodule NabooAPI.AccountControllerTest do
   use Naboo.ConnCase
 
-  alias Naboo.Accounts.AccountManager
+  alias Naboo.Accounts
   alias Naboo.Auth.Guardian
   alias NabooAPI.Router.Urls.Helpers
 
@@ -20,7 +20,7 @@ defmodule NabooAPI.AccountControllerTest do
   }
 
   setup %{conn: conn} do
-    user = AccountManager.get_account(1)
+    user = Accounts.get_account(1)
     {:ok, jwt, _claims} = Guardian.encode_and_sign(user)
 
     conn =

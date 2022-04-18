@@ -3,8 +3,16 @@
     "minimum_coverage": 80
   },
   "skip_files": [
-    "lib/naboo/release_tasks.ex",
-    "lib/mix/tasks/check.erlang_version.ex",
-    "test/"
+    "priv",
+    "test/",
+    "tmp",
+    "scripts",
+    "config",
+    "deps",
+    "lib/api/schema.ex",
+    "lib/api/application",
+    "lib/api/naboo_api.ex",
+    "lib/api/views",
+    "lib/naboo/router"
   ]
 }
