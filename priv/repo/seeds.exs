@@ -21,4 +21,3 @@ alias Naboo.Repo
   name: "darth sidious"
 })
 |> Repo.insert!()
-
