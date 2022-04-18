@@ -9,19 +9,16 @@ defmodule NabooAPI.Router.Urls do
   end
 
   pipeline :api_auth do
-    plug(Naboo.Auth.Guardian.Pipeline)
+    plug(NabooAPI.Auth.Guardian.Pipeline)
   end
 
   scope "/api" do
     pipe_through(:api)
+    post("/login", NabooAPI.SessionController, :sign_in)
+    resources("/account", NabooAPI.AccountController, only: [:create])
 
-    scope "/v1" do
-      post("/login", NabooAPI.Controllers.Auth.Session, :sign_in)
-      resources("/account", NabooAPI.Controllers.Auth.Account, only: [:create])
-
-      pipe_through(:api_auth)
-      resources("/account", NabooAPI.Controllers.Auth.Account, only: [:update, :delete, :show, :index])
-    end
+    pipe_through(:api_auth)
+    resources("/account", NabooAPI.AccountController, only: [:update, :delete, :show, :index])
   end
 
   # The session will be stored in the cookie and signed,

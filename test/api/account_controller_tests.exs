@@ -2,7 +2,7 @@ defmodule NabooAPI.AccountControllerTest do
   use Naboo.ConnCase
 
   alias Naboo.Accounts
-  alias Naboo.Auth.Guardian
+  alias NabooAPI.Auth.Guardian
   alias NabooAPI.Router.Urls.Helpers
 
   @create_attrs %{

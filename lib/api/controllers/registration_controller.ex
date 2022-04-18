@@ -1,8 +1,8 @@
-defmodule NabooAPI.Controllers.Auth.Registration do
+defmodule NabooAPI.RegistrationController do
   use Phoenix.Controller
 
   alias Naboo.Accounts
-  alias Naboo.Auth.Sessions
+  alias NabooAPI.Auth.Sessions
   alias NabooAPI.Router.Urls.Helpers
 
   def new(conn, _) do

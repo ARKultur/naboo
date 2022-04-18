@@ -16,11 +16,11 @@ config :naboo, Naboo.Repo, start_apps_before_migration: [:ssl]
 
 config :naboo, Corsica, allow_headers: :all
 
-config :naboo, Naboo.Auth.Guardian,
+config :naboo, NabooAPI.Auth.Guardian,
   issuer: "naboo",
   secret_key: System.get_env("GUARDIAN_SECRET")
 
-config :naboo, Naboo.Auth.Sessions,
+config :naboo, NabooAPI.Auth.Sessions,
   issuer: "naboo",
   secret_key: System.get_env("GUARDIAN_SECRET")
 

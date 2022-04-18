@@ -1,4 +1,4 @@
-defmodule Naboo.Auth.Guardian do
+defmodule NabooAPI.Auth.Guardian do
   use Guardian, otp_app: :naboo
 
   alias Naboo.Accounts

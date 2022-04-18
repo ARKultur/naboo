@@ -16,7 +16,7 @@ defmodule NabooAPI.Router.GraphQL do
       )
     end
 
-    plug(Naboo.Auth.Guardian.Pipeline)
+    plug(NabooAPI.Auth.Guardian.Pipeline)
 
     forward("/",
       to: Absinthe.Plug,

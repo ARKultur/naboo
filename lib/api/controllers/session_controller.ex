@@ -1,8 +1,8 @@
-defmodule NabooAPI.Controllers.Auth.Session do
+defmodule NabooAPI.SessionController do
   use Phoenix.Controller
 
   alias Naboo.Accounts
-  alias Naboo.Auth.Sessions
+  alias NabooAPI.Auth.Sessions
 
   require Logger
 

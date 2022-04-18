@@ -1,4 +1,4 @@
-defmodule Naboo.Auth.Errors do
+defmodule NabooAPI.Auth.Errors do
   @behaviour Guardian.Plug.ErrorHandler
 
   import Plug.Conn

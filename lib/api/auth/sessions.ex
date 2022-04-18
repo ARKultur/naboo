@@ -1,9 +1,9 @@
-defmodule Naboo.Auth.Sessions do
+defmodule NabooAPI.Auth.Sessions do
   use Guardian, otp_app: :naboo
 
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
-  alias Naboo.Auth.Guardian
+  alias NabooAPI.Auth.Guardian
 
   require Logger
 
