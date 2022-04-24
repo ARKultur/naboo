@@ -9,7 +9,7 @@ defmodule Naboo.Application do
     children = [
       Naboo.Repo,
       {Phoenix.PubSub, [name: Naboo.PubSub, adapter: Phoenix.PubSub.PG2]},
-      NabooWeb.Endpoint
+      Naboo.Endpoint
     ]
 
     opts = [strategy: :one_for_one, name: Naboo.Supervisor]
@@ -17,7 +17,7 @@ defmodule Naboo.Application do
   end
 
   def config_change(changed, _new, removed) do
-    NabooWeb.Endpoint.config_change(changed, removed)
+    Naboo.Endpoint.config_change(changed, removed)
     :ok
   end
 end

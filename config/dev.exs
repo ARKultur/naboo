@@ -1,6 +1,6 @@
 import Config
 
-config :naboo, NabooWeb.Endpoint,
+config :naboo, Naboo.Endpoint,
   code_reloader: true,
   check_origin: false,
   watchers: [
@@ -8,13 +8,11 @@ config :naboo, NabooWeb.Endpoint,
   ],
   live_reload: [
     patterns: [
-      ~r{priv/gettext/.*$},
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
-      ~r{lib/naboo_web/.*(ee?x)$}
+      ~r{lib/naboo/.*(ee?x)$},
+      ~r{lib/api/.*(ee?x)$},
+      ~r{lib/health/.*(ee?x)$}
     ]
   ]
-
-config :naboo, NabooWeb.ContentSecurityPolicy, allow_unsafe_scripts: true
 
 config :logger, :console, format: "[$level] $message\n"
 
