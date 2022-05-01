@@ -14,6 +14,16 @@ config :naboo, Naboo.Endpoint,
 
 config :naboo, Naboo.Repo, start_apps_before_migration: [:ssl]
 
+config :phoenix_swagger, json_library: Jason
+
+config :naboo, :phoenix_swagger,
+  swagger_files: %{
+    "priv/static/swagger.json" => [
+      endpoint: Naboo.Endpoint,
+      router: NabooAPI.Router.Swagger
+    ]
+  }
+
 config :naboo, Corsica, allow_headers: :all
 
 config :naboo, NabooAPI.Auth.Guardian,
