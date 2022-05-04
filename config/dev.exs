@@ -3,9 +3,7 @@ import Config
 config :naboo, Naboo.Endpoint,
   code_reloader: true,
   check_origin: false,
-  watchers: [
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
-  ],
+  watchers: [],
   live_reload: [
     patterns: [
       ~r{lib/naboo/.*(ee?x)$},
