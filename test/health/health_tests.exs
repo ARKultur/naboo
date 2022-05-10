@@ -1,5 +1,5 @@
 defmodule Naboo.Health.Tests do
-  use NabooAPI.ConnCase
+  use Naboo.ConnCase
 
   test "GET /health", %{conn: conn} do
     conn = get(conn, "/health")
