@@ -18,6 +18,7 @@ defmodule NabooAPI.Router.Urls do
     resources("/account", NabooAPI.AccountController, only: [:create])
 
     pipe_through(:api_auth)
+    post("/logout", NabooAPI.SessionController, :delete)
     resources("/account", NabooAPI.AccountController, only: [:update, :delete, :show, :index])
   end
 
