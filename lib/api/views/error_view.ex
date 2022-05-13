@@ -31,4 +31,11 @@ defmodule NabooAPI.Views.Errors do
       message: "could not find resource"
     }
   end
+
+  def render("422.json", _) do
+    %{
+      status: 422,
+      message: "unpossessable entity"
+    }
+  end
 end

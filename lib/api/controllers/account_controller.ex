@@ -24,7 +24,7 @@ defmodule NabooAPI.AccountController do
         conn
         |> put_view(AccountView)
         |> put_status(403)
-        |> render("already-exists.json", email: account_params.email)
+        |> render("already_exists.json", [])
     end
   end
 
@@ -52,7 +52,7 @@ defmodule NabooAPI.AccountController do
       |> put_status(:ok)
       |> render("show.json", account: updated)
     else
-      Nil ->
+      nil ->
         conn
         |> put_view(Errors)
         |> put_status(:not_found)
@@ -74,7 +74,7 @@ defmodule NabooAPI.AccountController do
       |> send_resp(200, "account deleted")
       |> halt()
     else
-      Nil ->
+      nil ->
         conn
         |> put_view(Errors)
         |> put_status(:not_found)

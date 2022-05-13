@@ -20,10 +20,9 @@ defmodule NabooAPI.AccountView do
     }
   end
 
-  def render("already_exists.json", %{email: email}) do
+  def render("already_exists.json", _) do
     %{
-      message: "account already exists",
-      email: email
+      message: "account already exists"
     }
   end
 end
