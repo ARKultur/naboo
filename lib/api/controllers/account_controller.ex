@@ -3,48 +3,88 @@ defmodule NabooAPI.AccountController do
 
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
+  alias NabooAPI.AccountView
+  alias NabooAPI.Views.Errors
 
   def index(conn, _params) do
     conn
-    |> put_view(NabooAPI.AccountView)
+    |> put_view(AccountView)
+    |> put_status(:ok)
     |> render("index.json", accounts: Accounts.list_accounts())
   end
 
   def create(conn, %{"account" => account_params}) do
     with {:ok, %Account{} = account} <- Accounts.register(account_params) do
       conn
+      |> put_view(AccountView)
       |> put_status(:created)
-      |> put_view(NabooAPI.AccountView)
       |> render("show.json", account: account)
+    else
+      _ ->
+        conn
+        |> put_view(AccountView)
+        |> put_status(403)
+        |> render("already-exists.json", email: account_params.email)
     end
   end
 
   def show(conn, %{"id" => id}) do
-    account = Accounts.get_account!(id)
+    case Accounts.get_account(id) do
+      nil ->
+        conn
+        |> put_view(Errors)
+        |> put_status(:not_found)
+        |> render("404.json", [])
 
-    conn
-    |> put_view(NabooAPI.AccountView)
-    |> render("show.json", account: account)
+      account ->
+        conn
+        |> put_view(AccountView)
+        |> put_status(:ok)
+        |> render("show.json", account: account)
+    end
   end
 
   def update(conn, %{"id" => id, "account" => account_params}) do
-    account = Accounts.get_account!(id)
-
-    with {:ok, %Account{} = account} <- Accounts.update_account(account, account_params) do
+    with %Account{} = account <- Accounts.get_account(id),
+         {:ok, %Account{} = updated} <- Accounts.update_account(account, account_params) do
       conn
-      |> put_view(NabooAPI.AccountView)
-      |> render("show.json", account: account)
+      |> put_view(AccountView)
+      |> put_status(:ok)
+      |> render("show.json", account: updated)
+    else
+      Nil ->
+        conn
+        |> put_view(Errors)
+        |> put_status(:not_found)
+        |> render("404.json", [])
+
+      {:ko, _} ->
+        conn
+        |> put_view(Errors)
+        |> put_status(400)
+        |> render("error_messages.json", %{errors: "Could not update account"})
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    account = Accounts.get_account!(id)
-
-    with {:ok, %Account{}} <- Accounts.delete_account(account) do
+    with %Account{} = account <- Accounts.get_account(id),
+         {:ok, %Account{}} <- Accounts.delete_account(account) do
       conn
       |> put_resp_content_type("application/json")
       |> send_resp(200, "account deleted")
       |> halt()
+    else
+      Nil ->
+        conn
+        |> put_view(Errors)
+        |> put_status(:not_found)
+        |> render("404.json", [])
+
+      {:ko, _} ->
+        conn
+        |> put_view(Errors)
+        |> put_status(400)
+        |> render("error_messages.json", %{errors: "Could not delete account"})
     end
   end
 end

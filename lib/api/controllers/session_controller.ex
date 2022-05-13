@@ -3,6 +3,7 @@ defmodule NabooAPI.SessionController do
 
   alias Naboo.Accounts
   alias NabooAPI.Auth.Sessions
+  alias NabooAPI.Views.Errors
 
   require Logger
 
@@ -11,27 +12,21 @@ defmodule NabooAPI.SessionController do
          {:ok, _} <- Sessions.authenticate(account, password),
          {:ok, token, conn} <- Sessions.log_in(conn, account) do
       render(conn, "token.json", token: token)
-    else
-      _error ->
-        conn
-        |> put_resp_header("content-type", "application/json")
-        |> send_resp(403, "could not authenticate")
-        |> halt()
     end
   end
 
   def sign_in(conn, _params) do
     conn
-    |> put_resp_header("content-type", "application/json")
-    |> send_resp(401, "wrong parameters")
-    |> halt()
+    |> put_view(Errors)
+    |> put_status(:unauthorized)
+    |> render("401.json", [])
   end
 
   def delete(conn, _params) do
     conn
     |> Sessions.log_out()
-    |> put_resp_header("content-type", "application/json")
-    |> send_resp(200, "disconnected.")
-    |> halt()
+    |> put_view(Accounts)
+    |> put_status(:ok)
+    |> render("disconnected.json", [])
   end
 end

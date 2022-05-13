@@ -34,4 +34,11 @@ defmodule NabooAPI.Router.Urls do
 
     Plug.Session.call(conn, opts)
   end
+
+  def render_result(conn, view, status, json_file, args) do
+    conn
+    |> put_status(status)
+    |> put_view(view)
+    |> render(json_file, args)
+  end
 end

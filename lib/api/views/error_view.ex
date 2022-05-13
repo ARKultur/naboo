@@ -17,4 +17,18 @@ defmodule NabooAPI.Views.Errors do
       message: "something went terribly wrong"
     }
   end
+
+  def render("401.json", _) do
+    %{
+      status: 401,
+      message: "unauthorized"
+    }
+  end
+
+  def render("404.json", _) do
+    %{
+      status: 404,
+      message: "could not find resource"
+    }
+  end
 end

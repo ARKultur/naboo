@@ -11,13 +11,10 @@
     "deps",
     "lib/api/schema.ex",
     "lib/api/application",
-    "lib/api/naboo_api.ex",
     "lib/naboo/socket.ex",
     "lib/naboo/repo.ex",
     "lib/naboo/release_tasks.ex",
-    "lib/api/views",
     "lib/naboo/application.ex",
-    "lib/naboo/router",
     "lib/api/resolvers"
   ]
 }
