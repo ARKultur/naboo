@@ -23,7 +23,6 @@ defmodule NabooAPI.SessionController do
   def delete(conn, _params) do
     conn
     |> Sessions.log_out()
-    |> put_view(Accounts)
     |> put_status(:ok)
     |> render("disconnected.json", [])
   end

@@ -1,6 +1,6 @@
 {
   "coverage_options": {
-    "minimum_coverage": 40
+    "minimum_coverage": 70
   },
   "skip_files": [
     "priv",
@@ -17,6 +17,10 @@
     "lib/naboo/application.ex",
     "lib/api/naboo_api.ex",
     "lib/api/errors.ex",
-    "lib/api/resolvers"
+    "lib/api/resolvers",
+    "lib/health/naboo_health.ex",
+    "lib/api/router/graphql.ex",
+    "lib/api/auth/guardian.ex",
+    "lib/naboo/endpoint.ex"
   ]
 }
