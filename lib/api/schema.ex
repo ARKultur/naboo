@@ -4,6 +4,7 @@ defmodule NabooAPI.Schema do
   alias Naboo.Repo
   alias NabooAPI.Resolvers.AccountResolver
   alias NabooAPI.Resolvers.AddressResolver
+  alias NabooAPI.Resolvers.NodeResolver
 
   import_types(Absinthe.Type.Custom)
   import_types(NabooAPI.Application.Types)
@@ -34,11 +35,39 @@ defmodule NabooAPI.Schema do
       resolve(&AddressResolver.update_address/3)
     end
 
-    @desc "Delete an account"
+    @desc "Delete an address"
     field :delete_address, :address do
       arg(:id, non_null(:id))
 
       resolve(&AddressResolver.delete_address/3)
+    end
+
+    @desc "Create a new node"
+    field :create_node, :node do
+      arg(:latitude, non_null(:string))
+      arg(:longitude, non_null(:string))
+      arg(:name, non_null(:string))
+      arg(:addr_id, non_null(:id))
+
+      resolve(&NodeResolver.create_node/3)
+    end
+
+    @desc "Updates existing node"
+    field :update_node, :node do
+      arg(:id, non_null(:id))
+      arg(:latitude, non_null(:string))
+      arg(:longitude, non_null(:string))
+      arg(:name, non_null(:string))
+      arg(:addr_id, non_null(:id))
+
+      resolve(&NodeResolver.update_node/3)
+    end
+
+    @desc "Delete an node"
+    field :delete_node, :node do
+      arg(:id, non_null(:id))
+
+      resolve(&NodeResolver.delete_node/3)
     end
 
     @desc "Create a new account"
@@ -72,7 +101,6 @@ defmodule NabooAPI.Schema do
 
   query do
     import_fields(:application_queries)
-
     @desc "get all accounts"
     field :all_accounts, non_null(list_of(non_null(:account))) do
       resolve(&AccountResolver.all_accounts/3)
@@ -82,6 +110,18 @@ defmodule NabooAPI.Schema do
     field :all_addresses, non_null(list_of(non_null(:address))) do
       resolve(&AddressResolver.all_addresses/3)
     end
+
+    @desc "get all nodes"
+    field :all_nodes, non_null(list_of(non_null(:node))) do
+      resolve(&NodeResolver.all_nodes/3)
+    end
+  end
+
+  object :node do
+    field(:latitude, non_null(:string))
+    field(:longitude, non_null(:string))
+    field(:name, non_null(:string))
+    field(:addr_id, non_null(:id))
   end
 
   object :address do

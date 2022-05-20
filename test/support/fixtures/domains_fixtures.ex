@@ -22,4 +22,23 @@ defmodule Naboo.DomainsFixtures do
 
     address
   end
+
+  @doc """
+  Generate a node.
+  """
+  def node_fixture(attrs \\ %{}) do
+    addr = address_fixture()
+
+    {:ok, node} =
+      attrs
+      |> Enum.into(%{
+        latitude: "some latitude",
+        longitude: "some longitude",
+        name: "some name",
+        addr_id: addr.id
+      })
+      |> Naboo.Domains.create_node()
+
+    node
+  end
 end
