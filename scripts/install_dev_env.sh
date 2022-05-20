@@ -1,5 +1,7 @@
 #!/bin/env bash
 
+set -eou
+
 export MIX_ENV=dev
 
 envup () {
@@ -36,8 +38,9 @@ install_elixir_with_asdf () {
     cp .tool-versions ~
     asdf plugin-update --all
 }
+
 envup .env.${MIX_ENV}
 
 install_elixir_with_asdf
 
-make dependencies && mix assets.deploy
+make prepare

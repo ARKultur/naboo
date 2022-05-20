@@ -6,7 +6,7 @@ This is the ARKultur's back-end, all written in Elixir. :^)
 
 ### dev
 
-A simple `docker-compose up --build` should suffice.
+A simple `docker-compose up --build` should be enough.
 If it's not the case, please read the documentation below.
 
 To build and run a dev version, you will need to export the data present in `.env.dev`.
@@ -14,7 +14,7 @@ I have a little function you can put in your `.bashrc` to export data to your en
 Use it as a function or it will not work:
 
 ```bash
-# in your .bashrc
+# in your .bashrc / .zshrc / whatever
 envup () {
     if [ -f ${1} ]; then
         set -o allexport
@@ -24,6 +24,7 @@ envup () {
     fi
 }
 
+source ~/.bashrc # or .zshrc or whatever
 
 # in the command-line
 ## installing dependencies
@@ -36,13 +37,18 @@ envup .env.test
 MIX_ENV=dev mix phx.server
 ```
 
+Note: When installing the necessary dependencies, `install_dev_env.sh` assumes you're running a Debian-variant of Linux,
+feel free to add a check to your own distro and upstream it if that's not the case.
+
 ### Check available API routes
 
 ```bash
 MIX_ENV=prod mix phx.routes
 ```
 
-### Test your queries
+An OpenAPI specification is also available.
+
+### GraphQL tests
 
 As we use graphQL to manage our queries, you can have an interface to test
 your queries.
@@ -84,9 +90,4 @@ You should receive a JWT token, like this:
 }
 ```
 
-Then, you can test if you're correclty authenticated using the `GET /api/protected-ping`
-route, setting in your Request Hearder the following key:
-`Authorization: Bearer some_jwt_token`.
-The API should then respond `pong!`
-
-
+You can then just use this as a Bearer token.
