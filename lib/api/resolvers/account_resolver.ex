@@ -27,12 +27,13 @@ defmodule NabooAPI.Resolvers.AccountResolver do
     case Accounts.get_account(id) do
       nil ->
         {:error, "could not find account"}
+
       account ->
         Accounts.delete_account(account)
     end
   end
 
   def create_account(_root, args, _info) do
-      Accounts.create_account(args)
+    Accounts.create_account(args)
   end
 end

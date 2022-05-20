@@ -3,11 +3,44 @@ defmodule NabooAPI.Schema do
 
   alias Naboo.Repo
   alias NabooAPI.Resolvers.AccountResolver
+  alias NabooAPI.Resolvers.AddressResolver
 
   import_types(Absinthe.Type.Custom)
   import_types(NabooAPI.Application.Types)
 
   mutation do
+    @desc "Create a new address"
+    field :create_address, :address do
+      arg(:city, non_null(:string))
+      arg(:country, non_null(:string))
+      arg(:country_code, non_null(:string))
+      arg(:postcode, non_null(:string))
+      arg(:state, non_null(:string))
+      arg(:state_district, non_null(:string))
+
+      resolve(&AddressResolver.create_address/3)
+    end
+
+    @desc "Update an address"
+    field :update_address, :address do
+      arg(:city, non_null(:string))
+      arg(:country, non_null(:string))
+      arg(:country_code, non_null(:string))
+      arg(:postcode, non_null(:string))
+      arg(:state, non_null(:string))
+      arg(:state_district, non_null(:string))
+      arg(:id, non_null(:id))
+
+      resolve(&AddressResolver.update_address/3)
+    end
+
+    @desc "Delete an account"
+    field :delete_address, :address do
+      arg(:id, non_null(:id))
+
+      resolve(&AddressResolver.delete_address/3)
+    end
+
     @desc "Create a new account"
     field :create_account, :account do
       arg(:password, non_null(:string))
@@ -18,7 +51,7 @@ defmodule NabooAPI.Schema do
       resolve(&AccountResolver.create_account/3)
     end
 
-  @desc "Updates existing account"
+    @desc "Updates existing account"
     field :update_account, :account do
       arg(:id, non_null(:id))
       arg(:password, non_null(:string))
@@ -44,6 +77,20 @@ defmodule NabooAPI.Schema do
     field :all_accounts, non_null(list_of(non_null(:account))) do
       resolve(&AccountResolver.all_accounts/3)
     end
+
+    @desc "get all addresses"
+    field :all_addresses, non_null(list_of(non_null(:address))) do
+      resolve(&AddressResolver.all_addresses/3)
+    end
+  end
+
+  object :address do
+    field(:city, non_null(:string))
+    field(:country, non_null(:string))
+    field(:country_code, non_null(:string))
+    field(:postcode, non_null(:string))
+    field(:state, non_null(:string))
+    field(:state_district, non_null(:string))
   end
 
   object :account do
