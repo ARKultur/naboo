@@ -111,10 +111,10 @@ defmodule Naboo.Accounts do
 
   ## Examples
 
-  iex> get_account(something@email.com)
+  iex> get_account_by_email(something@email.com)
   %Account{}
 
-  iex> get_account!(doesnt.exit@email.com)
+  iex> get_account_by_email(doesnt.exit@email.com)
   nil
 
   """

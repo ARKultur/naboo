@@ -13,8 +13,20 @@ defmodule NabooAPI.Schema do
       arg(:password, non_null(:string))
       arg(:email, non_null(:string))
       arg(:name, non_null(:string))
+      arg(:is_admin, non_null(:string))
 
       resolve(&AccountResolver.create_account/3)
+    end
+
+  @desc "Updates existing account"
+    field :update_account, :account do
+      arg(:id, non_null(:id))
+      arg(:password, non_null(:string))
+      arg(:email, non_null(:string))
+      arg(:name, non_null(:string))
+      arg(:is_admin, non_null(:string))
+
+      resolve(&AccountResolver.update_account/3)
     end
 
     @desc "Delete an account"
@@ -39,7 +51,6 @@ defmodule NabooAPI.Schema do
     field(:email, non_null(:string))
     field(:name, non_null(:string))
     field(:is_admin, non_null(:string))
-    field(:auth_token, non_null(:string))
   end
 
   def context(context) do
