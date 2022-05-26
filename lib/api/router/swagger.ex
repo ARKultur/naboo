@@ -1,19 +1,22 @@
 defmodule NabooAPI.Router.Swagger do
   use Phoenix.Router
 
-  pipeline :api do
-    plug(:accepts, ["json"])
+  pipeline :web do
+    plug(:accepts, ["json", "html"])
   end
 
-  scope "/" do
-    scope("/swagger", do: forward("/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :area, swagger_file: "swagger.json"))
+  scope "/swagger" do
+    pipe_through(:web)
+
+    scope("/", do: forward("/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :naboo, swagger_file: "swagger.json"))
   end
 
   def swagger_info do
     %{
       info: %{
-        version: "1.0",
-        title: "Naboo"
+        version: "0.2",
+        host: "http://localhost:4000",
+        title: "naboo"
       }
     }
   end
