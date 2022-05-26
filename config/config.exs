@@ -30,5 +30,15 @@ config :sentry,
 
 config :logger, backends: [:console, Sentry.LoggerBackend]
 
+config :phoenix_swagger, json_library: Jason
+
+config :naboo, :phoenix_swagger,
+  swagger_files: %{
+    "priv/static/swagger.json" => [
+      router: NabooAPI.Router.Swagger,
+      endpoint: Naboo.Endpoint
+    ]
+  }
+
 # Import environment configuration
 import_config "#{Mix.env()}.exs"
