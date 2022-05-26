@@ -38,4 +38,4 @@ ecto_create () {
 install_postgresql || exit 1
 
 ecto_create "dev"
-ecto_create "test"
+

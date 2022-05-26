@@ -2,7 +2,7 @@ defmodule NabooAPI.Router.Swagger do
   use Phoenix.Router
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
   scope "/" do

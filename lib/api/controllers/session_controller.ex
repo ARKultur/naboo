@@ -15,13 +15,13 @@ defmodule NabooAPI.SessionController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(),
+    response(200, "OK", Schema.ref(:LoginResponse),
       example: %{
         data: [
-        %{
-          email: "yolo",
-          password: "amogus"
-          },
+          %{
+            email: "yolo",
+            password: "amogus"
+          }
         ]
       }
     )
@@ -54,11 +54,10 @@ defmodule NabooAPI.SessionController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(),
+    response(200, "OK", Schema.ref(:LogoutResponse),
       example: %{
         data: [
-        %{
-          },
+          %{}
         ]
       }
     )

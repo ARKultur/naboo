@@ -17,9 +17,9 @@ defmodule NabooAPI.AccountController do
     response(200, "OK", Schema.ref(:AccountView),
       example: %{
         data: [
-        %{
-          _params: ""
-          },
+          %{
+            _params: ""
+          }
         ]
       }
     )
@@ -32,7 +32,6 @@ defmodule NabooAPI.AccountController do
     |> render("index.json", accounts: Accounts.list_accounts())
   end
 
-
   swagger_path(:create) do
     get("/account")
     summary("Create an user")
@@ -40,12 +39,12 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(),
+    response(200, "OK", Schema.ref(:CreateAccountResponse),
       example: %{
         data: [
-        %{
-          account_params: "jaj"
-          },
+          %{
+            account_params: "jaj"
+          }
         ]
       }
     )
@@ -73,12 +72,12 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(),
+    response(200, "OK", Schema.ref(:ShowAccountResponse),
       example: %{
         data: [
-        %{
-          id: 12
-          },
+          %{
+            id: 12
+          }
         ]
       }
     )
@@ -107,13 +106,13 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(),
+    response(200, "OK", Schema.ref(:UpdateAccountResponse),
       example: %{
         data: [
-        %{
-          id: 12,
-          account: "jaj"
-          },
+          %{
+            id: 12,
+            account: "jaj"
+          }
         ]
       }
     )
@@ -148,12 +147,12 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(),
+    response(200, "OK", Schema.ref(:DeleteAccountResponse),
       example: %{
         data: [
-        %{
-          id: 12
-          },
+          %{
+            id: 12
+          }
         ]
       }
     )
