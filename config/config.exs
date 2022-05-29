@@ -35,7 +35,7 @@ config :phoenix_swagger, json_library: Jason
 config :naboo, :phoenix_swagger,
   swagger_files: %{
     "priv/static/swagger.json" => [
-      router: NabooAPI.Router.Swagger,
+      router: NabooAPI.Router.Urls,
       endpoint: Naboo.Endpoint
     ]
   }

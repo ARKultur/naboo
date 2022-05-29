@@ -22,18 +22,16 @@ defmodule NabooAPI.SessionController do
 
           example(%{
             email: "some_user@email.com",
-            password: "amogus",
+            password: "amogus"
           })
-      end,
-
+        end,
       Unauthorized:
         swagger_schema do
           title("refuse the connection")
           description("Refuses the connection to the account")
 
-          example(%{
-          })
-      end
+          example(%{})
+        end
     }
   end
 
@@ -47,10 +45,10 @@ defmodule NabooAPI.SessionController do
     response(200, "OK", Schema.ref(:Sign_in),
       example: %{
         data: [
-        %{
-          email: "yolo@test.com",
-          password: "amogus"
-          },
+          %{
+            email: "yolo@test.com",
+            password: "amogus"
+          }
         ]
       }
     )
@@ -86,8 +84,7 @@ defmodule NabooAPI.SessionController do
     response(200, "OK", Schema.ref(:Unauthorized),
       example: %{
         data: [
-        %{
-          },
+          %{}
         ]
       }
     )
