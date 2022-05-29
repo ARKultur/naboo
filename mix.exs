@@ -37,8 +37,8 @@ defmodule Naboo.Mixfile do
       ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      "phx.server": ["phx.swagger.generate", "phx.server"],
-      test: ["ecto.reset", "test"]
+      test: ["ecto.reset", "test"],
+      "phx.server": ["phx.swagger.generate", "phx.server"]
     ]
   end
 
@@ -89,7 +89,7 @@ defmodule Naboo.Mixfile do
       {:faker, "~> 0.16", only: :test},
       {:excoveralls, "~> 0.14", only: :test},
 
-      # Documentation
+      # Swagger
       {:phoenix_swagger, "~> 0.8"},
       {:ex_json_schema, "~> 0.5"}
     ]

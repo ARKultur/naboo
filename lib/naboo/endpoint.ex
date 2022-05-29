@@ -48,6 +48,7 @@ defmodule Naboo.Endpoint do
 
   plug(NabooHealth.Router)
   plug(NabooAPI.Router.GraphQL)
+  plug(NabooAPI.Router.Swagger)
   plug(:halt_if_sent)
   plug(NabooAPI.Router.Urls)
 

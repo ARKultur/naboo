@@ -16,8 +16,13 @@ defmodule NabooAPI.AccountView do
       id: account.id,
       name: account.name,
       email: account.email,
-      encrypted_password: account.encrypted_password,
       is_admin: account.is_admin
+    }
+  end
+
+  def render("already_exists.json", _) do
+    %{
+      message: "account already exists"
     }
   end
 end

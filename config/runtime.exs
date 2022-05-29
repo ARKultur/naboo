@@ -83,7 +83,7 @@ config :naboo, NabooAPI.Router.Urls,
 
 config :naboo, Corsica, origins: Environment.get_cors_origins()
 
-# TODO: Finish configuration for Sentry and New Relic
+# TODO(bogdan): Finish configuration for Sentry and New Relic
 config :sentry,
   dsn: Environment.get("SENTRY_DSN"),
   environment_name: Environment.get("SENTRY_ENVIRONMENT_NAME"),
