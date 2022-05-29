@@ -134,7 +134,7 @@ defmodule NabooAPI.AccountController do
     deprecated(false)
 
     parameter(:id, :query, :integer, "id of the account to update", required: true)
-    parameter(:account_params, :body,:Account, "new informations of the account", required: true)
+    parameter(:account_params, :body, :Account, "new informations of the account", required: true)
 
     response(200, "show.json", %{},
       example: %{
