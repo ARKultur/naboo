@@ -71,11 +71,6 @@ defmodule Naboo.Mixfile do
       # Health
       {:plug_checkup, "~> 0.6"},
 
-      # Errors & Monitoring
-      {:sentry, "~> 8.0"},
-      {:new_relic_agent, "~> 1.27"},
-      {:new_relic_absinthe, "~> 0.0"},
-
       # Linting
       {:credo, "~> 1.5", only: [:dev, :test], override: true},
       {:credo_envvar, "~> 0.1", only: [:dev, :test], runtime: false},

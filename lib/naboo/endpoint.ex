@@ -1,5 +1,4 @@
 defmodule Naboo.Endpoint do
-  use Sentry.PlugCapture
   use Phoenix.Endpoint, otp_app: :naboo
   alias Plug.Conn
   require Logger
@@ -42,7 +41,6 @@ defmodule Naboo.Endpoint do
     json_decoder: Phoenix.json_library()
   )
 
-  plug(Sentry.PlugContext)
   plug(Plug.MethodOverride)
   plug(Plug.Head)
 

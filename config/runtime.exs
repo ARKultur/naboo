@@ -82,13 +82,3 @@ config :naboo, NabooAPI.Router.Urls,
   session_signing_salt: Environment.get("SESSION_SIGNING_SALT")
 
 config :naboo, Corsica, origins: Environment.get_cors_origins()
-
-# TODO(bogdan): Finish configuration for Sentry and New Relic
-config :sentry,
-  dsn: Environment.get("SENTRY_DSN"),
-  environment_name: Environment.get("SENTRY_ENVIRONMENT_NAME"),
-  included_environments: [Environment.get("SENTRY_ENVIRONMENT_NAME")]
-
-config :new_relic_agent,
-  app_name: System.get_env("NEW_RELIC_APP_NAME"),
-  license_key: System.get_env("NEW_RELIC_LICENSE_KEY")

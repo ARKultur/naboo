@@ -24,11 +24,7 @@ config :naboo, NabooAPI.Auth.Sessions,
   issuer: "naboo",
   secret_key: System.get_env("GUARDIAN_SECRET")
 
-config :sentry,
-  root_source_code_path: File.cwd!(),
-  release: version
-
-config :logger, backends: [:console, Sentry.LoggerBackend]
+config :logger, backends: [:console]
 
 # Import environment configuration
 import_config "#{Mix.env()}.exs"
