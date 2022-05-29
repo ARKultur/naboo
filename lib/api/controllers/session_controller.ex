@@ -8,6 +8,35 @@ defmodule NabooAPI.SessionController do
 
   require Logger
 
+  def swagger_definitions do
+    %{
+      Sign_in:
+        swagger_schema do
+          title("Sign in")
+          description("Signs in the account from the database")
+
+          properties do
+            email(:string, "user's email", required: true)
+            password(:string, "user password", required: true)
+          end
+
+          example(%{
+            email: "some_user@email.com",
+            password: "amogus",
+          })
+      end,
+
+      Unauthorized:
+        swagger_schema do
+          title("refuse the connection")
+          description("Refuses the connection to the account")
+
+          example(%{
+          })
+      end
+    }
+  end
+
   swagger_path(:sign_in) do
     get("/account")
     summary("Log in")
@@ -15,13 +44,13 @@ defmodule NabooAPI.SessionController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(:LoginResponse),
+    response(200, "OK", Schema.ref(:Sign_in),
       example: %{
         data: [
-          %{
-            email: "yolo",
-            password: "amogus"
-          }
+        %{
+          email: "yolo@test.com",
+          password: "amogus"
+          },
         ]
       }
     )
@@ -54,10 +83,11 @@ defmodule NabooAPI.SessionController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(:LogoutResponse),
+    response(200, "OK", Schema.ref(:Unauthorized),
       example: %{
         data: [
-          %{}
+        %{
+          },
         ]
       }
     )

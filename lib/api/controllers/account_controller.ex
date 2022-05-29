@@ -7,6 +7,82 @@ defmodule NabooAPI.AccountController do
   alias NabooAPI.AccountView
   alias NabooAPI.Views.Errors
 
+
+  def swagger_definitions do
+    %{
+      Index:
+        swagger_schema do
+          title("List all users")
+          description("Lists all users in the database")
+
+          example(%{
+          })
+      end,
+
+      Create:
+        swagger_schema do
+          title("Create an user")
+          description("Create an user in the database")
+          properties do
+            account_params(:Account, "account informations", required: true)
+          end
+          example(%{
+            account_params: %{
+              email: "test@test.com",
+              encrypted_password: "sqdqsd",
+              password: "test_t",
+              is_admin: false,
+              name: "test"
+            }
+          })
+      end,
+
+      Show:
+        swagger_schema do
+          title("Show an account informations")
+          description("Show an account informations from the database")
+          properties do
+            id(:integer, "account's id", required: true)
+          end
+          example(%{
+            id: 12
+          })
+      end,
+
+      Update:
+        swagger_schema do
+          title("Update an account informations")
+          description("Update an account informations in the database")
+          properties do
+            id(:integer, "account's id", required: true)
+            account_params(:Account, "account's new informations", required: true)
+          end
+          example(%{
+            id: 12,
+            account_params: %{
+              email: "test@test.com",
+              encrypted_password: "sqdqsd",
+              password: "test_t",
+              is_admin: false,
+              name: "test"
+            }
+          })
+      end,
+
+      Delete:
+      swagger_schema do
+        title("Delete an account")
+        description("Delete an account in the database")
+        properties do
+          id(:integer, "account's id", required: true)
+        end
+        example(%{
+          id: 12
+        })
+      end
+    }
+  end
+
   swagger_path(:index) do
     get("/account")
     summary("Lists users")
@@ -14,12 +90,11 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(:AccountView),
+    response(200, "OK", Schema.ref(:Index),
       example: %{
         data: [
-          %{
-            _params: ""
-          }
+        %{
+          },
         ]
       }
     )
@@ -32,6 +107,7 @@ defmodule NabooAPI.AccountController do
     |> render("index.json", accounts: Accounts.list_accounts())
   end
 
+
   swagger_path(:create) do
     get("/account")
     summary("Create an user")
@@ -39,12 +115,18 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(:CreateAccountResponse),
+    response(200, "OK", Schema.ref(:Create),
       example: %{
         data: [
-          %{
-            account_params: "jaj"
+        %{
+          account_params: %{
+            email: "test@test.com",
+            encrypted_password: "sqdqsd",
+            password: "test_t",
+            is_admin: false,
+            name: "test"
           }
+        },
         ]
       }
     )
@@ -72,11 +154,11 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(:ShowAccountResponse),
+    response(200, "OK", Schema.ref(:Show),
       example: %{
         data: [
-          %{
-            id: 12
+        %{
+          id: 12
           }
         ]
       }
@@ -106,12 +188,18 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(:UpdateAccountResponse),
+    response(200, "OK", Schema.ref(:Update),
       example: %{
         data: [
-          %{
-            id: 12,
-            account: "jaj"
+        %{
+          id: 12,
+          account_params: %{
+            email: "test@test.com",
+            encrypted_password: "sqdqsd",
+            password: "test_t",
+            is_admin: false,
+            name: "test"
+          }
           }
         ]
       }
@@ -147,11 +235,11 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(:DeleteAccountResponse),
+    response(200, "OK", Schema.ref(:Delete),
       example: %{
         data: [
-          %{
-            id: 12
+        %{
+          id: 12
           }
         ]
       }
