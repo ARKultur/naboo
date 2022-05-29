@@ -8,48 +8,18 @@ defmodule NabooAPI.SessionController do
 
   require Logger
 
-  def swagger_definitions do
-    %{
-      Sign_in:
-        swagger_schema do
-          title("Sign in")
-          description("Signs in the account from the database")
-
-          properties do
-            email(:string, "user's email", required: true)
-            password(:string, "user password", required: true)
-          end
-
-          example(%{
-            email: "some_user@email.com",
-            password: "amogus"
-          })
-        end,
-      Unauthorized:
-        swagger_schema do
-          title("refuse the connection")
-          description("Refuses the connection to the account")
-
-          example(%{})
-        end
-    }
-  end
-
   swagger_path(:sign_in) do
-    get("/account")
+    post("/login")
     summary("Log in")
     description("Log in with an account known in the database")
     produces("application/json")
     deprecated(false)
+    parameter(:email, :body, :string, "email of the account", required: true)
+    parameter(:password, :body, :string, "password of the account", required: true)
 
-    response(200, "OK", Schema.ref(:Sign_in),
+    response(200, "token.json", %{},
       example: %{
-        data: [
-          %{
-            email: "yolo@test.com",
-            password: "amogus"
-          }
-        ]
+        token: "46853121354qsfqse"
       }
     )
   end
@@ -72,22 +42,6 @@ defmodule NabooAPI.SessionController do
     |> Sessions.log_out()
     |> put_status(:ok)
     |> render("disconnected.json", [])
-  end
-
-  swagger_path(:unauthorized) do
-    get("/account")
-    summary("Refuses a connection")
-    description("Refuses the connection if the arguments are wrong")
-    produces("application/json")
-    deprecated(false)
-
-    response(200, "OK", Schema.ref(:Unauthorized),
-      example: %{
-        data: [
-          %{}
-        ]
-      }
-    )
   end
 
   defp unauthorized(conn) do

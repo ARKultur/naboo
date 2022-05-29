@@ -7,95 +7,30 @@ defmodule NabooAPI.AccountController do
   alias NabooAPI.AccountView
   alias NabooAPI.Views.Errors
 
-  def swagger_definitions do
-    %{
-      Index:
-        swagger_schema do
-          title("List all users")
-          description("Lists all users in the database")
-
-          example(%{})
-        end,
-      Create:
-        swagger_schema do
-          title("Create an user")
-          description("Create an user in the database")
-
-          properties do
-            account_params(:Account, "account informations", required: true)
-          end
-
-          example(%{
-            account_params: %{
-              email: "test@test.com",
-              encrypted_password: "sqdqsd",
-              password: "test_t",
-              is_admin: false,
-              name: "test"
-            }
-          })
-        end,
-      Show:
-        swagger_schema do
-          title("Show an account informations")
-          description("Show an account informations from the database")
-
-          properties do
-            id(:integer, "account's id", required: true)
-          end
-
-          example(%{
-            id: 12
-          })
-        end,
-      Update:
-        swagger_schema do
-          title("Update an account informations")
-          description("Update an account informations in the database")
-
-          properties do
-            id(:integer, "account's id", required: true)
-            account_params(:Account, "account's new informations", required: true)
-          end
-
-          example(%{
-            id: 12,
-            account_params: %{
-              email: "test@test.com",
-              encrypted_password: "sqdqsd",
-              password: "test_t",
-              is_admin: false,
-              name: "test"
-            }
-          })
-        end,
-      Delete:
-        swagger_schema do
-          title("Delete an account")
-          description("Delete an account in the database")
-
-          properties do
-            id(:integer, "account's id", required: true)
-          end
-
-          example(%{
-            id: 12
-          })
-        end
-    }
-  end
-
   swagger_path(:index) do
-    get("/account")
+    get("api/account")
     summary("Lists users")
     description("Lists all users in the database")
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(:Index),
+    response(200, "index.json", %{},
       example: %{
-        data: [
-          %{}
+        accounts: [
+          %{
+            email: "test@test.com",
+            encrypted_password: "sqdqsd",
+            password: "test_t",
+            is_admin: false,
+            name: "test"
+          },
+          %{
+            email: "test2@test.com",
+            encrypted_password: "sqdqsd58",
+            password: "tes",
+            is_admin: false,
+            name: "test2"
+          }
         ]
       }
     )
@@ -109,25 +44,32 @@ defmodule NabooAPI.AccountController do
   end
 
   swagger_path(:create) do
-    get("/account")
+    post("/api/account")
     summary("Create an user")
     description("Create an user in the database")
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(:Create),
+    parameter(:account_params, :body, :Account, "informations of the account",
+      required: true,
       example: %{
-        data: [
-          %{
-            account_params: %{
-              email: "test@test.com",
-              encrypted_password: "sqdqsd",
-              password: "test_t",
-              is_admin: false,
-              name: "test"
-            }
-          }
-        ]
+        account: %{
+          email: "test@test.com",
+          password: "test_t",
+          name: "test"
+        }
+      }
+    )
+
+    response(200, "show.json", %{},
+      example: %{
+        account: %{
+          email: "test@test.com",
+          encrypted_password: "sqdqsd",
+          password: "test_t",
+          is_admin: false,
+          name: "test"
+        }
       }
     )
   end
@@ -148,19 +90,22 @@ defmodule NabooAPI.AccountController do
   end
 
   swagger_path(:show) do
-    get("/account")
+    get("/api/account/{id}")
     summary("Show an user")
     description("Show an user in the database")
     produces("application/json")
     deprecated(false)
+    parameter(:id, :query, :integer, "id of the user to show", required: true)
 
-    response(200, "OK", Schema.ref(:Show),
+    response(200, "show.json", %{},
       example: %{
-        data: [
-          %{
-            id: 12
-          }
-        ]
+        account: %{
+          email: "test@test.com",
+          encrypted_password: "sqdqsd",
+          password: "test_t",
+          is_admin: false,
+          name: "test"
+        }
       }
     )
   end
@@ -182,26 +127,24 @@ defmodule NabooAPI.AccountController do
   end
 
   swagger_path(:update) do
-    get("/account")
+    patch("/api/account/{id}")
     summary("Update an user")
     description("Update an user in the database")
     produces("application/json")
     deprecated(false)
 
-    response(200, "OK", Schema.ref(:Update),
+    parameter(:id, :query, :integer, "id of the account to update", required: true)
+    parameter(:account_params, :body, :Account, "new informations of the account", required: true)
+
+    response(200, "show.json", %{},
       example: %{
-        data: [
-          %{
-            id: 12,
-            account_params: %{
-              email: "test@test.com",
-              encrypted_password: "sqdqsd",
-              password: "test_t",
-              is_admin: false,
-              name: "test"
-            }
-          }
-        ]
+        account_params: %{
+          email: "test@test.com",
+          encrypted_password: "sqdqsd",
+          password: "test_t",
+          is_admin: false,
+          name: "test"
+        }
       }
     )
   end
@@ -229,21 +172,13 @@ defmodule NabooAPI.AccountController do
   end
 
   swagger_path(:delete) do
-    get("/account")
-    summary("Delete an users")
+    PhoenixSwagger.Path.delete("/api/account/{id}")
+    summary("Delete an user")
     description("Delete an user in the database")
     produces("application/json")
     deprecated(false)
-
-    response(200, "OK", Schema.ref(:Delete),
-      example: %{
-        data: [
-          %{
-            id: 12
-          }
-        ]
-      }
-    )
+    parameter(:id, :query, :integer, "id of the user to delete", required: true)
+    response(200, "account deleted")
   end
 
   def delete(conn, %{"id" => id}) do
