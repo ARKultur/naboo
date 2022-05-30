@@ -19,17 +19,15 @@ defmodule NabooAPI.AccountController do
         accounts: [
           %{
             email: "test@test.com",
-            encrypted_password: "sqdqsd",
-            password: "test_t",
             is_admin: false,
-            name: "test"
+            name: "test",
+            updated_at: "2022-04-15 03:00:02.123+02:00 CEST Europe/Paris"
           },
           %{
             email: "test2@test.com",
-            encrypted_password: "sqdqsd58",
-            password: "tes",
             is_admin: false,
-            name: "test2"
+            name: "test2",
+            updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
           }
         ]
       }
@@ -65,10 +63,9 @@ defmodule NabooAPI.AccountController do
       example: %{
         account: %{
           email: "test@test.com",
-          encrypted_password: "sqdqsd",
-          password: "test_t",
           is_admin: false,
-          name: "test"
+          name: "test",
+          updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
         }
       }
     )
@@ -101,10 +98,9 @@ defmodule NabooAPI.AccountController do
       example: %{
         account: %{
           email: "test@test.com",
-          encrypted_password: "sqdqsd",
-          password: "test_t",
           is_admin: false,
-          name: "test"
+          name: "test",
+          updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
         }
       }
     )
@@ -140,10 +136,9 @@ defmodule NabooAPI.AccountController do
       example: %{
         account_params: %{
           email: "test@test.com",
-          encrypted_password: "sqdqsd",
-          password: "test_t",
           is_admin: false,
-          name: "test"
+          name: "test",
+          updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
         }
       }
     )
