@@ -2,7 +2,7 @@ defmodule NabooAPI.Router.Urls do
   use Phoenix.Router
 
   pipeline :api do
-    plug(:accepts, ["json"])
+    plug(:accepts, ["json", "html"])
     plug(:session)
     plug(:fetch_session)
     plug(:fetch_flash)
@@ -12,24 +12,15 @@ defmodule NabooAPI.Router.Urls do
     plug(NabooAPI.Auth.Guardian.Pipeline)
   end
 
-  pipeline :web do
-    plug(:accepts, ["json", "html"])
-  end
-
   scope "/api" do
     pipe_through(:api)
     post("/login", NabooAPI.SessionController, :sign_in)
     resources("/account", NabooAPI.AccountController, only: [:create])
+    forward("/swagger", PhoenixSwagger.Plug.SwaggerUI, otp_app: :naboo, swagger_file: "swagger.json")
 
     pipe_through(:api_auth)
     post("/logout", NabooAPI.SessionController, :delete)
     resources("/account", NabooAPI.AccountController, only: [:update, :delete, :show, :index])
-  end
-
-  scope "/swagger" do
-    pipe_through(:web)
-
-    forward("/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :naboo, swagger_file: "swagger.json")
   end
 
   # The session will be stored in the cookie and signed,
