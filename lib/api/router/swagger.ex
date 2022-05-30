@@ -8,6 +8,6 @@ defmodule NabooAPI.Router.Swagger do
   scope "/swagger" do
     pipe_through(:web)
 
-    scope("/", do: forward("/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :naboo, swagger_file: "swagger.json"))
+    forward("/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :naboo, swagger_file: "swagger.json")
   end
 end
