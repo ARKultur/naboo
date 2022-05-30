@@ -29,13 +29,5 @@ install_postgresql () {
     sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_TEST_DB} TO ${POSTGRES_USER};"
 }
 
-ecto_create () {
-    MIX_ENV=${1}
-
-    envup .env."${MIX_ENV}" && mix ecto.create
-}
 
 install_postgresql || exit 1
-
-ecto_create "dev"
-ecto_create "test"

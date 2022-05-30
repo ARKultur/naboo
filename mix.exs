@@ -12,7 +12,7 @@ defmodule Naboo.Mixfile do
       test_pattern: "**/*_tests.exs",
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
-      compilers: Mix.compilers(),
+      compilers: Mix.compilers() ++ [:phoenix_swagger],
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
@@ -37,7 +37,8 @@ defmodule Naboo.Mixfile do
       ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.reset", "test"]
+      test: ["ecto.reset", "test"],
+      "phx.server": ["phx.swagger.generate", "phx.server"]
     ]
   end
 
@@ -81,7 +82,11 @@ defmodule Naboo.Mixfile do
       # Unit testing
       {:ex_machina, "~> 2.7", only: :test},
       {:faker, "~> 0.16", only: :test},
-      {:excoveralls, "~> 0.14", only: :test}
+      {:excoveralls, "~> 0.14", only: :test},
+
+      # Swagger
+      {:phoenix_swagger, "~> 0.8"},
+      {:ex_json_schema, "~> 0.5"}
     ]
   end
 

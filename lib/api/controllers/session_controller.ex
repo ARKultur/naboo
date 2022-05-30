@@ -1,11 +1,28 @@
 defmodule NabooAPI.SessionController do
   use Phoenix.Controller
+  use PhoenixSwagger
 
   alias Naboo.Accounts
   alias NabooAPI.Auth.Sessions
   alias NabooAPI.Views.Errors
 
   require Logger
+
+  swagger_path(:sign_in) do
+    post("/login")
+    summary("Log in")
+    description("Log in with an account known in the database")
+    produces("application/json")
+    deprecated(false)
+    parameter(:email, :body, :string, "email of the account", required: true)
+    parameter(:password, :body, :string, "password of the account", required: true)
+
+    response(200, "token.json", %{},
+      example: %{
+        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+      }
+    )
+  end
 
   def sign_in(conn, %{"email" => email, "password" => password}) do
     with account <- Accounts.get_account_by_email(email),

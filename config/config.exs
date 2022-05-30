@@ -14,6 +14,8 @@ config :naboo, Naboo.Endpoint,
 
 config :naboo, Naboo.Repo, start_apps_before_migration: [:ssl]
 
+config :phoenix_swagger, json_library: Jason
+
 config :naboo, Corsica, allow_headers: :all
 
 config :naboo, NabooAPI.Auth.Guardian,
@@ -25,6 +27,16 @@ config :naboo, NabooAPI.Auth.Sessions,
   secret_key: System.get_env("GUARDIAN_SECRET")
 
 config :logger, backends: [:console]
+
+config :phoenix_swagger, json_library: Jason
+
+config :naboo, :phoenix_swagger,
+  swagger_files: %{
+    "priv/static/swagger.json" => [
+      router: NabooAPI.Router.Urls,
+      endpoint: Naboo.Endpoint
+    ]
+  }
 
 # Import environment configuration
 import_config "#{Mix.env()}.exs"

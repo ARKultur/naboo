@@ -14,4 +14,8 @@ defmodule NabooAPI.ErrorsTest do
   test "render any other" do
     assert render_to_string(NabooAPI.Views.Errors, "505.json", []) == "\"HTTP Version Not Supported\""
   end
+
+  test "renders 422.json" do
+    assert render_to_string(NabooAPI.Views.Errors, "422.json", []) =~ "unpossessable entity"
+  end
 end

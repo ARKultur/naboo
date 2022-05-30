@@ -2,7 +2,7 @@ defmodule NabooAPI.Router.Urls do
   use Phoenix.Router
 
   pipeline :api do
-    plug(:accepts, ["json"])
+    plug(:accepts, ["json", "html"])
     plug(:session)
     plug(:fetch_session)
     plug(:fetch_flash)
@@ -16,6 +16,7 @@ defmodule NabooAPI.Router.Urls do
     pipe_through(:api)
     post("/login", NabooAPI.SessionController, :sign_in)
     resources("/account", NabooAPI.AccountController, only: [:create])
+    forward("/swagger", PhoenixSwagger.Plug.SwaggerUI, otp_app: :naboo, swagger_file: "swagger.json")
 
     pipe_through(:api_auth)
     post("/logout", NabooAPI.SessionController, :delete)
@@ -34,5 +35,15 @@ defmodule NabooAPI.Router.Urls do
       )
 
     Plug.Session.call(conn, opts)
+  end
+
+  def swagger_info do
+    %{
+      info: %{
+        version: "0.2",
+        host: System.get_env("CANONICAL_URL"),
+        title: "naboo"
+      }
+    }
   end
 end

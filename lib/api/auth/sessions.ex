@@ -31,10 +31,6 @@ defmodule NabooAPI.Auth.Sessions do
     end
   end
 
-  def get_current_account(conn) do
-    __MODULE__.Plug.current_resource(conn)
-  end
-
   def authenticate(%Account{} = account, password) do
     authenticate(account, password, Argon2.verify_pass(password, account.encrypted_password))
   end
@@ -44,14 +40,5 @@ defmodule NabooAPI.Auth.Sessions do
 
   defp authenticate(_account, _password, false) do
     {:error, :invalid_credentials}
-  end
-
-  def generate_token do
-    length = 32
-    bytes = :crypto.strong_rand_bytes(length)
-
-    bytes
-    |> Base.url_encode64()
-    |> binary_part(0, length)
   end
 end
