@@ -35,4 +35,14 @@ defmodule NabooAPI.Router.Urls do
 
     Plug.Session.call(conn, opts)
   end
+
+  def swagger_info do
+    %{
+      info: %{
+        version: "0.2",
+        host: System.get_env("CANONICAL_URL"),
+        title: "naboo"
+      }
+    }
+  end
 end

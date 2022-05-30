@@ -10,14 +10,4 @@ defmodule NabooAPI.Router.Swagger do
 
     scope("/", do: forward("/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :naboo, swagger_file: "swagger.json"))
   end
-
-  def swagger_info do
-    %{
-      info: %{
-        version: "0.2",
-        host: "http://localhost:4000",
-        title: "naboo"
-      }
-    }
-  end
 end
