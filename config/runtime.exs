@@ -70,30 +70,15 @@ config :naboo, Naboo.Repo,
   ssl: Environment.get_boolean("DATABASE_SSL"),
   url: Environment.get("DATABASE_URL")
 
-config :naboo, NabooWeb.Endpoint,
+config :naboo, Naboo.Endpoint,
   debug_errors: Environment.get_boolean("DEBUG_ERRORS"),
   http: [port: Environment.get("PORT")],
   secret_key_base: Environment.get("SECRET_KEY_BASE"),
   static_url: Environment.get_endpoint_url_config(static_uri),
   url: Environment.get_endpoint_url_config(canonical_uri)
 
-config :naboo, NabooWeb.Router,
+config :naboo, NabooAPI.Router.Urls,
   session_key: Environment.get("SESSION_KEY"),
   session_signing_salt: Environment.get("SESSION_SIGNING_SALT")
 
 config :naboo, Corsica, origins: Environment.get_cors_origins()
-
-config :naboo,
-  basic_auth: [
-    username: Environment.get("BASIC_AUTH_USERNAME"),
-    password: Environment.get("BASIC_AUTH_PASSWORD")
-  ]
-
-config :sentry,
-  dsn: Environment.get("SENTRY_DSN"),
-  environment_name: Environment.get("SENTRY_ENVIRONMENT_NAME"),
-  included_environments: [Environment.get("SENTRY_ENVIRONMENT_NAME")]
-
-config :new_relic_agent,
-  app_name: System.get_env("NEW_RELIC_APP_NAME"),
-  license_key: System.get_env("NEW_RELIC_LICENSE_KEY")

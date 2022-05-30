@@ -1,10 +1,26 @@
 {
   "coverage_options": {
-    "minimum_coverage": 30
+    "minimum_coverage": 80
   },
   "skip_files": [
+    "priv",
+    "test/",
+    "tmp",
+    "scripts",
+    "config",
+    "deps",
+    "lib/api/schema.ex",
+    "lib/api/application",
+    "lib/naboo/socket.ex",
+    "lib/naboo/repo.ex",
     "lib/naboo/release_tasks.ex",
-    "lib/mix/tasks/check.erlang_version.ex",
-    "test/support"
+    "lib/naboo/application.ex",
+    "lib/api/naboo_api.ex",
+    "lib/api/errors.ex",
+    "lib/api/resolvers",
+    "lib/health/naboo_health.ex",
+    "lib/api/router/graphql.ex",
+    "lib/api/auth/guardian.ex",
+    "lib/naboo/endpoint.ex"
   ]
 }

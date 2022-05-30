@@ -1,24 +1,42 @@
-version: '3.3'
+version: '3.5'
 services:
-  application:
-    image: bogdzn/naboo:0.0.1-dev
-    container_name: naboo
-    env_file: .env.dev
+
+  back-end:
+    build:
+      context: .
+    env_file:
+      - .env.dev
     environment:
-      - DATABASE_URL=postgres://postgres:development@postgresql/naboo_dev
+      - DATABASE_URL=postgres://anon:ChangeMe@database/naboo
+      - POSTGRES_PORT=ChangeMe
+      - POSTGRES_USER=anon
+      - POSTGRES_HOST=database
     ports:
       - 4000:4000
     depends_on:
-      - postgresql
-  postgresql:
+      - database
+    networks:
+      - internal
+
+  database:
     image: postgres:12-alpine
     container_name: naboo-postgres
     environment:
-      - POSTGRES_DB=naboo_dev
-      - POSTGRES_PASSWORD=development
+      - POSTGRES_USER=anon
+      - POSTGRES_DB=naboo
+      - POSTGRES_PASSWORD=ChangeMe
     ports:
       - 5432:5432
     volumes:
-      - naboo_psql:/var/lib/postgresql/data
+      - database:/var/lib/postgresql/data
+    networks:
+      - internal
+
+
+
 volumes:
-  naboo_psql:
+  database:
+
+networks:
+  internal:
+

@@ -1,6 +1,6 @@
 import Config
 
-config :naboo, NabooWeb.Endpoint,
+config :naboo, Naboo.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true
 
