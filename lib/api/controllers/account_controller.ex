@@ -92,7 +92,7 @@ defmodule NabooAPI.AccountController do
     description("Show an user in the database")
     produces("application/json")
     deprecated(false)
-    parameter(:id, :query, :integer, "id of the user to show", required: true)
+    parameter(:id, :path, :integer, "id of the user to show", required: true)
 
     response(200, "show.json", %{},
       example: %{
@@ -129,7 +129,7 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    parameter(:id, :query, :integer, "id of the account to update", required: true)
+    parameter(:id, :path, :integer, "id of the account to update", required: true)
     parameter(:account_params, :body, :Account, "new informations of the account", required: true)
 
     response(200, "show.json", %{},
@@ -172,7 +172,7 @@ defmodule NabooAPI.AccountController do
     description("Delete an user in the database")
     produces("application/json")
     deprecated(false)
-    parameter(:id, :query, :integer, "id of the user to delete", required: true)
+    parameter(:id, :path, :integer, "id of the user to delete", required: true)
     response(200, "account deleted")
   end
 
