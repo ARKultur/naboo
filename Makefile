@@ -55,14 +55,12 @@ cleanup: ## Cleans the whole project, as if it was just cloned
 build: ## Build the Docker image for the OTP release
 	docker build \
 		--build-arg APP_VERSION=$(APP_VERSION)\
-		--build-arg APP_ENV=prod \
 		--rm --tag $(DOCKER_LOCAL_IMAGE) .
 
 .PHONY: build-dev
 build-dev: ## Build the Docker image for dev purposes
 	docker build \
-		--build-arg APP_VERSION=$(APP_VERSION)\
-		--build-arg APP_ENV=dev \
+		-f dockerfile.dev \
 		--rm --tag $(DOCKER_LOCAL_IMAGE)-dev .
 
 # Development targets

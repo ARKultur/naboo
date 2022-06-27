@@ -3,10 +3,6 @@ name: Docker
 on:
   push:
     branches:
-      - "dev"
-      - "canon"
-  pull_request:
-    branches:
       - "canon"
 
 jobs:
