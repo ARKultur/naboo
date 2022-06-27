@@ -69,4 +69,5 @@ jobs:
       - run: make dependencies
       - run: make check
       - run: make build-dev
+      - run: make build
 
