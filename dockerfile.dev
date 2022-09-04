@@ -13,10 +13,11 @@ RUN apk add --no-cache git \
     make \
     build-base
 
-COPY mix.exs ./
+COPY mix.exs .
 COPY config config
 COPY lib lib
 COPY priv priv
+COPY test test
 
 # Install Erlang && hex dependencies
 RUN mix local.rebar --force && \
@@ -56,6 +57,7 @@ COPY --from=otp-dependencies /build/priv priv
 COPY --from=otp-dependencies /build/_build _build
 COPY --from=otp-dependencies /build/mix.exs .
 COPY --from=otp-dependencies /build/mix.lock .
+COPY --from=otp-dependencies /build/test test
 
 # Copying files for test and CI
 COPY coveralls.json .
@@ -63,6 +65,5 @@ COPY .credo.exs .
 COPY .sobelow-conf .
 COPY .formatter.exs .
 
-RUN mix assets.deploy
-
-ENTRYPOINT ["/build/priv/docker-entrypoint.sh"]
+RUN mix deps.get && mix assets.deploy
+ ENTRYPOINT ["./priv/docker-entrypoint.sh"]

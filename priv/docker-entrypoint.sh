@@ -17,5 +17,6 @@ if [ "${MIX_ENV}" == "prod" ]; then
     /opt/palpatine/bin/naboo eval "Naboo.ReleaseTasks.migrate" && \
         exec /opt/palpatine/bin/naboo "$@"
 else
+    mix deps.get && mix deps.compile && \
     mix ecto.setup && exec mix phx.server
 fi
