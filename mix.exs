@@ -62,6 +62,7 @@ defmodule Naboo.Mixfile do
       {:guardian, "~> 2.1"},
 
       # GraphQL & Databases
+      {:new_relic_absinthe, "~> 0.0.4"},
       {:absinthe, "~> 1.7"},
       {:absinthe_plug, "~> 1.5.8"},
       {:dataloader, "~> 1.0"},

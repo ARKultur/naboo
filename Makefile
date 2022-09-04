@@ -72,7 +72,10 @@ run: prepare ## Run the server inside an IEx shell
 
 .PHONY: dependencies
 dependencies: ## Install dependencies
-	mix deps.get
+	asdf plugin add elixir || true 
+	asdf plugin add erlang || true
+	asdf install || true
+	yes | mix deps.get
 
 .PHONY: test
 test: ## Run the test suite
@@ -113,5 +116,5 @@ lint: lint-elixir
 
 .PHONY: lint-elixir
 lint-elixir:
-	mix compile --warnings-as-errors --force
+	yes | mix compile --warnings-as-errors --force
 	mix credo || true

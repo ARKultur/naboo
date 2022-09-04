@@ -31,6 +31,46 @@ defmodule NabooAPI.AccountControllerTest do
     {:ok, conn: conn}
   end
 
+  @get_account_query """
+  query findAccount($id: ID!) {
+    getAccount(id: $id) {
+      name
+      email
+    }
+  }
+  """
+
+  test "query account through graphql", %{conn: conn} do
+    conn =
+      post(conn, "/graphql/", %{
+        "query" => @get_account_query,
+        "variables" => %{id: 1}
+      })
+
+    assert json_response(conn, 200) == %{
+      "data" => %{"getAccount" => %{
+        "name" => "darth sidious",
+        "email" => "sheev.palpatine@naboo.net",
+      }}
+    }
+
+    conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
+    assert %{"id" => id} = json_response(conn, 201)["data"]
+
+    conn =
+      post(conn, "/graphql/", %{
+        "query" => @get_account_query,
+        "variables" => %{id: id}
+      })
+
+    assert json_response(conn, 200) == %{
+      "data" => %{"getAccount" => %{
+        "email" => "some email",
+        "name" => "some name",
+      }}
+    }
+  end
+
   describe "create account" do
     test "renders account when data is valid", %{conn: conn} do
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
@@ -38,11 +78,11 @@ defmodule NabooAPI.AccountControllerTest do
       conn = get(conn, Helpers.account_path(conn, :show, id))
 
       assert %{
-               "id" => ^id,
-               "email" => "some email",
-               "is_admin" => false,
-               "name" => "some name"
-             } = json_response(conn, 200)["data"]
+        "id" => ^id,
+        "email" => "some email",
+        "is_admin" => false,
+        "name" => "some name"
+      } = json_response(conn, 200)["data"]
     end
 
     test "fail when account is duplicated", %{conn: conn} do

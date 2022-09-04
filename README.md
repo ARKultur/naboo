@@ -57,7 +57,7 @@ your queries.
 MIX_ENV=dev mix phx.server
 ```
 
-Go to `https://localhost:4001/graphql/hub`, then try a query, like so:
+Go to `https://localhost:4000/graphql/hub`, then try a query, like so:
 
 ```graphql
 {

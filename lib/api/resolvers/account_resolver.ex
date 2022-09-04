@@ -6,8 +6,8 @@ defmodule NabooAPI.Resolvers.AccountResolver do
     {:ok, Accounts.list_accounts()}
   end
 
-  def get_user(_root, %{id: id}, _do) do
-    Accounts.get_account(id)
+  def get_account(_root, %{id: id}, _do) do
+    {:ok, Accounts.get_account(id)}
   end
 
   def update_account(_root, args, _info) do

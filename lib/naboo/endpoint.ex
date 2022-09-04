@@ -51,7 +51,7 @@ defmodule Naboo.Endpoint do
 
   @doc """
   Callback invoked for dynamically configuring the endpoint.
-
+  
   It receives the endpoint configuration and checks if
   configuration should be loaded from the system environment.
   """
