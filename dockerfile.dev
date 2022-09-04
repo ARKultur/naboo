@@ -2,7 +2,7 @@
 
 # Step 1 - hex dependencies
 #
-FROM hexpm/elixir:1.13.0-erlang-24.0.3-alpine-3.15.0 AS otp-dependencies
+FROM hexpm/elixir:1.14.0-erlang-23.3.4.14-alpine-3.14.5 as otp-dependencies
 
 ENV MIX_ENV=dev
 
@@ -13,10 +13,11 @@ RUN apk add --no-cache git \
     make \
     build-base
 
-COPY mix.exs ./
+COPY mix.exs .
 COPY config config
 COPY lib lib
 COPY priv priv
+COPY test test
 
 # Install Erlang && hex dependencies
 RUN mix local.rebar --force && \
@@ -27,7 +28,7 @@ RUN mix local.rebar --force && \
 #
 # Step 2 - build the OTP binary
 #
-FROM hexpm/elixir:1.13.0-erlang-24.0.3-alpine-3.15.0 AS otp-builder
+FROM hexpm/elixir:1.14.0-erlang-23.3.4.14-alpine-3.14.5 as otp-builder
 
 ENV MIX_ENV=dev
 
@@ -56,6 +57,7 @@ COPY --from=otp-dependencies /build/priv priv
 COPY --from=otp-dependencies /build/_build _build
 COPY --from=otp-dependencies /build/mix.exs .
 COPY --from=otp-dependencies /build/mix.lock .
+COPY --from=otp-dependencies /build/test test
 
 # Copying files for test and CI
 COPY coveralls.json .
@@ -63,6 +65,5 @@ COPY .credo.exs .
 COPY .sobelow-conf .
 COPY .formatter.exs .
 
-RUN mix assets.deploy
-
-ENTRYPOINT ["/build/priv/docker-entrypoint.sh"]
+RUN mix deps.get && mix assets.deploy
+ ENTRYPOINT ["./priv/docker-entrypoint.sh"]

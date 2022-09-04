@@ -1,6 +1,6 @@
 # Step 1 - hex dependencies
 #
-FROM hexpm/elixir:1.13.0-erlang-24.0.3-alpine-3.15.0 AS otp-dependencies
+FROM hexpm/elixir:1.14.0-erlang-23.3.4.14-alpine-3.14.5 as otp-dependencies
 
 ENV MIX_ENV=prod
 
@@ -25,7 +25,7 @@ RUN mix local.rebar --force && \
 #
 # Step 2 - build the OTP binary
 #
-FROM hexpm/elixir:1.13.0-erlang-24.0.3-alpine-3.15.0 AS otp-builder
+FROM hexpm/elixir:1.14.0-erlang-23.3.4.14-alpine-3.14.5 as otp-builder
 
 ARG APP_VERSION
 ENV MIX_ENV=prod
