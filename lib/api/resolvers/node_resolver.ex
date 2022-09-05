@@ -1,6 +1,6 @@
 defmodule NabooAPI.Resolvers.NodeResolver do
-  alias Naboo.Domains
   alias Naboo.Domain.Node
+  alias Naboo.Domains
 
   def all_nodes(_root, _args, _info) do
     {:ok, Domains.list_nodes()}

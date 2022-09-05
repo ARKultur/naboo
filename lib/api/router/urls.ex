@@ -15,6 +15,7 @@ defmodule NabooAPI.Router.Urls do
   scope "/api" do
     pipe_through(:api)
     post("/login", NabooAPI.SessionController, :sign_in)
+    post("/rfc7946-compliance", NabooAPI.SessionController, :validate)
     resources("/account", NabooAPI.AccountController, only: [:create])
     forward("/swagger", PhoenixSwagger.Plug.SwaggerUI, otp_app: :naboo, swagger_file: "swagger.json")
 

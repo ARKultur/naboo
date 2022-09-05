@@ -50,4 +50,19 @@ defmodule NabooAPI.SessionController do
     |> put_status(:unauthorized)
     |> render("401.json", [])
   end
+
+  def validate(conn, params) do
+    with {:ok, _} <- params |> Geo.JSON.decode() do
+      conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(200, "valid data")
+      |> halt()
+    else
+      {:ko, _} ->
+      conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(400, "invalid data")
+      |> halt()
+    end
+  end
 end

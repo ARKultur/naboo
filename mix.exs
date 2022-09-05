@@ -87,7 +87,10 @@ defmodule Naboo.Mixfile do
 
       # Swagger
       {:phoenix_swagger, "~> 0.8"},
-      {:ex_json_schema, "~> 0.9.1"}
+      {:ex_json_schema, "~> 0.9.1"},
+
+      # GeoJSON
+      {:geo, "~> 3.4"}
     ]
   end
 
