@@ -7,7 +7,7 @@ defmodule NabooAPI.Resolvers.AddressResolver do
   end
 
   def get_address(_root, %{id: id}, _do) do
-    Domains.get_address(id)
+    {:ok, Domains.get_address(id)}
   end
 
   def update_address(_root, args, _info) do

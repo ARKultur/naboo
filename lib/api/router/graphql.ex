@@ -28,8 +28,8 @@ defmodule NabooAPI.Router.GraphQL do
     )
   end
 
-    plug(:match)
-    plug(:dispatch)
+  plug(:match)
+  plug(:dispatch)
 
   forward("/graphql", to: API)
 

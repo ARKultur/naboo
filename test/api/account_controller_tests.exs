@@ -31,6 +31,16 @@ defmodule NabooAPI.AccountControllerTest do
     {:ok, conn: conn}
   end
 
+  @create_account_query """
+    mutation CreateSimpleAccount($e:String!, $n:String!, $p:String!, $i:String!) {
+      createAccount(email: $e, name: $n, password:$p, isAdmin:$i) {
+        email,
+        id,
+        name
+      }
+    }
+  """
+
   @get_account_query """
   query findAccount($id: ID!) {
     getAccount(id: $id) {
@@ -40,6 +50,36 @@ defmodule NabooAPI.AccountControllerTest do
   }
   """
 
+  test "create and delete account through graphql", %{conn: conn} do
+    conn =
+      post(conn, "/graphql/", %{
+        "query" => @create_account_query,
+        "variables" => %{
+          "p" => "verycoolpassword",
+          "e" => "email@email.com",
+          "n" => "example name",
+          "i" => "false"
+        }
+      })
+
+    assert %{"createAccount" => %{"id" => id}} = json_response(conn, 200)["data"]
+
+    conn =
+      post(conn, "/graphql/", %{
+        "query" => @get_account_query,
+        "variables" => %{id: id}
+      })
+
+    assert json_response(conn, 200) == %{
+             "data" => %{
+               "getAccount" => %{
+                 "email" => "email@email.com",
+                 "name" => "example name"
+               }
+             }
+           }
+  end
+
   test "query account through graphql", %{conn: conn} do
     conn =
       post(conn, "/graphql/", %{
@@ -48,11 +88,13 @@ defmodule NabooAPI.AccountControllerTest do
       })
 
     assert json_response(conn, 200) == %{
-      "data" => %{"getAccount" => %{
-        "name" => "darth sidious",
-        "email" => "sheev.palpatine@naboo.net",
-      }}
-    }
+             "data" => %{
+               "getAccount" => %{
+                 "name" => "darth sidious",
+                 "email" => "sheev.palpatine@naboo.net"
+               }
+             }
+           }
 
     conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
     assert %{"id" => id} = json_response(conn, 201)["data"]
@@ -64,11 +106,13 @@ defmodule NabooAPI.AccountControllerTest do
       })
 
     assert json_response(conn, 200) == %{
-      "data" => %{"getAccount" => %{
-        "email" => "some email",
-        "name" => "some name",
-      }}
-    }
+             "data" => %{
+               "getAccount" => %{
+                 "email" => "some email",
+                 "name" => "some name"
+               }
+             }
+           }
   end
 
   describe "create account" do
@@ -78,11 +122,11 @@ defmodule NabooAPI.AccountControllerTest do
       conn = get(conn, Helpers.account_path(conn, :show, id))
 
       assert %{
-        "id" => ^id,
-        "email" => "some email",
-        "is_admin" => false,
-        "name" => "some name"
-      } = json_response(conn, 200)["data"]
+               "id" => ^id,
+               "email" => "some email",
+               "is_admin" => false,
+               "name" => "some name"
+             } = json_response(conn, 200)["data"]
     end
 
     test "fail when account is duplicated", %{conn: conn} do
