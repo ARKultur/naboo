@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         otp-version: [24.1.2]
-        elixir-version: [1.13.1]
+        elixir-version: [1.14]
 
     services:
       db:
@@ -69,4 +69,5 @@ jobs:
       - run: make dependencies
       - run: make check
       - run: make build-dev
+      - run: make build
 

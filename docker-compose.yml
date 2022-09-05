@@ -4,9 +4,11 @@ services:
   back-end:
     build:
       context: .
+      dockerfile: dockerfile.dev
     env_file:
       - .env.dev
     environment:
+      - MIX_ENV=dev
       - DATABASE_URL=postgres://anon:ChangeMe@database/naboo
       - POSTGRES_PORT=ChangeMe
       - POSTGRES_USER=anon
