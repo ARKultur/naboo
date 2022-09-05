@@ -41,6 +41,14 @@ defmodule NabooAPI.AccountControllerTest do
     }
   """
 
+  @delete_account_query """
+    mutation DeleteSimpleAccount($id: ID!) {
+     deleteAccount(id: $id) {
+      id
+     }
+    }
+  """
+
   @get_account_query """
   query findAccount($id: ID!) {
     getAccount(id: $id) {
@@ -75,6 +83,20 @@ defmodule NabooAPI.AccountControllerTest do
                "getAccount" => %{
                  "email" => "email@email.com",
                  "name" => "example name"
+               }
+             }
+           }
+
+    conn =
+      post(conn, "/graphql/", %{
+        "query" => @delete_account_query,
+        "variables" => %{id: id}
+      })
+
+    assert json_response(conn, 200) == %{
+             "data" => %{
+               "deleteAccount" => %{
+                 "id" => id
                }
              }
            }
