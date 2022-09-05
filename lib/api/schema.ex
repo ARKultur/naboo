@@ -101,14 +101,36 @@ defmodule NabooAPI.Schema do
 
   query do
     import_fields(:application_queries)
+
+    @desc "get single account"
+    field :get_account, :account do
+      arg(:id, non_null(:id))
+
+      resolve(&AccountResolver.get_account/3)
+    end
+
     @desc "get all accounts"
     field :all_accounts, non_null(list_of(non_null(:account))) do
       resolve(&AccountResolver.all_accounts/3)
     end
 
+    @desc "get single address"
+    field :get_address, :address do
+      arg(:id, non_null(:id))
+
+      resolve(&AddressResolver.get_address/3)
+    end
+
     @desc "get all addresses"
     field :all_addresses, non_null(list_of(non_null(:address))) do
       resolve(&AddressResolver.all_addresses/3)
+    end
+
+    @desc "get single node"
+    field :get_node, :node do
+      arg(:id, non_null(:id))
+
+      resolve(&NodeResolver.get_node/3)
     end
 
     @desc "get all nodes"

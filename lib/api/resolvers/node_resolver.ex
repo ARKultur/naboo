@@ -7,7 +7,7 @@ defmodule NabooAPI.Resolvers.NodeResolver do
   end
 
   def get_node(_root, %{id: id}, _do) do
-    Domains.get_node(id)
+    {:ok, Domains.get_node(id)}
   end
 
   def update_node(_root, args, _info) do

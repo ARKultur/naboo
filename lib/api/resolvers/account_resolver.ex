@@ -6,8 +6,8 @@ defmodule NabooAPI.Resolvers.AccountResolver do
     {:ok, Accounts.list_accounts()}
   end
 
-  def get_user(_root, %{id: id}, _do) do
-    Accounts.get_account(id)
+  def get_account(_root, %{id: id}, _do) do
+    {:ok, Accounts.get_account(id)}
   end
 
   def update_account(_root, args, _info) do
@@ -33,7 +33,10 @@ defmodule NabooAPI.Resolvers.AccountResolver do
     end
   end
 
+  # sobelow_skip ["DOS.StringToAtom"]
   def create_account(_root, args, _info) do
-    Accounts.create_account(args)
+    args
+    |> Map.replace(:is_admin, String.to_atom(args[:is_admin]))
+    |> Accounts.create_account()
   end
 end
