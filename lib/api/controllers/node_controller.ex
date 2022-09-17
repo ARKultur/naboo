@@ -8,7 +8,6 @@ defmodule NabooAPI.NodeController do
   alias NabooAPI.NodeView
   alias NabooAPI.Views.Errors
 
-
   swagger_path(:index) do
     get("api/nodes")
     summary("Lists all registered nodes")
@@ -53,7 +52,7 @@ defmodule NabooAPI.NodeController do
     parameter(:node_params, :body, :Node, "informations about the node",
       required: true,
       example: %{
-        account: %{
+        node: %{
           latitude: "38.8951",
           longitude: "-77.0364",
           name: "washington dc",
@@ -80,7 +79,6 @@ defmodule NabooAPI.NodeController do
       |> put_view(NodeView)
       |> put_status(:created)
       |> render("show.json", node: node)
-
     else
       {:error, changeset} ->
         conn

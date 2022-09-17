@@ -18,7 +18,7 @@ defmodule NabooAPI.NodeView do
       id: node.id,
       latitude: node.latitude,
       longitude: node.longitude,
-      name: node.name,
+      name: node.name
     }
   end
 end

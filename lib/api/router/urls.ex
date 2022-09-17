@@ -22,6 +22,7 @@ defmodule NabooAPI.Router.Urls do
     post("/logout", NabooAPI.SessionController, :delete)
     resources("/account", NabooAPI.AccountController, only: [:update, :delete, :show, :index])
     resources("/node", NabooAPI.NodeController)
+    resources("/address", NabooAPI.AddressController)
   end
 
   # The session will be stored in the cookie and signed,

@@ -57,14 +57,23 @@ defmodule Naboo.Domains do
 
   ## Examples
 
-  iex> create_node(%{field: value})
+  iex> create_node(%{field: value}, address_id)
   {:ok, %Node{}}
 
-  iex> create_node(%{field: bad_value})
+  iex> create_node(%{field: bad_value}, address_id)
   {:error, %Ecto.Changeset{}}
 
   """
-  def create_node(attrs \\ %{}) do
+  def create_node(attrs \\ %{}, addr_id) do
+
+    """
+      TODO(bogdan): finish implementing has_many / belongs_to relationship
+        and implement it in the controllers
+    """
+
+    with %{:ok, %Address{} = addr } <- get_address(addr_id),
+         Ecto.build_assoc(addr, )
+
     %Node{}
     |> Node.changeset(attrs)
     |> Repo.insert()

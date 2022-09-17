@@ -9,16 +9,16 @@ defmodule NabooAPI.NodeControllerTest do
     latitude: "38.8951",
     longitude: "-77.0364",
     name: "washington dc",
-    addr_id: 1,
+    addr_id: 1
   }
 
   @bad_create_attrs %{
     name: "washington dc",
-    addr_id: 1,
+    addr_id: 1
   }
 
   @update_attrs %{
-    name: "Washington DC",
+    name: "Washington DC"
   }
 
   setup %{conn: conn} do
@@ -40,11 +40,11 @@ defmodule NabooAPI.NodeControllerTest do
       conn = get(conn, Helpers.node_path(conn, :show, id))
 
       assert %{
-        "id" => ^id,
-        "latitude" => "38.8951",
-        "longitude" => "-77.0364",
-        "name" => "washington dc",
-      } = json_response(conn, 200)["data"]
+               "id" => ^id,
+               "latitude" => "38.8951",
+               "longitude" => "-77.0364",
+               "name" => "washington dc"
+             } = json_response(conn, 200)["data"]
     end
 
     test "fail when data is not valid", %{conn: conn} do
@@ -60,22 +60,23 @@ defmodule NabooAPI.NodeControllerTest do
       conn = get(conn, Helpers.node_path(conn, :show, id))
 
       assert %{
-        "id" => ^id,
-        "latitude" => "38.8951",
-        "longitude" => "-77.0364",
-        "name" => "washington dc",
-      } = json_response(conn, 200)["data"]
+               "id" => ^id,
+               "latitude" => "38.8951",
+               "longitude" => "-77.0364",
+               "name" => "washington dc"
+             } = json_response(conn, 200)["data"]
 
       conn = patch(conn, Helpers.node_path(conn, :update, id), node: @update_attrs)
       assert %{"id" => id} = json_response(conn, 200)["data"]
 
       conn = get(conn, Helpers.node_path(conn, :show, id))
+
       assert %{
-        "id" => ^id,
-        "latitude" => "38.8951",
-        "longitude" => "-77.0364",
-        "name" => "Washington DC",
-      } = json_response(conn, 200)["data"]
+               "id" => ^id,
+               "latitude" => "38.8951",
+               "longitude" => "-77.0364",
+               "name" => "Washington DC"
+             } = json_response(conn, 200)["data"]
     end
 
     test "fail if node does not exist", %{conn: conn} do

@@ -10,6 +10,8 @@ defmodule Naboo.Domain.Address do
     field(:state, :string)
     field(:state_district, :string)
 
+    belongs_to :node, Naboo.Domain.Node
+
     timestamps()
   end
 
