@@ -1,14 +1,14 @@
-#!/bin/python 
+#!/bin/python
 
 """
     Install deps:
-    pip3 install locust
+    pip3 install -U locust
 """
 
 import time
 import string
 import random
-from locust import HttpUser, task, between
+from locust import HttpUser, task
 
 
 
@@ -16,24 +16,11 @@ from locust import HttpUser, task, between
 class User(HttpUser):
 
     @task
-    def health_check(self):
-        self.client.get('/health')
+    def create_domain_REST(self):
 
-    @task
-    def create_account(self):
-        size = 7
-        str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=size))
 
-        print(f'[+] Creating account: {str}')
 
-        self.client.post('/api/account', {
-            'email': f'{str}@email.com',
-            'password': str,
-            'is_admin': False,
-            'name': str,
-        })
-
-    @task
+      @task
     def list_accounts(self):
         self.client.get('/api/account')
 
