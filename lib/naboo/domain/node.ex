@@ -6,6 +6,7 @@ defmodule Naboo.Domain.Node do
     field(:latitude, :string)
     field(:longitude, :string)
     field(:name, :string)
+
     # This should be the id of a Domain.Address object
     field(:addr_id, :id)
 

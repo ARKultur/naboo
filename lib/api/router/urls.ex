@@ -21,6 +21,7 @@ defmodule NabooAPI.Router.Urls do
     pipe_through(:api_auth)
     post("/logout", NabooAPI.SessionController, :delete)
     resources("/account", NabooAPI.AccountController, only: [:update, :delete, :show, :index])
+    resources("/node", NabooAPI.NodeController)
   end
 
   # The session will be stored in the cookie and signed,
@@ -40,7 +41,7 @@ defmodule NabooAPI.Router.Urls do
   def swagger_info do
     %{
       info: %{
-        version: "0.3",
+        version: "0.4",
         host: System.get_env("CANONICAL_URL"),
         title: "naboo"
       }
