@@ -1,6 +1,8 @@
 defmodule NabooAPI.NodeControllerTest do
   use Naboo.ConnCase
 
+  import Naboo.DomainsFixtures
+
   alias Naboo.Accounts
   alias NabooAPI.Auth.Guardian
   alias NabooAPI.Router.Urls.Helpers
@@ -9,7 +11,6 @@ defmodule NabooAPI.NodeControllerTest do
     latitude: "38.8951",
     longitude: "-77.0364",
     name: "washington dc",
-    addr_id: 1
   }
 
   @bad_create_attrs %{
@@ -35,7 +36,14 @@ defmodule NabooAPI.NodeControllerTest do
 
   describe "create node" do
     test "renders node when data is valid", %{conn: conn} do
-      conn = post(conn, Helpers.node_path(conn, :create), node: @create_attrs)
+
+      address = address_fixture()
+
+      attrs =
+        %{"addr_id" => address.id}
+        |> Enum.into(@create_attrs)
+
+      conn = post(conn, Helpers.node_path(conn, :create), node: attrs)
       assert %{"id" => id} = json_response(conn, 201)["data"]
       conn = get(conn, Helpers.node_path(conn, :show, id))
 
@@ -55,53 +63,45 @@ defmodule NabooAPI.NodeControllerTest do
 
   describe "update a node" do
     test "updates an existing node, then displays it", %{conn: conn} do
-      conn = post(conn, Helpers.node_path(conn, :create), node: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
-      conn = get(conn, Helpers.node_path(conn, :show, id))
+
+      node = node_fixture()
+
+      conn = patch(conn, Helpers.node_path(conn, :update, node.id), node: @update_attrs)
+      assert %{
+        "id" => node.id,
+      } == json_response(conn, 200)["data"]
+
+      conn = get(conn, Helpers.node_path(conn, :show, node.id))
 
       assert %{
-               "id" => ^id,
-               "latitude" => "38.8951",
-               "longitude" => "-77.0364",
-               "name" => "washington dc"
-             } = json_response(conn, 200)["data"]
-
-      conn = patch(conn, Helpers.node_path(conn, :update, id), node: @update_attrs)
-      assert %{"id" => id} = json_response(conn, 200)["data"]
-
-      conn = get(conn, Helpers.node_path(conn, :show, id))
-
-      assert %{
-               "id" => ^id,
+               "id" => node.id,
                "latitude" => "38.8951",
                "longitude" => "-77.0364",
                "name" => "Washington DC"
-             } = json_response(conn, 200)["data"]
+             } == json_response(conn, 200)["data"]
     end
 
     test "fail if node does not exist", %{conn: conn} do
-      conn = post(conn, Helpers.node_path(conn, :create), node: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      node = node_fixture()
 
-      conn = patch(conn, Helpers.node_path(conn, :update, id + 5), node: @update_attrs)
+      conn = patch(conn, Helpers.node_path(conn, :update, node.id + 5), node: @update_attrs)
       assert response(conn, 404)
     end
   end
 
   describe "delete a node" do
     test "delete an exising node", %{conn: conn} do
-      conn = post(conn, Helpers.node_path(conn, :create), node: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
 
-      conn = delete(conn, Helpers.node_path(conn, :delete, id))
+      node = node_fixture()
+
+      conn = delete(conn, Helpers.node_path(conn, :delete, node.id))
       assert response(conn, 200)
     end
 
     test "fail if an node does not exist", %{conn: conn} do
-      conn = post(conn, Helpers.node_path(conn, :create), node: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      node = node_fixture()
 
-      conn = delete(conn, Helpers.node_path(conn, :delete, id + 5))
+      conn = delete(conn, Helpers.node_path(conn, :delete, node.id + 5))
       assert response(conn, 404)
     end
   end
@@ -117,6 +117,18 @@ defmodule NabooAPI.NodeControllerTest do
     test "fail when node does not exist", %{conn: conn} do
       conn = get(conn, Helpers.node_path(conn, :show, 555_453))
       assert response(conn, 404)
+    end
+
+    test "show an existing node", %{conn: conn} do
+      node = node_fixture()
+
+      conn = get(conn, Helpers.node_path(conn, :show, node.id))
+      assert %{
+        "id" => node.id,
+        "latitude" => node.latitude,
+        "longitude" => node.longitude,
+        "name" => node.name
+      } == json_response(conn, 200)["data"]
     end
   end
 end

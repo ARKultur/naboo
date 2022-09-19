@@ -34,7 +34,10 @@ defmodule Naboo.Domains do
   nil
 
   """
-  def get_node(id), do: Repo.get(Node, id)
+  def get_node(id) do
+    Repo.get(Node, id)
+    |> Repo.preload(:address)
+  end
 
   @doc """
   Gets a single node.
@@ -50,33 +53,48 @@ defmodule Naboo.Domains do
   ** (Ecto.NoResultsError)
 
   """
-  def get_node!(id), do: Repo.get!(Node, id)
+  def get_node!(id) do
+    Repo.get!(Node, id)
+    |> Repo.preload(:address)
+  end
 
   @doc """
   Creates a node.
 
   ## Examples
 
-  iex> create_node(%{field: value}, address_id)
+  iex> create_node(%{field: value})
   {:ok, %Node{}}
 
-  iex> create_node(%{field: bad_value}, address_id)
+  iex> create_node(%{field: bad_value})
   {:error, %Ecto.Changeset{}}
 
   """
-  def create_node(attrs \\ %{}, addr_id) do
+  def create_node(attrs) do
 
-    """
-      TODO(bogdan): finish implementing has_many / belongs_to relationship
-        and implement it in the controllers
-    """
+    with %Address{} = addr <- get_address(attrs.addr_id),
+         cset <- Ecto.build_assoc(addr, :node, attrs),
+         {:ok, %Node{} = node} <- Repo.insert(cset),
+         {:ok, %Address{}} <- update_address(addr, %{node_id: node.id}) do
 
-    with %{:ok, %Address{} = addr } <- get_address(addr_id),
-         Ecto.build_assoc(addr, )
+      {:ok, node}
 
-    %Node{}
-    |> Node.changeset(attrs)
-    |> Repo.insert()
+    else
+      nil ->
+        {:error, %{
+          message: "could not find address",
+        }}
+
+      {:error, cset} ->
+
+        {:error, %{
+          message: "could not create node",
+          changeset: cset,
+        }}
+
+      err ->
+        {:error, err}
+    end
   end
 
   @doc """

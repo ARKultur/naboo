@@ -9,11 +9,7 @@ defmodule Naboo.DomainsTest do
     import Naboo.DomainsFixtures
 
     @invalid_attrs %{
-      city: nil,
-      country: nil,
       country_code: nil,
-      postcode: nil,
-      state: nil,
       state_district: nil
     }
 
@@ -97,7 +93,7 @@ defmodule Naboo.DomainsTest do
       latitude: nil,
       longitude: nil,
       name: nil,
-      addr_id: nil
+      addr_id: 1
     }
 
     test "list_nodes/0 returns all nodes" do
@@ -106,7 +102,7 @@ defmodule Naboo.DomainsTest do
 
     test "get_node!/1 returns the node with given id" do
       node = node_fixture()
-      assert Domains.get_node!(node.id).id == node.id
+      assert Domains.get_node(node.id).id == node.id
     end
 
     test "create_node/1 with valid data creates a node" do
@@ -150,6 +146,7 @@ defmodule Naboo.DomainsTest do
 
     test "update_node/2 with invalid data returns error changeset" do
       node = node_fixture()
+
       assert {:error, %Ecto.Changeset{}} = Domains.update_node(node, @invalid_attrs)
       assert node.id == Domains.get_node!(node.id).id
     end

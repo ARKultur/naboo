@@ -29,7 +29,7 @@ defmodule Naboo.DomainsFixtures do
   def node_fixture(attrs \\ %{}) do
     addr = address_fixture()
 
-    {:ok, node} =
+    new_attrs =
       attrs
       |> Enum.into(%{
         latitude: "some latitude",
@@ -37,7 +37,8 @@ defmodule Naboo.DomainsFixtures do
         name: "some name",
         addr_id: addr.id
       })
-      |> Naboo.Domains.create_node()
+
+    {:ok, node} = Naboo.Domains.create_node(new_attrs)
 
     node
   end

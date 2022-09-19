@@ -7,8 +7,7 @@ defmodule Naboo.Domain.Node do
     field(:longitude, :string)
     field(:name, :string)
 
-    # This should be the id of a Domain.Address object
-    has_many :addresses, Naboo.Domain.Address
+    has_one(:address, Naboo.Domain.Address)
 
     timestamps()
   end

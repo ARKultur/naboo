@@ -15,10 +15,16 @@ defmodule NabooAPI.AddressControllerTest do
 
   @bad_create_attrs %{
     city: "Paris",
-    country: "France"
+    country_code: "FR",
+    postcode: "75019",
+    state_district: "Paris"
   }
 
   @update_attrs %{
+    city: "Paris",
+    country: "France",
+    country_code: "FR",
+    postcode: "75019",
     state_district: "Seine"
   }
 
