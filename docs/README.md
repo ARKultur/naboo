@@ -77,7 +77,7 @@ Currently, it does not seem that this techniques affects performance that much. 
 
 ## Benchmarking GraphQL queries vs REST for creating and listing domains
 
-Currently (0.4.0), we can create Domain objects through our REST api (using controllers and stuff, you know the drill), and through GraphQL. The point of this benchmarks is to call both methods to see which one works the best for us.
+Currently (0.3.0), we can create Domain objects through our REST api (using controllers and stuff, you know the drill), and through GraphQL. The point of this benchmarks is to call both methods to see which one works the best for us.
 
 Here is our locust test file:
 ```python

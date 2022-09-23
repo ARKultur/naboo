@@ -44,7 +44,7 @@ defmodule NabooAPI.Router.Urls do
   def swagger_info do
     %{
       info: %{
-        version: "0.4",
+        version: "0.3.0",
         host: System.get_env("CANONICAL_URL"),
         title: "naboo"
       }
