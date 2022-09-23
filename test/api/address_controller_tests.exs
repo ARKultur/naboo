@@ -1,6 +1,8 @@
 defmodule NabooAPI.AddressControllerTest do
   use Naboo.ConnCase
 
+  import Naboo.DomainsFixtures
+
   alias Naboo.Accounts
   alias NabooAPI.Auth.Guardian
   alias NabooAPI.Router.Urls.Helpers
@@ -10,6 +12,7 @@ defmodule NabooAPI.AddressControllerTest do
     country: "France",
     country_code: "FR",
     postcode: "75019",
+    state: "Something",
     state_district: "Paris"
   }
 
@@ -25,6 +28,7 @@ defmodule NabooAPI.AddressControllerTest do
     country: "France",
     country_code: "FR",
     postcode: "75019",
+    state: "Something else",
     state_district: "Seine"
   }
 
@@ -58,7 +62,7 @@ defmodule NabooAPI.AddressControllerTest do
 
     test "fail when data is not valid", %{conn: conn} do
       conn = post(conn, Helpers.address_path(conn, :create), address: @bad_create_attrs)
-      assert %{"error" => _changeset} = json_response(conn, 403)["data"]
+      assert _resp = json_response(conn, 403)
     end
   end
 
@@ -93,28 +97,25 @@ defmodule NabooAPI.AddressControllerTest do
     end
 
     test "fail if address does not exist", %{conn: conn} do
-      conn = post(conn, Helpers.address_path(conn, :create), address: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      addr = address_fixture()
 
-      conn = patch(conn, Helpers.address_path(conn, :update, id + 5), address: @update_attrs)
+      conn = patch(conn, Helpers.address_path(conn, :update, addr.id + 5), address: @update_attrs)
       assert response(conn, 404)
     end
   end
 
   describe "delete a address" do
     test "delete an exising address", %{conn: conn} do
-      conn = post(conn, Helpers.address_path(conn, :create), address: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      address = address_fixture()
 
-      conn = delete(conn, Helpers.address_path(conn, :delete, id))
+      conn = delete(conn, Helpers.address_path(conn, :delete, address.id))
       assert response(conn, 200)
     end
 
     test "fail if an address does not exist", %{conn: conn} do
-      conn = post(conn, Helpers.address_path(conn, :create), address: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      addr = address_fixture()
 
-      conn = delete(conn, Helpers.address_path(conn, :delete, id + 5))
+      conn = delete(conn, Helpers.address_path(conn, :delete, addr.id + 5))
       assert response(conn, 404)
     end
   end

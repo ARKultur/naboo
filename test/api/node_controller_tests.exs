@@ -7,12 +7,6 @@ defmodule NabooAPI.NodeControllerTest do
   alias NabooAPI.Auth.Guardian
   alias NabooAPI.Router.Urls.Helpers
 
-  @create_attrs %{
-    latitude: "38.8951",
-    longitude: "-77.0364",
-    name: "washington dc",
-  }
-
   @bad_create_attrs %{
     name: "washington dc",
     addr_id: 1
@@ -36,12 +30,14 @@ defmodule NabooAPI.NodeControllerTest do
 
   describe "create node" do
     test "renders node when data is valid", %{conn: conn} do
-
       address = address_fixture()
 
-      attrs =
-        %{"addr_id" => address.id}
-        |> Enum.into(@create_attrs)
+      attrs = %{
+        addr_id: address.id,
+        name: "washington dc",
+        longitude: "-77.0364",
+        latitude: "38.8951"
+      }
 
       conn = post(conn, Helpers.node_path(conn, :create), node: attrs)
       assert %{"id" => id} = json_response(conn, 201)["data"]
@@ -57,27 +53,46 @@ defmodule NabooAPI.NodeControllerTest do
 
     test "fail when data is not valid", %{conn: conn} do
       conn = post(conn, Helpers.node_path(conn, :create), node: @bad_create_attrs)
-      assert %{"error" => _changeset} = json_response(conn, 403)["data"]
+      assert _response = json_response(conn, 403)
     end
   end
 
   describe "update a node" do
     test "updates an existing node, then displays it", %{conn: conn} do
-
       node = node_fixture()
-
-      conn = patch(conn, Helpers.node_path(conn, :update, node.id), node: @update_attrs)
-      assert %{
-        "id" => node.id,
-      } == json_response(conn, 200)["data"]
 
       conn = get(conn, Helpers.node_path(conn, :show, node.id))
 
       assert %{
                "id" => node.id,
-               "latitude" => "38.8951",
-               "longitude" => "-77.0364",
-               "name" => "Washington DC"
+               "latitude" => "some latitude",
+               "longitude" => "some longitude",
+               "name" => "some name",
+               "address" => %{
+                 "city" => "some city",
+                 "country" => "some country",
+                 "country_code" => "some country_code",
+                 "postcode" => "some postcode",
+                 "state" => "some state",
+                 "state_district" => "some state_district"
+               }
+             } == json_response(conn, 200)["data"]
+
+      conn = patch(conn, Helpers.node_path(conn, :update, node.id), node: @update_attrs)
+
+      assert %{
+               "id" => node.id,
+               "latitude" => "some latitude",
+               "longitude" => "some longitude",
+               "name" => "Washington DC",
+               "address" => %{
+                 "city" => "some city",
+                 "country" => "some country",
+                 "country_code" => "some country_code",
+                 "postcode" => "some postcode",
+                 "state" => "some state",
+                 "state_district" => "some state_district"
+               }
              } == json_response(conn, 200)["data"]
     end
 
@@ -91,7 +106,6 @@ defmodule NabooAPI.NodeControllerTest do
 
   describe "delete a node" do
     test "delete an exising node", %{conn: conn} do
-
       node = node_fixture()
 
       conn = delete(conn, Helpers.node_path(conn, :delete, node.id))
@@ -123,12 +137,21 @@ defmodule NabooAPI.NodeControllerTest do
       node = node_fixture()
 
       conn = get(conn, Helpers.node_path(conn, :show, node.id))
+
       assert %{
-        "id" => node.id,
-        "latitude" => node.latitude,
-        "longitude" => node.longitude,
-        "name" => node.name
-      } == json_response(conn, 200)["data"]
+               "id" => node.id,
+               "latitude" => node.latitude,
+               "longitude" => node.longitude,
+               "name" => node.name,
+               "address" => %{
+                 "city" => "some city",
+                 "country" => "some country",
+                 "country_code" => "some country_code",
+                 "postcode" => "some postcode",
+                 "state" => "some state",
+                 "state_district" => "some state_district"
+               }
+             } == json_response(conn, 200)["data"]
     end
   end
 end

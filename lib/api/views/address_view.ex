@@ -7,17 +7,19 @@ defmodule NabooAPI.AddressView do
     %{data: render_many(addresses, AddressView, "domain.json")}
   end
 
-  def render("show.json", %{addresses: addresses}) do
-    %{data: render_one(addresses, AddressView, "domain.json")}
+  def render("show.json", %{address: address}) do
+    %{data: render_one(address, AddressView, "address.json")}
   end
 
-  def render("node.json", %{address: address}) do
+  def render("address.json", %{address: address}) do
     %{
       id: address.id,
       city: address.city,
+      country: address.country,
       country_code: address.country_code,
       postcode: address.postcode,
       state: address.state,
+      state_district: address.state_district,
       district: address.state_district
     }
   end

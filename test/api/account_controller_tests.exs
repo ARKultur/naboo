@@ -156,7 +156,7 @@ defmodule NabooAPI.AccountControllerTest do
       assert %{"id" => _id} = json_response(conn, 201)["data"]
 
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"message" => "account already exists"} = json_response(conn, 403)
+      assert %{"errors" => "already_exists"} = json_response(conn, 403)
     end
   end
 

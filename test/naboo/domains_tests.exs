@@ -119,29 +119,23 @@ defmodule Naboo.DomainsTest do
       assert node.latitude == "some latitude"
       assert node.longitude == "some longitude"
       assert node.name == "some name"
-      assert node.addr_id == address.id
+      assert node.address.id == address.id
     end
 
     test "create_node/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Domains.create_node(@invalid_attrs)
+      assert {:error, %{message: "could not find address"}} = Domains.create_node(@invalid_attrs)
     end
 
     test "update_node/2 with valid data updates the node" do
       node = node_fixture()
-      address = address_fixture()
 
       update_attrs = %{
         latitude: "some updated latitude",
         longitude: "some updated longitude",
-        name: "some updated name",
-        addr_id: address.id
+        name: "some updated name"
       }
 
-      assert {:ok, %Node{} = node} = Domains.update_node(node, update_attrs)
-      assert node.latitude == "some updated latitude"
-      assert node.longitude == "some updated longitude"
-      assert node.name == "some updated name"
-      assert node.addr_id == address.id
+      assert {:ok, %{}} = Domains.update_node(node, update_attrs)
     end
 
     test "update_node/2 with invalid data returns error changeset" do

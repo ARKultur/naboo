@@ -54,6 +54,7 @@ defmodule NabooAPI.AccountController do
         account: %{
           email: "test@test.com",
           password: "test_t",
+          password_confirmation: "test_t",
           name: "test"
         }
       }
@@ -78,11 +79,11 @@ defmodule NabooAPI.AccountController do
       |> put_status(:created)
       |> render("show.json", account: account)
     else
-      _ ->
+      {:error, something} ->
         conn
-        |> put_view(AccountView)
+        |> put_view(Errors)
         |> put_status(403)
-        |> render("already_exists.json", [])
+        |> render("error_messages.json", %{errors: something})
     end
   end
 

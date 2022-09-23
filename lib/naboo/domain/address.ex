@@ -2,6 +2,7 @@ defmodule Naboo.Domain.Address do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:city, :country, :country_code, :postcode, :state, :state_district]}
   schema "addresses" do
     field(:city, :string)
     field(:country, :string)

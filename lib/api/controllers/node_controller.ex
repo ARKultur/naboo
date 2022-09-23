@@ -74,7 +74,8 @@ defmodule NabooAPI.NodeController do
   end
 
   def create(conn, %{"node" => node_params}) do
-    with {:ok, %Node{} = node} <- Domains.create_node(node_params) do
+    with filtered <- Map.new(node_params, fn {k, v} -> {String.to_existing_atom(k), v} end),
+         {:ok, %Node{} = node} <- Domains.create_node(filtered) do
       conn
       |> put_view(NodeView)
       |> put_status(:created)
@@ -85,6 +86,18 @@ defmodule NabooAPI.NodeController do
         |> put_view(Errors)
         |> put_status(:forbidden)
         |> render("error_messages.json", %{error: changeset})
+
+      "Internal Server Error" ->
+        conn
+        |> put_view(Errors)
+        |> put_status(500)
+        |> render("error_messages.json", %{error: "internal server error"})
+
+      nil ->
+        conn
+        |> put_view(Errors)
+        |> put_status(:forbidden)
+        |> render("error_messages.json", %{error: "input not acceptable"})
     end
   end
 
@@ -148,7 +161,8 @@ defmodule NabooAPI.NodeController do
 
   def update(conn, %{"id" => id, "node" => node_params}) do
     with %Node{} = node <- Domains.get_node(id),
-         {:ok, %Node{} = updated} <- Domains.update_node(node, node_params) do
+         filtered <- Map.new(node_params, fn {k, v} -> {String.to_existing_atom(k), v} end),
+         {:ok, %Node{} = updated} <- Domains.update_node(node, filtered) do
       conn
       |> put_view(NodeView)
       |> put_status(:ok)
@@ -160,11 +174,17 @@ defmodule NabooAPI.NodeController do
         |> put_status(:not_found)
         |> render("404.json", [])
 
-      {:ko, changeset} ->
+      {:error, changeset} ->
         conn
         |> put_view(Errors)
         |> put_status(400)
         |> render("error_messages.json", %{errors: changeset})
+
+      err ->
+        conn
+        |> put_view(Errors)
+        |> put_status(403)
+        |> render("error_messages.json", %{errors: err})
     end
   end
 

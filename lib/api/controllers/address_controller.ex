@@ -81,17 +81,19 @@ defmodule NabooAPI.AddressController do
   end
 
   def create(conn, %{"address" => address_params}) do
-    with {:ok, %Address{} = address} <- Domains.create_address(address_params) do
+    with filtered <- Map.new(address_params, fn {k, v} -> {String.to_existing_atom(k), v} end),
+         {:ok, %Address{} = address} <- Domains.create_address(filtered) do
       conn
       |> put_view(AddressView)
       |> put_status(:created)
       |> render("show.json", address: address)
     else
-      {:error, changeset} ->
+      # TODO(bogdan): fix cleanly the error message sent back by changeset
+      {:error, _changeset} ->
         conn
         |> put_view(Errors)
-        |> put_status(:forbidden)
-        |> render("error_messages.json", %{error: changeset})
+        |> put_status(403)
+        |> render("error_messages.json", %{errors: "invalid input"})
     end
   end
 
@@ -159,7 +161,8 @@ defmodule NabooAPI.AddressController do
 
   def update(conn, %{"id" => id, "address" => address_params}) do
     with %Address{} = address <- Domains.get_address(id),
-         {:ok, %Address{} = updated} <- Domains.update_address(address, address_params) do
+         filtered <- Map.new(address_params, fn {k, v} -> {String.to_existing_atom(k), v} end),
+         {:ok, %Address{} = updated} <- Domains.update_address(address, filtered) do
       conn
       |> put_view(AddressView)
       |> put_status(:ok)
@@ -171,7 +174,7 @@ defmodule NabooAPI.AddressController do
         |> put_status(:not_found)
         |> render("404.json", [])
 
-      {:ko, changeset} ->
+      {:error, changeset} ->
         conn
         |> put_view(Errors)
         |> put_status(400)

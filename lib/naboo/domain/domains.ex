@@ -71,26 +71,25 @@ defmodule Naboo.Domains do
 
   """
   def create_node(attrs) do
-
     with %Address{} = addr <- get_address(attrs.addr_id),
          cset <- Ecto.build_assoc(addr, :node, attrs),
          {:ok, %Node{} = node} <- Repo.insert(cset),
          {:ok, %Address{}} <- update_address(addr, %{node_id: node.id}) do
-
-      {:ok, node}
-
+      # ensure that we preload the address as well
+      {:ok, get_node(node.id)}
     else
       nil ->
-        {:error, %{
-          message: "could not find address",
-        }}
+        {:error,
+         %{
+           message: "could not find address"
+         }}
 
       {:error, cset} ->
-
-        {:error, %{
-          message: "could not create node",
-          changeset: cset,
-        }}
+        {:error,
+         %{
+           message: "could not create node",
+           changeset: cset
+         }}
 
       err ->
         {:error, err}
@@ -110,9 +109,19 @@ defmodule Naboo.Domains do
 
   """
   def update_node(%Node{} = node, attrs) do
-    node
-    |> Node.changeset(attrs)
-    |> Repo.update()
+    rvalue =
+      node
+      |> Node.changeset(attrs)
+      |> Repo.update()
+
+    # preload related address when returning node
+    case rvalue do
+      %Node{} = node ->
+        get_node(node.id)
+
+      err ->
+        err
+    end
   end
 
   @doc """
@@ -128,7 +137,17 @@ defmodule Naboo.Domains do
 
   """
   def delete_node(%Node{} = node) do
-    Repo.delete(node)
+    with %Address{} = addr <- get_address(node.address.id),
+         {:ok, %Address{}} <- delete_address(addr) do
+      node
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.no_assoc_constraint(:address)
+      |> Ecto.Changeset.foreign_key_constraint(:address, name: :addresses_node_id_fkey)
+      |> Repo.delete()
+    else
+      error ->
+        {:error, error}
+    end
   end
 
   @doc """
