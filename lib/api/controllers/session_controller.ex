@@ -36,8 +36,7 @@ defmodule NabooAPI.SessionController do
         |> put_status(:unauthorized)
         |> render("error_messages.json", %{errors: something})
 
-      err ->
-        IO.inspect(err)
+      _err ->
         unauthorized(conn)
     end
   end

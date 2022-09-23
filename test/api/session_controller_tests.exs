@@ -32,6 +32,17 @@ defmodule NabooAPI.SessionControllerTests do
       assert _resp = json_response(conn, 401)
     end
 
+    test "fail if garbage is sent at login", %{conn: conn} do
+      garbage = %{
+        "this" => "is",
+        "some" => "garbage input",
+        "something" => 231_231_231
+      }
+
+      conn = post(conn, Helpers.session_path(conn, :sign_in), garbage)
+      assert _resp = json_response(conn, 401)
+    end
+
     test "access unpermitted route should give error from middleware", %{conn: conn} do
       conn = get(conn, Helpers.account_path(conn, :show, 1), %{})
       assert _response = json_response(conn, 401)
