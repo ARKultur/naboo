@@ -70,6 +70,10 @@ build-dev: ## Build the Docker image for dev purposes
 run: prepare ## Run the server inside an IEx shell
 	iex -S mix phx.server
 
+.PHONY: shell
+shell: prepare ## Runs an Interactive REPL with naboo modules loaded
+	iex -S mix
+
 .PHONY: dependencies
 dependencies: ## Install dependencies
 	mix deps.get
