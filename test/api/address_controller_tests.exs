@@ -44,6 +44,94 @@ defmodule NabooAPI.AddressControllerTest do
     {:ok, conn: conn}
   end
 
+  @create_address_query """
+    mutation CreateSimpleAddress(
+      $city: String!,
+      $country: String!,
+      $country_code: String!,
+      $postcode: String!,
+      $state: String!,
+      $state_district: String!
+    ) {
+      createAddress(
+        city: $city,
+        country: $country,
+        countryCode: $country_code,
+        postcode: $postcode,
+        state: $state,
+        stateDistrict: $state_district
+      ) {
+        id
+        city
+        country
+        state
+      }
+    }
+  """
+
+  @delete_address_query """
+    mutation DeleteSimpleAddress($id: ID!) {
+      deleteAddress(id: $id) {
+        id
+      }
+    }
+  """
+
+  @get_address_query """
+  query findAddress($id: ID!) {
+    getAddress(id: $id) {
+      id
+      city
+      country
+    }
+  }      
+  """
+
+  describe "GraphQL test set" do
+    test "create, get and delete an address through graphql", %{conn: conn} do
+      conn =
+        post(conn, "/graphql", %{
+          "query" => @create_address_query,
+          "variables" => @create_attrs
+        })
+
+      assert %{
+               "createAddress" => %{
+                 "id" => id,
+                 "city" => "Paris",
+                 "country" => "France",
+                 "state" => "Something"
+               }
+             } = json_response(conn, 200)["data"]
+
+      conn =
+        post(conn, "/graphql", %{
+          "query" => @get_address_query,
+          "variables" => %{id: id}
+        })
+
+      assert %{
+               "getAddress" => %{
+                 "id" => id,
+                 "city" => "Paris",
+                 "country" => "France"
+               }
+             } == json_response(conn, 200)["data"]
+
+      conn =
+        post(conn, "/graphql", %{
+          "query" => @delete_address_query,
+          "variables" => %{id: id}
+        })
+
+      assert %{
+               "deleteAddress" => %{
+                 "id" => id
+               }
+             } == json_response(conn, 200)["data"]
+    end
+  end
+
   describe "create address" do
     test "renders address when data is valid", %{conn: conn} do
       conn = post(conn, Helpers.address_path(conn, :create), address: @create_attrs)

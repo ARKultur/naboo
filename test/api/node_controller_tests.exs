@@ -28,6 +28,97 @@ defmodule NabooAPI.NodeControllerTest do
     {:ok, conn: conn}
   end
 
+  @create_node_query """
+    mutation CreateSimpleNode(
+      $addr: ID!,
+      $latitude: String!,
+      $longitude: String!,
+      $name: String!,
+      ) {
+      createNode(
+        addrId: $addr,
+        latitude: $latitude,
+        longitude: $longitude,
+        name: $name,
+      ) {
+        id
+        latitude
+        longitude
+      }
+    }
+  """
+
+  @delete_node_query """
+    mutation DeleteSimpleNode($id: ID!) {
+      deleteNode(id: $id) {
+        id
+      }
+    }
+  """
+
+  @get_node_query """
+    query findNode($id: ID!) {
+      getNode(id: $id) {
+        id
+        latitude
+        longitude
+      }
+    }
+  """
+
+  describe "GraphQL test set" do
+    test "create, get and delete a node through graphql", %{conn: conn} do
+      addr = address_fixture()
+
+      create_attrs = %{
+        addr: addr.id,
+        name: "something cool",
+        longitude: "some longitude",
+        latitude: "some latitude"
+      }
+
+      conn =
+        post(conn, "/graphql", %{
+          "query" => @create_node_query,
+          "variables" => create_attrs
+        })
+
+      assert %{
+               "createNode" => %{
+                 "id" => id,
+                 "longitude" => "some longitude",
+                 "latitude" => "some latitude"
+               }
+             } = json_response(conn, 200)["data"]
+
+      conn =
+        post(conn, "/graphql", %{
+          "query" => @get_node_query,
+          "variables" => %{id: id}
+        })
+
+      assert %{
+               "getNode" => %{
+                 "id" => id,
+                 "longitude" => "some longitude",
+                 "latitude" => "some latitude"
+               }
+             } == json_response(conn, 200)["data"]
+
+      conn =
+        post(conn, "/graphql", %{
+          "query" => @delete_node_query,
+          "variables" => %{id: id}
+        })
+
+      assert %{
+               "deleteNode" => %{
+                 "id" => id
+               }
+             } == json_response(conn, 200)["data"]
+    end
+  end
+
   describe "create node" do
     test "renders node when data is valid", %{conn: conn} do
       address = address_fixture()
