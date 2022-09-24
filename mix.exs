@@ -86,8 +86,8 @@ defmodule Naboo.Mixfile do
       {:excoveralls, "~> 0.14", only: :test},
 
       # Swagger
-      {:phoenix_swagger, "~> 0.8"},
-      {:ex_json_schema, "~> 0.9.1"}
+      {:phoenix_swagger, "~> 0.8.3"},
+      {:ex_json_schema, "~> 0.9.1", override: true}
     ]
   end
 

@@ -46,6 +46,10 @@ targets:
 prepare: dependencies
 	bash ./scripts/setup_db.sh
 
+.PHONY: checkdeps
+checkdeps: ## checks if dependencies are up-to-date
+	mix hex.outdated
+
 .PHONY: cleanup
 cleanup: ## Cleans the whole project, as if it was just cloned
 	echo "" | bash ./scripts/nuke_db.sh
