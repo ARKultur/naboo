@@ -68,7 +68,7 @@ defmodule Naboo.Mixfile do
       {:dataloader, "~> 1.0"},
       {:absinthe_error_payload, "~> 1.1.4"},
       {:ecto_sql, "~> 3.7"},
-      {:postgrex, "~> 0.15"},
+      {:postgrex, "~> 0.16"},
 
       # Health
       {:plug_checkup, "~> 0.6"},
