@@ -4,6 +4,8 @@ defmodule Naboo.Domains do
   """
 
   import Ecto.Query, warn: false
+  import Naboo.Utils
+
   alias Naboo.Repo
 
   alias Naboo.Domain.Address
@@ -34,7 +36,10 @@ defmodule Naboo.Domains do
   nil
 
   """
-  def get_node(id), do: Repo.get(Node, id)
+  def get_node(id) do
+    Repo.get(Node, id)
+    |> Repo.preload(:address)
+  end
 
   @doc """
   Gets a single node.
@@ -50,7 +55,10 @@ defmodule Naboo.Domains do
   ** (Ecto.NoResultsError)
 
   """
-  def get_node!(id), do: Repo.get!(Node, id)
+  def get_node!(id) do
+    Repo.get!(Node, id)
+    |> Repo.preload(:address)
+  end
 
   @doc """
   Creates a node.
@@ -64,10 +72,33 @@ defmodule Naboo.Domains do
   {:error, %Ecto.Changeset{}}
 
   """
-  def create_node(attrs \\ %{}) do
-    %Node{}
-    |> Node.changeset(attrs)
-    |> Repo.insert()
+  def create_node(attrs) do
+    atoms_as_keys = map_castable(attrs)
+
+    with addr_id <- Map.get(atoms_as_keys, :addr_id),
+         %Address{} = addr <- get_address(addr_id),
+         cset <- Ecto.build_assoc(addr, :node, atoms_as_keys),
+         {:ok, %Node{} = node} <- Repo.insert(cset),
+         {:ok, %Address{}} <- update_address(addr, %{node_id: node.id}) do
+      # ensure that we preload the address as well
+      {:ok, get_node(node.id)}
+    else
+      nil ->
+        {:error,
+         %{
+           message: "could not find address"
+         }}
+
+      {:error, cset} ->
+        {:error,
+         %{
+           message: "could not create node",
+           changeset: cset
+         }}
+
+      err ->
+        {:error, err}
+    end
   end
 
   @doc """
@@ -83,9 +114,19 @@ defmodule Naboo.Domains do
 
   """
   def update_node(%Node{} = node, attrs) do
-    node
-    |> Node.changeset(attrs)
-    |> Repo.update()
+    rvalue =
+      node
+      |> Node.changeset(attrs)
+      |> Repo.update()
+
+    # preload related address when returning node
+    case rvalue do
+      %Node{} = node ->
+        get_node(node.id)
+
+      err ->
+        err
+    end
   end
 
   @doc """
@@ -101,7 +142,17 @@ defmodule Naboo.Domains do
 
   """
   def delete_node(%Node{} = node) do
-    Repo.delete(node)
+    with %Address{} = addr <- get_address(node.address.id),
+         {:ok, %Address{}} <- delete_address(addr) do
+      node
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.no_assoc_constraint(:address)
+      |> Ecto.Changeset.foreign_key_constraint(:address, name: :addresses_node_id_fkey)
+      |> Repo.delete()
+    else
+      error ->
+        {:error, error}
+    end
   end
 
   @doc """
@@ -173,8 +224,10 @@ defmodule Naboo.Domains do
 
   """
   def create_address(attrs \\ %{}) do
+    atoms_as_keys = map_castable(attrs)
+
     %Address{}
-    |> Address.changeset(attrs)
+    |> Address.changeset(atoms_as_keys)
     |> Repo.insert()
   end
 
@@ -191,8 +244,10 @@ defmodule Naboo.Domains do
 
   """
   def update_address(%Address{} = address, attrs) do
+    atoms_as_keys = map_castable(attrs)
+
     address
-    |> Address.changeset(attrs)
+    |> Address.changeset(atoms_as_keys)
     |> Repo.update()
   end
 

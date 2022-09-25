@@ -46,6 +46,10 @@ targets:
 prepare: dependencies
 	bash ./scripts/setup_db.sh
 
+.PHONY: checkdeps
+checkdeps: ## checks if dependencies are up-to-date
+	mix hex.outdated
+
 .PHONY: cleanup
 cleanup: ## Cleans the whole project, as if it was just cloned
 	echo "" | bash ./scripts/nuke_db.sh
@@ -69,6 +73,10 @@ build-dev: ## Build the Docker image for dev purposes
 .PHONY: run
 run: prepare ## Run the server inside an IEx shell
 	iex -S mix phx.server
+
+.PHONY: shell
+shell: prepare ## Runs an Interactive REPL with naboo modules loaded
+	iex -S mix
 
 .PHONY: dependencies
 dependencies: ## Install dependencies

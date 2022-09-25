@@ -30,7 +30,13 @@ defmodule NabooAPI.SessionController do
          {:ok, token, _} <- Sessions.log_in(conn, account) do
       render(conn, "token.json", token: token)
     else
-      _ ->
+      {:error, something} ->
+        conn
+        |> put_view(Errors)
+        |> put_status(:unauthorized)
+        |> render("error_messages.json", %{errors: something})
+
+      _err ->
         unauthorized(conn)
     end
   end

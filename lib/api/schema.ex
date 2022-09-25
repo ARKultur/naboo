@@ -63,7 +63,7 @@ defmodule NabooAPI.Schema do
       resolve(&NodeResolver.update_node/3)
     end
 
-    @desc "Delete an node"
+    @desc "Delete a node"
     field :delete_node, :node do
       arg(:id, non_null(:id))
 
@@ -144,6 +144,7 @@ defmodule NabooAPI.Schema do
     field(:longitude, non_null(:string))
     field(:name, non_null(:string))
     field(:addr_id, non_null(:id))
+    field(:id, non_null(:id))
   end
 
   object :address do
@@ -153,6 +154,7 @@ defmodule NabooAPI.Schema do
     field(:postcode, non_null(:string))
     field(:state, non_null(:string))
     field(:state_district, non_null(:string))
+    field(:id, non_null(:id))
   end
 
   object :account do

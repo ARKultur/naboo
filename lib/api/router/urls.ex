@@ -17,10 +17,14 @@ defmodule NabooAPI.Router.Urls do
     post("/login", NabooAPI.SessionController, :sign_in)
     resources("/account", NabooAPI.AccountController, only: [:create])
     forward("/swagger", PhoenixSwagger.Plug.SwaggerUI, otp_app: :naboo, swagger_file: "swagger.json")
+  end
 
-    pipe_through(:api_auth)
+  scope "/api" do
+    pipe_through([:api, :api_auth])
     post("/logout", NabooAPI.SessionController, :delete)
     resources("/account", NabooAPI.AccountController, only: [:update, :delete, :show, :index])
+    resources("/node", NabooAPI.NodeController)
+    resources("/address", NabooAPI.AddressController)
   end
 
   # The session will be stored in the cookie and signed,
@@ -40,7 +44,7 @@ defmodule NabooAPI.Router.Urls do
   def swagger_info do
     %{
       info: %{
-        version: "0.3",
+        version: "0.3.0",
         host: System.get_env("CANONICAL_URL"),
         title: "naboo"
       }

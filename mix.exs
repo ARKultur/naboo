@@ -4,7 +4,7 @@ defmodule Naboo.Mixfile do
   def project do
     [
       app: :naboo,
-      version: "0.4.0",
+      version: "0.3.0",
       elixir: "~> 1.14",
       erlang: "~> 24.1",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -68,7 +68,7 @@ defmodule Naboo.Mixfile do
       {:dataloader, "~> 1.0"},
       {:absinthe_error_payload, "~> 1.1.4"},
       {:ecto_sql, "~> 3.7"},
-      {:postgrex, "~> 0.15"},
+      {:postgrex, "~> 0.16"},
 
       # Health
       {:plug_checkup, "~> 0.6"},
@@ -86,8 +86,8 @@ defmodule Naboo.Mixfile do
       {:excoveralls, "~> 0.14", only: :test},
 
       # Swagger
-      {:phoenix_swagger, "~> 0.8"},
-      {:ex_json_schema, "~> 0.9.1"}
+      {:phoenix_swagger, "~> 0.8.3"},
+      {:ex_json_schema, "~> 0.9.1", override: true}
     ]
   end
 
