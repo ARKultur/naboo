@@ -8,28 +8,28 @@ defmodule NabooAPI.AddressControllerTest do
   alias NabooAPI.Router.Urls.Helpers
 
   @create_attrs %{
-    city: "Paris",
-    country: "France",
-    country_code: "FR",
-    postcode: "75019",
-    state: "Something",
-    state_district: "Paris"
+    "city" => "Paris",
+    "country" => "France",
+    "country_code" => "FR",
+    "postcode" => "75019",
+    "state" => "Something",
+    "state_district" => "Paris"
   }
 
   @bad_create_attrs %{
-    city: "Paris",
-    country_code: "FR",
-    postcode: "75019",
-    state_district: "Paris"
+    "city" => "Paris",
+    "country_code" => "FR",
+    "postcode" => "75019",
+    "state_district" => "Paris"
   }
 
   @update_attrs %{
-    city: "Paris",
-    country: "France",
-    country_code: "FR",
-    postcode: "75019",
-    state: "Something else",
-    state_district: "Seine"
+    "city" => "Paris",
+    "country" => "France",
+    "country_code" => "FR",
+    "postcode" => "75019",
+    "state" => "Something else",
+    "state_district" => "Seine"
   }
 
   setup %{conn: conn} do

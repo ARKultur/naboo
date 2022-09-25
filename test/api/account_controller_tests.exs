@@ -6,17 +6,17 @@ defmodule NabooAPI.AccountControllerTest do
   alias NabooAPI.Router.Urls.Helpers
 
   @create_attrs %{
-    email: "some email",
-    password: "some password",
-    password_confirmation: "some password",
-    name: "some name"
+    "email" => "some email",
+    "password" => "some password",
+    "password_confirmation" => "some password",
+    "name" => "some name"
   }
 
   @update_attrs %{
-    email: "some updated email",
-    password: "some updated password",
-    password_confirmation: "some updated password",
-    name: "some updated name"
+    "email" => "some updated email",
+    "password" => "some updated password",
+    "password_confirmation" => "some updated password",
+    "name" => "some updated name"
   }
 
   setup %{conn: conn} do

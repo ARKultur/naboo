@@ -8,12 +8,12 @@ defmodule NabooAPI.NodeControllerTest do
   alias NabooAPI.Router.Urls.Helpers
 
   @bad_create_attrs %{
-    name: "washington dc",
-    addr_id: 1
+    "name" => "washington dc",
+    "addr_id" => 1
   }
 
   @update_attrs %{
-    name: "Washington DC"
+    "name" => "Washington DC"
   }
 
   setup %{conn: conn} do
@@ -71,10 +71,10 @@ defmodule NabooAPI.NodeControllerTest do
       addr = address_fixture()
 
       create_attrs = %{
-        addr: addr.id,
-        name: "something cool",
-        longitude: "some longitude",
-        latitude: "some latitude"
+        "addr" => addr.id,
+        "name" => "something cool",
+        "longitude" => "some longitude",
+        "latitude" => "some latitude"
       }
 
       conn =

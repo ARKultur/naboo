@@ -9,8 +9,8 @@ defmodule Naboo.DomainsTest do
     import Naboo.DomainsFixtures
 
     @invalid_attrs %{
-      country_code: nil,
-      state_district: nil
+      "country_code" => nil,
+      "state_district" => nil
     }
 
     test "list_addresses/0 returns all addresses" do
@@ -24,12 +24,12 @@ defmodule Naboo.DomainsTest do
 
     test "create_address/1 with valid data creates a address" do
       valid_attrs = %{
-        city: "some city",
-        country: "some country",
-        country_code: "some country_code",
-        postcode: "some postcode",
-        state: "some state",
-        state_district: "some state district"
+        "city" => "some city",
+        "country" => "some country",
+        "country_code" => "some country_code",
+        "postcode" => "some postcode",
+        "state" => "some state",
+        "state_district" => "some state_district"
       }
 
       assert {:ok, %Address{} = address} = Domains.create_address(valid_attrs)
@@ -38,7 +38,7 @@ defmodule Naboo.DomainsTest do
       assert address.country_code == "some country_code"
       assert address.postcode == "some postcode"
       assert address.state == "some state"
-      assert address.state_district == "some state district"
+      assert address.state_district == "some state_district"
     end
 
     test "create_address/1 with invalid data returns error changeset" do
@@ -49,12 +49,12 @@ defmodule Naboo.DomainsTest do
       address = address_fixture()
 
       update_attrs = %{
-        city: "some updated city",
-        country: "some updated country",
-        country_code: "some updated country_code",
-        postcode: "some updated postcode",
-        state: "some updated state",
-        state_district: "some updated state district"
+        "city" => "some updated city",
+        "country" => "some updated country",
+        "country_code" => "some updated country_code",
+        "postcode" => "some updated postcode",
+        "state" => "some updated state",
+        "state_district" => "some updated state_district"
       }
 
       assert {:ok, %Address{} = address} = Domains.update_address(address, update_attrs)
@@ -63,7 +63,7 @@ defmodule Naboo.DomainsTest do
       assert address.country_code == "some updated country_code"
       assert address.postcode == "some updated postcode"
       assert address.state == "some updated state"
-      assert address.state_district == "some updated state district"
+      assert address.state_district == "some updated state_district"
     end
 
     test "update_address/2 with invalid data returns error changeset" do
@@ -90,10 +90,10 @@ defmodule Naboo.DomainsTest do
     import Naboo.DomainsFixtures
 
     @invalid_attrs %{
-      latitude: nil,
-      longitude: nil,
-      name: nil,
-      addr_id: 1
+      "latitude" => nil,
+      "longitude" => nil,
+      "name" => nil,
+      "addr_id" => 1
     }
 
     test "list_nodes/0 returns all nodes" do
@@ -109,10 +109,10 @@ defmodule Naboo.DomainsTest do
       address = address_fixture()
 
       valid_attrs = %{
-        latitude: "some latitude",
-        longitude: "some longitude",
-        name: "some name",
-        addr_id: address.id
+        "latitude" => "some latitude",
+        "longitude" => "some longitude",
+        "name" => "some name",
+        "addr_id" => address.id
       }
 
       assert {:ok, %Node{} = node} = Domains.create_node(valid_attrs)
@@ -130,9 +130,9 @@ defmodule Naboo.DomainsTest do
       node = node_fixture()
 
       update_attrs = %{
-        latitude: "some updated latitude",
-        longitude: "some updated longitude",
-        name: "some updated name"
+        "latitude" => "some updated latitude",
+        "longitude" => "some updated longitude",
+        "name" => "some updated name",
       }
 
       assert {:ok, %{}} = Domains.update_node(node, update_attrs)
