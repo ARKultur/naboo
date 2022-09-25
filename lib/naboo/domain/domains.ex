@@ -4,6 +4,8 @@ defmodule Naboo.Domains do
   """
 
   import Ecto.Query, warn: false
+  import Naboo.Utils
+
   alias Naboo.Repo
 
   alias Naboo.Domain.Address
@@ -71,18 +73,14 @@ defmodule Naboo.Domains do
 
   """
   def create_node(attrs) do
-    # safely get keys from attrs (checking if they are passed as strings of atoms)
-    filtered =
-      if Map.has_key?(attrs, "addr_id") do
-        Map.new(attrs, fn {k, v} -> {String.to_existing_atom(k), v} end)
-      else
-        attrs
-      end
+    atoms_as_keys = map_castable(attrs)
 
-    with %Address{} = addr <- get_address(filtered.addr_id),
-         cset <- Ecto.build_assoc(addr, :node, filtered),
+    with addr_id <- Map.get(atoms_as_keys, :addr_id),
+         %Address{} = addr <- get_address(addr_id),
+         cset <- Ecto.build_assoc(addr, :node, atoms_as_keys),
          {:ok, %Node{} = node} <- Repo.insert(cset),
          {:ok, %Address{}} <- update_address(addr, %{node_id: node.id}) do
+
       # ensure that we preload the address as well
       {:ok, get_node(node.id)}
     else
@@ -227,8 +225,10 @@ defmodule Naboo.Domains do
 
   """
   def create_address(attrs \\ %{}) do
+    atoms_as_keys = map_castable(attrs)
+
     %Address{}
-    |> Address.changeset(attrs)
+    |> Address.changeset(atoms_as_keys)
     |> Repo.insert()
   end
 
@@ -245,8 +245,10 @@ defmodule Naboo.Domains do
 
   """
   def update_address(%Address{} = address, attrs) do
+    atoms_as_keys = map_castable(attrs)
+
     address
-    |> Address.changeset(attrs)
+    |> Address.changeset(atoms_as_keys)
     |> Repo.update()
   end
 

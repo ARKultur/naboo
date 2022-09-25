@@ -1,6 +1,7 @@
 defmodule Naboo.Domain.Address do
   use Ecto.Schema
   import Ecto.Changeset
+  import Naboo.Utils
 
   @derive {Jason.Encoder, only: [:city, :country, :country_code, :postcode, :state, :state_district]}
   schema "addresses" do
@@ -20,7 +21,7 @@ defmodule Naboo.Domain.Address do
   @doc false
   def changeset(address, attrs) do
     address
-    |> cast(attrs, [:city, :country, :country_code, :postcode, :state, :state_district, :node_id])
+    |> cast(map_castable(attrs), [:city, :country, :country_code, :postcode, :state, :state_district, :node_id])
     |> validate_required([:city, :country, :country_code, :postcode, :state, :state_district])
   end
 end

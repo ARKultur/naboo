@@ -2,6 +2,8 @@ defmodule NabooAPI.AddressController do
   use Phoenix.Controller, namespace: NabooAPI, root: "lib/api"
   use PhoenixSwagger
 
+  alias Ecto.Changeset
+
   alias Naboo.Domains
   alias Naboo.Domain.Address
 
@@ -81,19 +83,23 @@ defmodule NabooAPI.AddressController do
   end
 
   def create(conn, %{"address" => address_params}) do
-    with filtered <- Map.new(address_params, fn {k, v} -> {String.to_existing_atom(k), v} end),
-         {:ok, %Address{} = address} <- Domains.create_address(filtered) do
+    with {:ok, %Address{} = address} <- Domains.create_address(address_params) do
       conn
       |> put_view(AddressView)
       |> put_status(:created)
       |> render("show.json", address: address)
     else
-      # TODO(bogdan): fix cleanly the error message sent back by changeset
-      {:error, _changeset} ->
+      {:error, changeset = %Changeset{}} ->
         conn
         |> put_view(Errors)
         |> put_status(403)
-        |> render("error_messages.json", %{errors: "invalid input"})
+        |> render("error_messages.json", %{errors: changeset.errors})
+
+      err ->
+        conn
+        |> put_view(Errors)
+        |> put_status(500)
+        |> render("error_messages.json", %{errors: err})
     end
   end
 
@@ -177,7 +183,7 @@ defmodule NabooAPI.AddressController do
         conn
         |> put_view(Errors)
         |> put_status(400)
-        |> render("error_messages.json", %{errors: changeset})
+        |> render("error_messages.json", %{errors: changeset.errors})
     end
   end
 
@@ -205,7 +211,7 @@ defmodule NabooAPI.AddressController do
         |> put_status(:not_found)
         |> render("404.json", [])
 
-      {:ko, _} ->
+      {:error, _} ->
         conn
         |> put_view(Errors)
         |> put_status(400)
