@@ -84,7 +84,7 @@ defmodule NabooAPI.AddressControllerTest do
       city
       country
     }
-  }      
+  }
   """
 
   describe "GraphQL test set" do

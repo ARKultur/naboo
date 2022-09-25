@@ -74,8 +74,7 @@ defmodule NabooAPI.NodeController do
   end
 
   def create(conn, %{"node" => node_params}) do
-    with filtered <- Map.new(node_params, fn {k, v} -> {String.to_existing_atom(k), v} end),
-         {:ok, %Node{} = node} <- Domains.create_node(filtered) do
+    with {:ok, %Node{} = node} <- Domains.create_node(node_params) do
       conn
       |> put_view(NodeView)
       |> put_status(:created)
@@ -161,8 +160,7 @@ defmodule NabooAPI.NodeController do
 
   def update(conn, %{"id" => id, "node" => node_params}) do
     with %Node{} = node <- Domains.get_node(id),
-         filtered <- Map.new(node_params, fn {k, v} -> {String.to_existing_atom(k), v} end),
-         {:ok, %Node{} = updated} <- Domains.update_node(node, filtered) do
+         {:ok, %Node{} = updated} <- Domains.update_node(node, node_params) do
       conn
       |> put_view(NodeView)
       |> put_status(:ok)

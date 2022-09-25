@@ -124,10 +124,10 @@ defmodule NabooAPI.NodeControllerTest do
       address = address_fixture()
 
       attrs = %{
-        addr_id: address.id,
-        name: "washington dc",
-        longitude: "-77.0364",
-        latitude: "38.8951"
+        "addr_id" => address.id,
+        "name" => "washington dc",
+        "longitude" => "-77.0364",
+        "latitude" => "38.8951"
       }
 
       conn = post(conn, Helpers.node_path(conn, :create), node: attrs)
@@ -143,7 +143,9 @@ defmodule NabooAPI.NodeControllerTest do
     end
 
     test "fail when data is not valid", %{conn: conn} do
-      conn = post(conn, Helpers.node_path(conn, :create), node: @bad_create_attrs)
+      args = @bad_create_attrs
+
+      conn = post(conn, Helpers.node_path(conn, :create), node: args)
       assert _response = json_response(conn, 403)
     end
   end
@@ -169,7 +171,9 @@ defmodule NabooAPI.NodeControllerTest do
                }
              } == json_response(conn, 200)["data"]
 
-      conn = patch(conn, Helpers.node_path(conn, :update, node.id), node: @update_attrs)
+      args = @update_attrs
+
+      conn = patch(conn, Helpers.node_path(conn, :update, node.id), node: args)
 
       assert %{
                "id" => node.id,
@@ -190,7 +194,9 @@ defmodule NabooAPI.NodeControllerTest do
     test "fail if node does not exist", %{conn: conn} do
       node = node_fixture()
 
-      conn = patch(conn, Helpers.node_path(conn, :update, node.id + 5), node: @update_attrs)
+      args = @update_attrs
+
+      conn = patch(conn, Helpers.node_path(conn, :update, node.id + 5), node: args)
       assert response(conn, 404)
     end
   end

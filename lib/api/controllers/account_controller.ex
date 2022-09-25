@@ -159,7 +159,7 @@ defmodule NabooAPI.AccountController do
         |> put_status(:not_found)
         |> render("404.json", [])
 
-      {:ko, _} ->
+      {:error, _} ->
         conn
         |> put_view(Errors)
         |> put_status(400)
@@ -191,7 +191,7 @@ defmodule NabooAPI.AccountController do
         |> put_status(:not_found)
         |> render("404.json", [])
 
-      {:ko, _} ->
+      {:error, _} ->
         conn
         |> put_view(Errors)
         |> put_status(400)

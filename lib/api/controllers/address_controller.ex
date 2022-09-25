@@ -161,8 +161,7 @@ defmodule NabooAPI.AddressController do
 
   def update(conn, %{"id" => id, "address" => address_params}) do
     with %Address{} = address <- Domains.get_address(id),
-         filtered <- Map.new(address_params, fn {k, v} -> {String.to_existing_atom(k), v} end),
-         {:ok, %Address{} = updated} <- Domains.update_address(address, filtered) do
+         {:ok, %Address{} = updated} <- Domains.update_address(address, address_params) do
       conn
       |> put_view(AddressView)
       |> put_status(:ok)

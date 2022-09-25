@@ -71,8 +71,16 @@ defmodule Naboo.Domains do
 
   """
   def create_node(attrs) do
-    with %Address{} = addr <- get_address(attrs.addr_id),
-         cset <- Ecto.build_assoc(addr, :node, attrs),
+    # safely get keys from attrs (checking if they are passed as strings of atoms)
+    filtered =
+      if Map.has_key?(attrs, "addr_id") do
+        Map.new(attrs, fn {k, v} -> {String.to_existing_atom(k), v} end)
+      else
+        attrs
+      end
+
+    with %Address{} = addr <- get_address(filtered.addr_id),
+         cset <- Ecto.build_assoc(addr, :node, filtered),
          {:ok, %Node{} = node} <- Repo.insert(cset),
          {:ok, %Address{}} <- update_address(addr, %{node_id: node.id}) do
       # ensure that we preload the address as well
