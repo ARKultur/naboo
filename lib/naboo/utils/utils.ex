@@ -1,5 +1,4 @@
 defmodule Naboo.Utils do
-
   @doc """
   Transforms the key of a map from string to existing atoms.
 
@@ -18,7 +17,6 @@ defmodule Naboo.Utils do
   def map_castable(map) when is_map(map) do
     map
     |> Map.new(fn {key, val} ->
-
       cond do
         is_binary(key) ->
           {String.to_existing_atom(key), val}

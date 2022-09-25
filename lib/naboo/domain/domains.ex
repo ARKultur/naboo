@@ -80,7 +80,6 @@ defmodule Naboo.Domains do
          cset <- Ecto.build_assoc(addr, :node, atoms_as_keys),
          {:ok, %Node{} = node} <- Repo.insert(cset),
          {:ok, %Address{}} <- update_address(addr, %{node_id: node.id}) do
-
       # ensure that we preload the address as well
       {:ok, get_node(node.id)}
     else

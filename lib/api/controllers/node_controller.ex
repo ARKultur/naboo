@@ -86,12 +86,6 @@ defmodule NabooAPI.NodeController do
         |> put_status(:forbidden)
         |> render("error_messages.json", %{error: changeset})
 
-      "Internal Server Error" ->
-        conn
-        |> put_view(Errors)
-        |> put_status(500)
-        |> render("error_messages.json", %{error: "internal server error"})
-
       nil ->
         conn
         |> put_view(Errors)

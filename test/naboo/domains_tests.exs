@@ -132,7 +132,7 @@ defmodule Naboo.DomainsTest do
       update_attrs = %{
         "latitude" => "some updated latitude",
         "longitude" => "some updated longitude",
-        "name" => "some updated name",
+        "name" => "some updated name"
       }
 
       assert {:ok, %{}} = Domains.update_node(node, update_attrs)
