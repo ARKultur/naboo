@@ -27,3 +27,4 @@ priv/static/security-*
 priv/static/swagger.json
 
 .vim
+__pycache__
