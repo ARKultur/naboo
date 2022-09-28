@@ -6,17 +6,17 @@ defmodule NabooAPI.AccountControllerTest do
   alias NabooAPI.Router.Urls.Helpers
 
   @create_attrs %{
-    email: "some email",
-    password: "some password",
-    password_confirmation: "some password",
-    name: "some name"
+    "email" => "some email",
+    "password" => "some password",
+    "password_confirmation" => "some password",
+    "name" => "some name"
   }
 
   @update_attrs %{
-    email: "some updated email",
-    password: "some updated password",
-    password_confirmation: "some updated password",
-    name: "some updated name"
+    "email" => "some updated email",
+    "password" => "some updated password",
+    "password_confirmation" => "some updated password",
+    "name" => "some updated name"
   }
 
   setup %{conn: conn} do
@@ -29,6 +29,112 @@ defmodule NabooAPI.AccountControllerTest do
       |> put_req_header("authorization", "Bearer #{jwt}")
 
     {:ok, conn: conn}
+  end
+
+  @create_account_query """
+    mutation CreateSimpleAccount($e:String!, $n:String!, $p:String!, $i:String!) {
+      createAccount(email: $e, name: $n, password:$p, isAdmin:$i) {
+        email,
+        id,
+        name
+      }
+    }
+  """
+
+  @delete_account_query """
+    mutation DeleteSimpleAccount($id: ID!) {
+     deleteAccount(id: $id) {
+      id
+     }
+    }
+  """
+
+  @get_account_query """
+  query findAccount($id: ID!) {
+    getAccount(id: $id) {
+      name
+      email
+    }
+  }
+  """
+
+  test "create and delete account through graphql", %{conn: conn} do
+    conn =
+      post(conn, "/graphql/", %{
+        "query" => @create_account_query,
+        "variables" => %{
+          "p" => "verycoolpassword",
+          "e" => "email@email.com",
+          "n" => "example name",
+          "i" => "false"
+        }
+      })
+
+    assert %{"createAccount" => %{"id" => id}} = json_response(conn, 200)["data"]
+
+    conn =
+      post(conn, "/graphql/", %{
+        "query" => @get_account_query,
+        "variables" => %{id: id}
+      })
+
+    assert json_response(conn, 200) == %{
+             "data" => %{
+               "getAccount" => %{
+                 "email" => "email@email.com",
+                 "name" => "example name"
+               }
+             }
+           }
+
+    conn =
+      post(conn, "/graphql/", %{
+        "query" => @delete_account_query,
+        "variables" => %{id: id}
+      })
+
+    assert json_response(conn, 200) == %{
+             "data" => %{
+               "deleteAccount" => %{
+                 "id" => id
+               }
+             }
+           }
+  end
+
+  test "query account through graphql", %{conn: conn} do
+    conn =
+      post(conn, "/graphql/", %{
+        "query" => @get_account_query,
+        "variables" => %{id: 1}
+      })
+
+    assert json_response(conn, 200) == %{
+             "data" => %{
+               "getAccount" => %{
+                 "name" => "darth sidious",
+                 "email" => "sheev.palpatine@naboo.net"
+               }
+             }
+           }
+
+    conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
+    assert %{"id" => id} = json_response(conn, 201)["data"]
+
+    conn =
+      post(conn, "/graphql/", %{
+        "query" => @get_account_query,
+        "variables" => %{id: id}
+      })
+
+    assert json_response(conn, 200) == %{
+             "data" => %{
+               "getAccount" => %{
+                 "email" => "some email",
+                 "name" => "some name"
+               }
+             }
+           }
   end
 
   describe "create account" do
@@ -50,7 +156,7 @@ defmodule NabooAPI.AccountControllerTest do
       assert %{"id" => _id} = json_response(conn, 201)["data"]
 
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"message" => "account already exists"} = json_response(conn, 403)
+      assert %{"errors" => "already_exists"} = json_response(conn, 403)
     end
   end
 

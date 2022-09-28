@@ -1,6 +1,7 @@
 defmodule Naboo.Accounts.Account do
   use Ecto.Schema
   import Ecto.Changeset
+  import Naboo.Utils
 
   @derive {Jason.Encoder, only: [:is_admin, :name, :email, :updated_at]}
   schema "accounts" do
@@ -16,7 +17,7 @@ defmodule Naboo.Accounts.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:email, :password, :name, :is_admin])
+    |> cast(map_castable(attrs), [:email, :password, :name, :is_admin])
     |> validate_required([:email, :password, :name])
     |> unique_constraint(:name)
     |> unique_constraint(:email)

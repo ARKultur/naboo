@@ -1,13 +1,15 @@
-version: '3.5'
+version: '3.9'
 services:
 
   back-end:
     build:
       context: .
+      dockerfile: dockerfile.dev
     env_file:
       - .env.dev
     environment:
-      - DATABASE_URL=postgres://anon:ChangeMe@database/naboo
+      - MIX_ENV=dev
+      - DATABASE_URL=postgres://anon:ChangeMe@database/naboo_dev
       - POSTGRES_PORT=ChangeMe
       - POSTGRES_USER=anon
       - POSTGRES_HOST=database
@@ -23,7 +25,7 @@ services:
     container_name: naboo-postgres
     environment:
       - POSTGRES_USER=anon
-      - POSTGRES_DB=naboo
+      - POSTGRES_DB=naboo_dev
       - POSTGRES_PASSWORD=ChangeMe
     ports:
       - 5432:5432

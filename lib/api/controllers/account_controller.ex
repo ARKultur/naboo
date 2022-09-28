@@ -54,6 +54,7 @@ defmodule NabooAPI.AccountController do
         account: %{
           email: "test@test.com",
           password: "test_t",
+          password_confirmation: "test_t",
           name: "test"
         }
       }
@@ -78,11 +79,11 @@ defmodule NabooAPI.AccountController do
       |> put_status(:created)
       |> render("show.json", account: account)
     else
-      _ ->
+      {:error, something} ->
         conn
-        |> put_view(AccountView)
+        |> put_view(Errors)
         |> put_status(403)
-        |> render("already_exists.json", [])
+        |> render("error_messages.json", %{errors: something})
     end
   end
 
@@ -92,7 +93,7 @@ defmodule NabooAPI.AccountController do
     description("Show an user in the database")
     produces("application/json")
     deprecated(false)
-    parameter(:id, :query, :integer, "id of the user to show", required: true)
+    parameter(:id, :path, :integer, "id of the user to show", required: true)
 
     response(200, "show.json", %{},
       example: %{
@@ -129,7 +130,7 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    parameter(:id, :query, :integer, "id of the account to update", required: true)
+    parameter(:id, :path, :integer, "id of the account to update", required: true)
     parameter(:account_params, :body, :Account, "new informations of the account", required: true)
 
     response(200, "show.json", %{},
@@ -158,7 +159,7 @@ defmodule NabooAPI.AccountController do
         |> put_status(:not_found)
         |> render("404.json", [])
 
-      {:ko, _} ->
+      {:error, _} ->
         conn
         |> put_view(Errors)
         |> put_status(400)
@@ -172,7 +173,7 @@ defmodule NabooAPI.AccountController do
     description("Delete an user in the database")
     produces("application/json")
     deprecated(false)
-    parameter(:id, :query, :integer, "id of the user to delete", required: true)
+    parameter(:id, :path, :integer, "id of the user to delete", required: true)
     response(200, "account deleted")
   end
 
@@ -190,7 +191,7 @@ defmodule NabooAPI.AccountController do
         |> put_status(:not_found)
         |> render("404.json", [])
 
-      {:ko, _} ->
+      {:error, _} ->
         conn
         |> put_view(Errors)
         |> put_status(400)

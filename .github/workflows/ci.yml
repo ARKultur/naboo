@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp-version: [24.1.2]
-        elixir-version: [1.13.1]
+        otp-version: [25.0.4]
+        elixir-version: [1.14]
 
     services:
       db:
@@ -69,4 +69,5 @@ jobs:
       - run: make dependencies
       - run: make check
       - run: make build-dev
+      - run: make build
 

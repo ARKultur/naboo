@@ -4,8 +4,8 @@ defmodule Naboo.Mixfile do
   def project do
     [
       app: :naboo,
-      version: "0.2.0",
-      elixir: "~> 1.13",
+      version: "0.3.0",
+      elixir: "~> 1.14",
       erlang: "~> 24.1",
       elixirc_paths: elixirc_paths(Mix.env()),
       test_paths: ["test"],
@@ -58,16 +58,17 @@ defmodule Naboo.Mixfile do
       {:jason, "~> 1.2"},
 
       # Authentication
-      {:argon2_elixir, "~> 2.3", override: true},
+      {:argon2_elixir, "~> 3.0", override: true},
       {:guardian, "~> 2.1"},
 
       # GraphQL & Databases
-      {:absinthe, "~> 1.6"},
+      {:new_relic_absinthe, "~> 0.0.4"},
+      {:absinthe, "~> 1.7"},
       {:absinthe_plug, "~> 1.5.8"},
       {:dataloader, "~> 1.0"},
-      {:absinthe_error_payload, "~> 1.1"},
+      {:absinthe_error_payload, "~> 1.1.4"},
       {:ecto_sql, "~> 3.7"},
-      {:postgrex, "~> 0.15"},
+      {:postgrex, "~> 0.16"},
 
       # Health
       {:plug_checkup, "~> 0.6"},
@@ -77,7 +78,7 @@ defmodule Naboo.Mixfile do
       {:credo_envvar, "~> 0.1", only: [:dev, :test], runtime: false},
       {:credo_naming, "~> 1.0", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.11", only: [:dev, :test], runtime: true},
-      {:mix_audit, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:mix_audit, "~> 2.0.1", only: [:dev, :test], runtime: false},
 
       # Unit testing
       {:ex_machina, "~> 2.7", only: :test},
@@ -85,8 +86,8 @@ defmodule Naboo.Mixfile do
       {:excoveralls, "~> 0.14", only: :test},
 
       # Swagger
-      {:phoenix_swagger, "~> 0.8"},
-      {:ex_json_schema, "~> 0.5"}
+      {:phoenix_swagger, "~> 0.8.3"},
+      {:ex_json_schema, "~> 0.9.1", override: true}
     ]
   end
 
