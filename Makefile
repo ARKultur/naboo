@@ -58,12 +58,14 @@ cleanup: ## Cleans the whole project, as if it was just cloned
 .PHONY: build
 build: ## Build the Docker image for the OTP release
 	docker build \
-		--build-arg APP_VERSION=$(APP_VERSION)\
+		--build-arg APP_VERSION=$(APP_VERSION) \
+		--network host \
 		--rm --tag $(DOCKER_LOCAL_IMAGE) .
 
 .PHONY: build-dev
 build-dev: ## Build the Docker image for dev purposes
 	docker build \
+		--network host \
 		-f dockerfile.dev \
 		--rm --tag $(DOCKER_LOCAL_IMAGE)-dev .
 
