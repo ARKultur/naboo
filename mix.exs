@@ -46,6 +46,7 @@ defmodule Naboo.Mixfile do
     [
       # HTTP
       {:hackney, "~> 1.18"},
+      {:cowboy, "~> 2.9"},
       {:plug_cowboy, "~> 2.5"},
       {:plug_canonical_host, "~> 2.0"},
       {:corsica, "~> 1.1"},
