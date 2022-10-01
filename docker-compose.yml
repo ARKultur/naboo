@@ -6,9 +6,8 @@ services:
       context: .
       dockerfile: dockerfile.dev
       args:
-            APP_VERSION: 0.3.2
+        - APP_VERSION: 0.3.2
       image: naboo
-      container_name: naboo
     env_file:
       - .env.dev
     environment:
