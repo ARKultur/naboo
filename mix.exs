@@ -4,7 +4,7 @@ defmodule Naboo.Mixfile do
   def project do
     [
       app: :naboo,
-      version: "0.3.0",
+      version: "0.3.1",
       elixir: "~> 1.14",
       erlang: "~> 24.1",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -46,6 +46,7 @@ defmodule Naboo.Mixfile do
     [
       # HTTP
       {:hackney, "~> 1.18"},
+      {:cowboy, "~> 2.9"},
       {:plug_cowboy, "~> 2.5"},
       {:plug_canonical_host, "~> 2.0"},
       {:corsica, "~> 1.1"},
