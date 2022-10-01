@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "canon"
+      - "hotfix/ci-docker"
     workflow_dispatch:
 
 jobs:
