@@ -97,5 +97,5 @@ RUN adduser -D palpatine && \
     chown -R palpatine: /opt/palpatine
 USER palpatine
 
-ENTRYPOINT ["/build/priv/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["start"]

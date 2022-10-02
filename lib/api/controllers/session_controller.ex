@@ -30,7 +30,13 @@ defmodule NabooAPI.SessionController do
          {:ok, token, _} <- Sessions.log_in(conn, account) do
       render(conn, "token.json", token: token)
     else
-      _ ->
+      {:error, something} ->
+        conn
+        |> put_view(Errors)
+        |> put_status(:unauthorized)
+        |> render("error_messages.json", %{errors: something})
+
+      _err ->
         unauthorized(conn)
     end
   end
@@ -51,11 +57,7 @@ defmodule NabooAPI.SessionController do
     |> render("401.json", [])
   end
 
-  def validate_geopoint() do
-
-  end
-
-  def validate(conn, params) do
+  def validate_route(conn, params) do
     with {:ok, _} <- params |> Geo.JSON.decode() do
       conn
       |> put_resp_content_type("application/json")

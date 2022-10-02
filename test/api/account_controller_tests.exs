@@ -6,17 +6,17 @@ defmodule NabooAPI.AccountControllerTest do
   alias NabooAPI.Router.Urls.Helpers
 
   @create_attrs %{
-    email: "some email",
-    password: "some password",
-    password_confirmation: "some password",
-    name: "some name"
+    "email" => "some email",
+    "password" => "some password",
+    "password_confirmation" => "some password",
+    "name" => "some name"
   }
 
   @update_attrs %{
-    email: "some updated email",
-    password: "some updated password",
-    password_confirmation: "some updated password",
-    name: "some updated name"
+    "email" => "some updated email",
+    "password" => "some updated password",
+    "password_confirmation" => "some updated password",
+    "name" => "some updated name"
   }
 
   setup %{conn: conn} do
@@ -156,7 +156,7 @@ defmodule NabooAPI.AccountControllerTest do
       assert %{"id" => _id} = json_response(conn, 201)["data"]
 
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"message" => "account already exists"} = json_response(conn, 403)
+      assert %{"errors" => "already_exists"} = json_response(conn, 403)
     end
   end
 

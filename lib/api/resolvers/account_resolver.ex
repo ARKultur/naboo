@@ -36,7 +36,7 @@ defmodule NabooAPI.Resolvers.AccountResolver do
   # sobelow_skip ["DOS.StringToAtom"]
   def create_account(_root, args, _info) do
     args
-    |> Map.replace(:is_admin, String.to_atom(args[:is_admin]))
+    |> Map.replace(:is_admin, String.to_existing_atom(args[:is_admin]))
     |> Accounts.create_account()
   end
 end

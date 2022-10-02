@@ -11,12 +11,12 @@ defmodule Naboo.DomainsFixtures do
     {:ok, address} =
       attrs
       |> Enum.into(%{
-        city: "some city",
-        country: "some country",
-        country_code: "some country_code",
-        postcode: "some postcode",
-        state: "some state",
-        state_district: "some state_district"
+        "city" => "some city",
+        "country" => "some country",
+        "country_code" => "some country_code",
+        "postcode" => "some postcode",
+        "state" => "some state",
+        "state_district" => "some state_district"
       })
       |> Naboo.Domains.create_address()
 
@@ -29,15 +29,16 @@ defmodule Naboo.DomainsFixtures do
   def node_fixture(attrs \\ %{}) do
     addr = address_fixture()
 
-    {:ok, node} =
+    new_attrs =
       attrs
       |> Enum.into(%{
-        latitude: "some latitude",
-        longitude: "some longitude",
-        name: "some name",
-        addr_id: addr.id
+        "latitude" => "some latitude",
+        "longitude" => "some longitude",
+        "name" => "some name",
+        "addr_id" => addr.id
       })
-      |> Naboo.Domains.create_node()
+
+    {:ok, node} = Naboo.Domains.create_node(new_attrs)
 
     node
   end

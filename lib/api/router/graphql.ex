@@ -12,11 +12,13 @@ defmodule NabooAPI.Router.GraphQL do
         to: Absinthe.Plug.GraphiQL,
         schema: NabooAPI.Schema,
         interface: :simple,
-        context: %{pubsub: Naboo.Endpoint}
+        context: %{
+          pubsub: Naboo.Endpoint
+        }
       )
     end
 
-    plug(NabooAPI.Auth.Guardian.Pipeline)
+    if Mix.env() == :prod, do: plug(NabooAPI.Auth.Guardian.Pipeline)
 
     forward("/",
       to: Absinthe.Plug,
