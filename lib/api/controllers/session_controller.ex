@@ -51,6 +51,10 @@ defmodule NabooAPI.SessionController do
     |> render("401.json", [])
   end
 
+  def validate_geopoint() do
+
+  end
+
   def validate(conn, params) do
     with {:ok, _} <- params |> Geo.JSON.decode() do
       conn
@@ -58,7 +62,7 @@ defmodule NabooAPI.SessionController do
       |> send_resp(200, "valid data")
       |> halt()
     else
-      {:ko, _} ->
+      {:error, _} ->
       conn
       |> put_resp_content_type("application/json")
       |> send_resp(400, "invalid data")
