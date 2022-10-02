@@ -130,8 +130,8 @@ defmodule Naboo.DomainsTest do
       node = node_fixture()
 
       update_attrs = %{
-        "latitude" => "some updated latitude",
-        "longitude" => "some updated longitude",
+        "latitude" => "120",
+        "longitude" => "120",
         "name" => "some updated name"
       }
 
