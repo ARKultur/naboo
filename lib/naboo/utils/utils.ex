@@ -1,5 +1,4 @@
 defmodule Naboo.Utils do
-
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -46,9 +45,8 @@ defmodule Naboo.Utils do
       changeset
     else
       {:error, _} ->
-      add_error(changeset, :latitude, "invalid values")
-      add_error(changeset, :longitude, "invalid values")
+        add_error(changeset, :latitude, "invalid values")
+        add_error(changeset, :longitude, "invalid values")
     end
   end
-
 end

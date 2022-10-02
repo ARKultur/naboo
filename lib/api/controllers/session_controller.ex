@@ -65,10 +65,10 @@ defmodule NabooAPI.SessionController do
       |> halt()
     else
       {:error, _} ->
-      conn
-      |> put_resp_content_type("application/json")
-      |> send_resp(400, "invalid data")
-      |> halt()
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(400, "invalid data")
+        |> halt()
     end
   end
 end

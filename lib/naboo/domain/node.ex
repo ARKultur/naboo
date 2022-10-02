@@ -24,5 +24,4 @@ defmodule Naboo.Domain.Node do
     |> validate_required([:name, :latitude, :longitude, :address])
     |> validate_point()
   end
-
 end
