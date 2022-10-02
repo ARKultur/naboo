@@ -2,8 +2,8 @@ defmodule NabooAPI.NodeController do
   use Phoenix.Controller, namespace: NabooAPI, root: "lib/api"
   use PhoenixSwagger
 
-  alias Naboo.Domains
   alias Naboo.Domain.Node
+  alias Naboo.Domains
 
   alias NabooAPI.NodeView
   alias NabooAPI.Views.Errors
