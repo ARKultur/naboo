@@ -86,7 +86,8 @@ dependencies: ## Install dependencies
 
 .PHONY: test
 test: ## Run the test suite
-	mix test
+	mix test --cover
+	mix test.coverage
 
 # Check, lint and format targets
 # ------------------------------
