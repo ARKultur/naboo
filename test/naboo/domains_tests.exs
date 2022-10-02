@@ -90,8 +90,8 @@ defmodule Naboo.DomainsTest do
     import Naboo.DomainsFixtures
 
     @invalid_attrs %{
-      "latitude" => nil,
-      "longitude" => nil,
+      "latitude" => "nil",
+      "longitude" => "nil",
       "name" => nil,
       "addr_id" => 1
     }
