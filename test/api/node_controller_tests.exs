@@ -73,8 +73,8 @@ defmodule NabooAPI.NodeControllerTest do
       create_attrs = %{
         "addr" => addr.id,
         "name" => "something cool",
-        "longitude" => "some longitude",
-        "latitude" => "some latitude"
+        "longitude" => "120",
+        "latitude" => "120"
       }
 
       conn =
@@ -86,8 +86,8 @@ defmodule NabooAPI.NodeControllerTest do
       assert %{
                "createNode" => %{
                  "id" => id,
-                 "longitude" => "some longitude",
-                 "latitude" => "some latitude"
+                 "longitude" => "120",
+                 "latitude" => "120"
                }
              } = json_response(conn, 200)["data"]
 
@@ -100,8 +100,8 @@ defmodule NabooAPI.NodeControllerTest do
       assert %{
                "getNode" => %{
                  "id" => id,
-                 "longitude" => "some longitude",
-                 "latitude" => "some latitude"
+                 "longitude" => "120",
+                 "latitude" => "120"
                }
              } == json_response(conn, 200)["data"]
 

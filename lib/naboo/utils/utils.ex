@@ -35,6 +35,22 @@ defmodule Naboo.Utils do
 
   def map_castable(_), do: %{}
 
+  @doc """
+  Ensures that for type "Point", coordinates are in x, y order (easting, northing for projected coordinates, longitude, and latitude for geographic coordinates)
+
+  ## Examples
+
+  iex> validate_point_datatype_in_geojson(%{lat: => "10", long: => "2"})
+  %{:ok, _}
+
+  iex> validate_point_datatype_in_geojson(%{lat: "1qsdqs", long: "20"})
+  %{:ko, _}
+
+  """
+  def validate_point_datatype_in_geojson(changeset) do
+    validate_point(changeset)
+  end
+
   def validate_point(changeset) do
     lat = get_change(changeset, :latitude)
     long = get_change(changeset, :longitude)
