@@ -86,7 +86,11 @@ dependencies: ## Install dependencies
 
 .PHONY: test
 test: ## Run the test suite
-	mix test #mix does not generate html file therefore we need an external test library
+	mix test
+
+.PHONY: covr
+covr: ## Run the test suite and generate HTML coverage
+	mix coveralls.html
 
 # Check, lint and format targets
 # ------------------------------
