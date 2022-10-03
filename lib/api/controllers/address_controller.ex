@@ -4,8 +4,8 @@ defmodule NabooAPI.AddressController do
 
   alias Ecto.Changeset
 
-  alias Naboo.Domains
   alias Naboo.Domain.Address
+  alias Naboo.Domains
 
   alias NabooAPI.AddressView
   alias NabooAPI.Views.Errors

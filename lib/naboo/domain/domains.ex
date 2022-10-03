@@ -6,6 +6,7 @@ defmodule Naboo.Domains do
   import Ecto.Query, warn: false
   import Naboo.Utils
 
+  alias Ecto.Changeset
   alias Naboo.Repo
 
   alias Naboo.Domain.Address
@@ -145,9 +146,9 @@ defmodule Naboo.Domains do
     with %Address{} = addr <- get_address(node.address.id),
          {:ok, %Address{}} <- delete_address(addr) do
       node
-      |> Ecto.Changeset.change()
-      |> Ecto.Changeset.no_assoc_constraint(:address)
-      |> Ecto.Changeset.foreign_key_constraint(:address, name: :addresses_node_id_fkey)
+      |> Changeset.change()
+      |> Changeset.no_assoc_constraint(:address)
+      |> Changeset.foreign_key_constraint(:address, name: :addresses_node_id_fkey)
       |> Repo.delete()
     else
       error ->

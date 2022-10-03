@@ -12,7 +12,7 @@ envup () {
 install_postgresql () {
     echo "installing postgresql"
 
-    export POSTGRES_USER="${USER}"
+    export POSTGRES_USER="kali"
     export POSTGRES_PASSWORD="postgres"
     export POSTGRES_DB="naboo_dev"
     export POSTGRES_TEST_DB="naboo_test"

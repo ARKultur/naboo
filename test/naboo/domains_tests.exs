@@ -90,8 +90,8 @@ defmodule Naboo.DomainsTest do
     import Naboo.DomainsFixtures
 
     @invalid_attrs %{
-      "latitude" => nil,
-      "longitude" => nil,
+      "latitude" => "niqsdqsd4526l",
+      "longitude" => 12,
       "name" => nil,
       "addr_id" => 1
     }
@@ -109,15 +109,15 @@ defmodule Naboo.DomainsTest do
       address = address_fixture()
 
       valid_attrs = %{
-        "latitude" => "some latitude",
-        "longitude" => "some longitude",
+        "latitude" => "100.0",
+        "longitude" => "100.0",
         "name" => "some name",
         "addr_id" => address.id
       }
 
       assert {:ok, %Node{} = node} = Domains.create_node(valid_attrs)
-      assert node.latitude == "some latitude"
-      assert node.longitude == "some longitude"
+      assert node.latitude == "100.0"
+      assert node.longitude == "100.0"
       assert node.name == "some name"
       assert node.address.id == address.id
     end
@@ -130,8 +130,8 @@ defmodule Naboo.DomainsTest do
       node = node_fixture()
 
       update_attrs = %{
-        "latitude" => "some updated latitude",
-        "longitude" => "some updated longitude",
+        "latitude" => "120",
+        "longitude" => "120",
         "name" => "some updated name"
       }
 

@@ -22,5 +22,6 @@ defmodule Naboo.Domain.Node do
     |> cast_assoc(:address, with: &Naboo.Domain.Address.changeset/2)
     |> foreign_key_constraint(:addresses, name: :addresses_node_id_fkey, message: "No such address exists")
     |> validate_required([:name, :latitude, :longitude, :address])
+    |> validate_point_datatype_in_geojson()
   end
 end
