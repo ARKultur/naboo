@@ -15,6 +15,7 @@ services:
       - POSTGRES_USER=anon
       - POSTGRES_HOST=localhost
       - POSTGRES_PORT=5432
+      - POSTGRES_DB=naboo_db
 
       - DATABASE_POOL_SIZE=15
       - PORT=4000
