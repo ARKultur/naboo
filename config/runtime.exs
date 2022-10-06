@@ -5,7 +5,7 @@ defmodule Environment do
   This modules provides various helpers to handle environment metadata
   """
 
-  def get(key), do: System.get_env(key)
+  def get(key), do: System.fetch_env!(key)
 
   def get_boolean(key) do
     case get(key) do

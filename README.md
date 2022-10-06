@@ -6,7 +6,7 @@ This is the ARKultur's back-end, all written in Elixir. :^)
 
 ### dev
 
-A simple `docker-compose up --build` should be enough.
+A simple `docker-compose -f docker-compose-dev.yml up --build` should be enough.
 If it's not the case, please read the documentation below.
 
 To build and run a dev version, you will need to export the data present in `.env.dev`.
@@ -27,11 +27,11 @@ envup () {
 source ~/.bashrc # or .zshrc or whatever
 
 # in the command-line
-## installing dependencies
+## installing dependencies (assumes you're running a debian-based distro)
 ./scripts/install_dev_env.sh
 
 ## exporting ENV variables
-envup .env.test
+envup .env.dev
 
 ## running server
 MIX_ENV=dev mix phx.server
@@ -39,6 +39,25 @@ MIX_ENV=dev mix phx.server
 
 Note: When installing the necessary dependencies, `install_dev_env.sh` assumes you're running a Debian-variant of Linux,
 feel free to add a check to your own distro and upstream it if that's not the case.
+
+### Run the tests
+
+```bash
+# start postgresql
+sudo systemctl start postgresql.service
+
+# init databases schemas and privileges
+./scripts/setup_db.sh
+
+# export test env variables
+envup .env.test
+
+# run the tests
+make test
+
+# or, run all of the test suite (linting, coverage, etc.)
+make check
+```
 
 ### Check available API routes
 

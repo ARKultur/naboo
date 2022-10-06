@@ -1,44 +1,44 @@
 version: '3.9'
-services:
 
+services:
   back-end:
     build:
       context: .
-      dockerfile: dockerfile.dev
+      dockerfile: Dockerfile
+      network: host
       args:
-        APP_VERSION: 0.3.2
-    env_file:
-      - .env.dev
+        APP_VERSION: 0.4.0
     environment:
-      - MIX_ENV=dev
-      - DATABASE_URL=postgres://anon:ChangeMe@database/naboo_dev
-      - POSTGRES_PORT=ChangeMe
+      - MIX_ENV=prod
+      - DATABASE_URL=postgres://anon:ChangeMe@localhost/naboo_db
+      - POSTGRES_PASSWORD=ChangeMe
       - POSTGRES_USER=anon
-      - POSTGRES_HOST=database
-    ports:
-      - 4000:4000
+      - POSTGRES_HOST=localhost
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=naboo_db
+
+      - DATABASE_POOL_SIZE=15
+      - PORT=4000
+
+      - DEBUG_ERRORS=true
+      - DATABASE_SSL=false
+      - CORS_ALLOWED_ORIGINS=*
+      - SESSION_KEY=naboo
+      - CANONICAL_URL=http://back-end:4000
+      - STATIC_URL=http://localhost:4000
+
+      - SESSION_SIGNING_SALT=some_very_secret_salt
+      - SECRET_KEY_BASE=secret_key_base_very_secret_wow
+      - GUARDIAN_SECRET=another_very_important_secret
+    network_mode: host
     depends_on:
       - database
-    networks:
-      - internal
 
   database:
     image: postgres:12-alpine
-    container_name: naboo-postgres
+    network_mode: host
     environment:
       - POSTGRES_USER=anon
-      - POSTGRES_DB=naboo_dev
+      - POSTGRES_DB=naboo_db
       - POSTGRES_PASSWORD=ChangeMe
-    ports:
-      - 5432:5432
-    volumes:
-      - database:/var/lib/postgresql/data
-    networks:
-      - internal
-
-volumes:
-  database:
-
-networks:
-  internal:
 

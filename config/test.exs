@@ -4,7 +4,7 @@ defmodule TestEnvironment do
   @database_name_suffix "_test"
 
   def get_database_url do
-    url = System.get_env("DATABASE_URL")
+    url = System.fetch_env!("DATABASE_URL")
 
     if is_nil(url) || String.ends_with?(url, @database_name_suffix) do
       url
