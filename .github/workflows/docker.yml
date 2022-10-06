@@ -59,7 +59,7 @@ jobs:
           tags: bogdzn/naboo:canon, bogdzn/naboo:${{ env.APP_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            APP_VERSION=$APP_VERSION
+            APP_VERSION=${{ env.APP_VERSION }}
 
       - name: Build and push dev docker image
         if: github.ref == 'refs/heads/dev' && github.event_name != 'pull_request'
@@ -70,4 +70,4 @@ jobs:
           tags: bogdzn/naboo:${{ env.APP_VERSION }}-dev
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            APP_VERSION=$APP_VERSION
+            APP_VERSION=${{ env.APP_VERSION }}
