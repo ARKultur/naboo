@@ -1,15 +1,27 @@
-name: Docker
+name: Push docker image
 
 on:
   push:
     branches:
       - "canon"
+      - "dev"
     workflow_dispatch:
+
+  pull_request:
+    branches:
+      - "canon"
+      - "dev"
+    workflow_dispatch:
+
+
+env:
+  APP_VERSION: 0.4.0
 
 jobs:
   push:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
     steps:
       - uses: actions/checkout@v3
 
@@ -17,7 +29,7 @@ jobs:
         with:
           node-version: 14.18
 
-      - name: Start containers
+      - name: Start containers to check if it builds
         run: docker-compose -f "docker-compose.yml" up -d --build
 
       - name: Stop containers
@@ -38,12 +50,28 @@ jobs:
         with:
           images: bogdzn/naboo
 
-      - name: Build and push Docker image
+      - name: Build and push canon Docker image
+        if: github.ref == 'refs/heads/canon' && github.event_name != 'pull_request'
         uses: docker/build-push-action@v3
         with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          tags: bogdzn/naboo:canon, bogdzn/naboo:$APP_VERSION
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            APP_VERSION=0.3.2
+            APP_VERSION=$APP_VERSION
+
+      - name: Build and push dev docker image
+        if: github.ref == 'refs/heads/dev' && github.event_name != 'pull_request'
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          tags: bogdzn/naboo:$APP_VERSION-dev
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP_VERSION=$APP_VERSION
+
+
