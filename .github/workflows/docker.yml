@@ -56,7 +56,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: bogdzn/naboo:canon, bogdzn/naboo:$APP_VERSION
+          tags: bogdzn/naboo:canon, bogdzn/naboo:${{ env.APP_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             APP_VERSION=$APP_VERSION
@@ -67,7 +67,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: bogdzn/naboo:$APP_VERSION-dev
+          tags: bogdzn/naboo:${{ env.APP_VERSION }}-dev
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             APP_VERSION=$APP_VERSION
