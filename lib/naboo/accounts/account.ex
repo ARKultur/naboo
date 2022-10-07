@@ -11,6 +11,8 @@ defmodule Naboo.Accounts.Account do
     field(:is_admin, :boolean, default: false)
     field(:name, :string)
 
+    has_many(:domains, Naboo.Domain.Node)
+
     timestamps()
   end
 

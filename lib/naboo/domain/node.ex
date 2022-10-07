@@ -10,11 +10,11 @@ defmodule Naboo.Domain.Node do
     field(:name, :string)
 
     has_one(:address, Naboo.Domain.Address)
+    belongs_to(:account, Naboo.Accounts.Account)
 
     timestamps()
   end
 
-  # TODO(shelton): improve validation during creation / update
   @doc false
   def changeset(node, attrs) do
     node
