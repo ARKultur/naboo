@@ -94,6 +94,7 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
     parameter(:id, :path, :integer, "id of the user to show", required: true)
+    parameter(:preload_nodes, :body, :boolean, "set to true if you want to receive domains as well", required: false, default: false)
 
     response(200, "show.json", %{},
       example: %{
@@ -108,7 +109,16 @@ defmodule NabooAPI.AccountController do
   end
 
   def show(conn, %{"id" => id}) do
-    case Accounts.get_account(id) do
+    should_preload = conn.body_params |> Access.get("preload_nodes", false)
+
+    value =
+      if should_preload do
+        Accounts.get_account_preload(id)
+      else
+        Accounts.get_account(id)
+      end
+
+    case value do
       nil ->
         conn
         |> put_view(Errors)
@@ -116,10 +126,16 @@ defmodule NabooAPI.AccountController do
         |> render("404.json", [])
 
       account ->
-        conn
-        |> put_view(AccountView)
-        |> put_status(:ok)
-        |> render("show.json", account: account)
+        conn =
+          conn
+          |> put_view(AccountView)
+          |> put_status(:ok)
+
+        if should_preload do
+          render(conn, "show_preload.json", account: account)
+        else
+          render(conn, "show.json", account: account)
+        end
     end
   end
 

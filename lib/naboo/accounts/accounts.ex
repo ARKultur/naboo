@@ -77,6 +77,24 @@ defmodule Naboo.Accounts do
   end
 
   @doc """
+  Get an account & fetch related nodes
+
+  Returns nil if Account does not exist
+
+  ## Examples
+
+  iex > get_account_preload(123)
+  %Account{}
+
+  iex > get_account_preload(456)
+  nil
+  """
+  def get_account_preload(id) do
+    get_account(id)
+    |> Repo.preload(:nodes)
+  end
+
+  @doc """
   Safely gets a single account.
 
   Returns nil if the Account does not exist.
@@ -86,7 +104,7 @@ defmodule Naboo.Accounts do
   iex> get_account(123)
   %Account{}
 
-  iex> get_account!(456)
+  iex> get_account(456)
   nil
 
   """

@@ -24,6 +24,7 @@ defmodule Naboo.Accounts.Account do
     |> unique_constraint([:name, :email], name: :accounts_name_email_index)
     |> validate_format(:email, ~r/@/)
     |> put_encrypted_password()
+    |> foreign_key_constraint(:domains, name: :accounts_node_id_fkey, message: "No such node exists")
   end
 
   defp put_encrypted_password(%{valid?: true, changes: %{password: pw}} = changeset) do
