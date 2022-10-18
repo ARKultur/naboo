@@ -6,14 +6,14 @@ defmodule NabooAPI.AccountControllerTest do
   alias NabooAPI.Router.Urls.Helpers
 
   @create_attrs %{
-    "email" => "some email",
+    "email" => "email@email.com",
     "password" => "some password",
     "password_confirmation" => "some password",
     "name" => "some name"
   }
 
   @update_attrs %{
-    "email" => "some updated email",
+    "email" => "updated.email@email.com",
     "password" => "some updated password",
     "password_confirmation" => "some updated password",
     "name" => "some updated name"
@@ -130,7 +130,7 @@ defmodule NabooAPI.AccountControllerTest do
     assert json_response(conn, 200) == %{
              "data" => %{
                "getAccount" => %{
-                 "email" => "some email",
+                 "email" => "email@email.com",
                  "name" => "some name"
                }
              }
@@ -145,7 +145,7 @@ defmodule NabooAPI.AccountControllerTest do
 
       assert %{
                "id" => ^id,
-               "email" => "some email",
+               "email" => "email@email.com",
                "is_admin" => false,
                "name" => "some name"
              } = json_response(conn, 200)["data"]
@@ -156,7 +156,40 @@ defmodule NabooAPI.AccountControllerTest do
       assert %{"id" => _id} = json_response(conn, 201)["data"]
 
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"errors" => "already_exists"} = json_response(conn, 403)
+      assert %{"errors" => [%{"detail" => "has already been taken", "field" => "name"}]} = json_response(conn, 403)
+    end
+
+    test "fail when account data is completely invalid", %{conn: conn} do
+      attrs = %{
+        hello: "world",
+        testvalue: 1234,
+        gaming: true
+      }
+
+      conn = post(conn, Helpers.account_path(conn, :create), account: attrs)
+
+      assert %{
+               "errors" => [
+                 %{"detail" => "can't be blank", "field" => "email"},
+                 %{"detail" => "can't be blank", "field" => "password"},
+                 %{"detail" => "can't be blank", "field" => "name"}
+               ]
+             } = json_response(conn, 403)
+    end
+
+    test "fail if account email is invalid", %{conn: conn} do
+      args = %{
+        "email" => "some wrong email",
+        "name" => "some valid name",
+        "password" => "very cool password",
+        "password_confirmation" => "very cool password"
+      }
+
+      conn = post(conn, Helpers.account_path(conn, :create), account: args)
+
+      assert %{
+               "errors" => [%{"detail" => "has invalid format", "field" => "email"}]
+             } = json_response(conn, 403)
     end
   end
 
@@ -172,7 +205,7 @@ defmodule NabooAPI.AccountControllerTest do
 
       assert %{
                "id" => ^id,
-               "email" => "some updated email",
+               "email" => "updated.email@email.com",
                "is_admin" => false,
                "name" => "some updated name"
              } = json_response(conn, 200)["data"]

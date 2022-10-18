@@ -11,7 +11,7 @@ defmodule Naboo.AccountsFixtures do
     {:ok, account} =
       attrs
       |> Enum.into(%{
-        email: "some email",
+        email: "email@email.com",
         password: "some password",
         is_admin: true,
         name: "some name"

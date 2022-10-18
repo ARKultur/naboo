@@ -32,29 +32,17 @@ defmodule Naboo.Accounts do
   ## Example
 
   iex> register(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
-    "password" => "anak1n", "password_confirmation" => anak1n"})
+    "password" => "anak1n"})
   %Account{}
 
-  iex> register(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
-    "password" => "anakin", "password_confirmation" => anak1n"})
-  {:error, :wrong_parameters}
-
   iex> register("Some wrong value")
-  {:error, :wrong_parameters}
+  {:error,  changeset = %Changeset{}}
 
   """
-  def register(%{"name" => n, "email" => e, "password" => p, "password_confirmation" => p}) do
-    if find_by_email!(e) do
-      {:error, :already_exists}
-    else
-      %Account{}
-      |> Account.changeset(%{name: n, email: e, password: p})
-      |> Naboo.Repo.insert()
-    end
-  end
-
-  def register(_) do
-    {:error, :wrong_parameters}
+  def register(account_params) do
+    %Account{}
+    |> Account.changeset(account_params)
+    |> Naboo.Repo.insert()
   end
 
   @doc """

@@ -21,8 +21,8 @@ defmodule Naboo.Accounts.Account do
     account
     |> cast(map_castable(attrs), [:email, :password, :name, :is_admin])
     |> validate_required([:email, :password, :name])
-    |> unique_constraint(:name)
-    |> unique_constraint(:email)
+    |> unique_constraint([:name, :email], name: :accounts_name_email_index)
+    |> validate_format(:email, ~r/@/)
     |> put_encrypted_password()
   end
 

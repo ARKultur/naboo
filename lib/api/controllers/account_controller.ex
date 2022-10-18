@@ -5,6 +5,7 @@ defmodule NabooAPI.AccountController do
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
   alias NabooAPI.AccountView
+  alias NabooAPI.ChangesetView
   alias NabooAPI.Views.Errors
 
   swagger_path(:index) do
@@ -54,7 +55,6 @@ defmodule NabooAPI.AccountController do
         account: %{
           email: "test@test.com",
           password: "test_t",
-          password_confirmation: "test_t",
           name: "test"
         }
       }
@@ -81,9 +81,9 @@ defmodule NabooAPI.AccountController do
     else
       {:error, something} ->
         conn
-        |> put_view(Errors)
+        |> put_view(ChangesetView)
         |> put_status(403)
-        |> render("error_messages.json", %{errors: something})
+        |> render("error.json", %{changeset: something})
     end
   end
 
