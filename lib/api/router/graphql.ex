@@ -1,39 +1,57 @@
+defmodule NabooAPI.Router.GraphqlAuth do
+  @behaviour Plug
+
+  alias NabooAPI.Auth.Sessions
+  alias Naboo.Accounts.Account
+
+  def init(opts) do
+    opts
+  end
+
+  def call(conn, _) do
+    context = build_context(conn)
+
+    conn
+    |> Absinthe.Plug.put_options(context: context)
+  end
+
+  def build_context(conn) do
+    case Sessions.resource(conn) do
+      %Account{} = account ->
+        %{current_user: account}
+
+      _ ->
+        %{}
+    end
+  end
+end
+
 defmodule NabooAPI.Router.GraphQL do
   use Plug.Router
 
-  defmodule API do
-    use Plug.Router
-
-    plug(:match)
-    plug(:dispatch)
-
-    if Mix.env() != :prod do
-      forward("/hub",
-        to: Absinthe.Plug.GraphiQL,
-        schema: NabooAPI.Schema,
-        interface: :simple,
-        context: %{
-          pubsub: Naboo.Endpoint
-        }
-      )
-    end
-
-    if Mix.env() == :prod, do: plug(NabooAPI.Auth.Guardian.Pipeline)
-
-    forward("/",
-      to: Absinthe.Plug,
-      init_opts: [
-        document_providers: {NabooAPI, :document_providers},
-        json_codec: Jason,
-        schema: NabooAPI.Schema
-      ]
-    )
-  end
-
+  plug(NabooAPI.Router.GraphqlAuth)
   plug(:match)
   plug(:dispatch)
 
-  forward("/graphql", to: API)
+  forward("/graphql",
+    to: Absinthe.Plug,
+    init_opts: [
+      document_providers: {NabooAPI, :document_providers},
+      json_codec: Jason,
+      schema: NabooAPI.Schema
+    ]
+  )
+
+  if Mix.env() == :dev do
+    forward("/graphql/hub",
+      to: Absinthe.Plug.GraphiQL,
+      schema: NabooAPI.Schema,
+      interface: :simple,
+      context: %{
+        pubsub: Naboo.Endpoint
+      }
+    )
+  end
 
   match(_, do: conn)
 end

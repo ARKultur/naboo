@@ -1,7 +1,7 @@
 defmodule NabooAPI.NodeView do
   use Phoenix.View, root: "lib/api", namespace: NabooAPI
 
-  alias NabooAPI.NodeView
+  alias NabooAPI.{NodeView, AddressView}
 
   def render("index.json", %{nodes: nodes}) do
     %{data: render_many(nodes, NodeView, "node.json")}
@@ -21,14 +21,7 @@ defmodule NabooAPI.NodeView do
       latitude: node.latitude,
       longitude: node.longitude,
       name: node.name,
-      address: %{
-        city: node.address.city,
-        country: node.address.country,
-        country_code: node.address.country_code,
-        postcode: node.address.postcode,
-        state: node.address.state,
-        state_district: node.address.state_district
-      }
+      address: render_one(node.address, AddressView, "address.json")
     }
   end
 end

@@ -5,6 +5,7 @@ defmodule NabooAPI.AccountController do
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
   alias NabooAPI.AccountView
+  alias NabooAPI.ChangesetView
   alias NabooAPI.Views.Errors
 
   swagger_path(:index) do
@@ -54,7 +55,6 @@ defmodule NabooAPI.AccountController do
         account: %{
           email: "test@test.com",
           password: "test_t",
-          password_confirmation: "test_t",
           name: "test"
         }
       }
@@ -81,9 +81,9 @@ defmodule NabooAPI.AccountController do
     else
       {:error, something} ->
         conn
-        |> put_view(Errors)
+        |> put_view(ChangesetView)
         |> put_status(403)
-        |> render("error_messages.json", %{errors: something})
+        |> render("error.json", %{changeset: something})
     end
   end
 
@@ -94,6 +94,7 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
     parameter(:id, :path, :integer, "id of the user to show", required: true)
+    parameter(:preload_nodes, :query, :boolean, "set to true if you want to receive domains as well", required: false, default: false)
 
     response(200, "show.json", %{},
       example: %{
@@ -108,18 +109,34 @@ defmodule NabooAPI.AccountController do
   end
 
   def show(conn, %{"id" => id}) do
-    case Accounts.get_account(id) do
+    should_preload = conn.query_params |> Access.get("preload_nodes", false)
+
+    value =
+      if should_preload do
+        Accounts.get_account_preload(id)
+      else
+        Accounts.get_account(id)
+      end
+
+    case value do
       nil ->
         conn
         |> put_view(Errors)
         |> put_status(:not_found)
         |> render("404.json", [])
 
-      account ->
-        conn
-        |> put_view(AccountView)
-        |> put_status(:ok)
-        |> render("show.json", account: account)
+      %Account{} = account ->
+        if should_preload do
+          conn
+          |> put_view(AccountView)
+          |> put_status(:ok)
+          |> render("show_preload.json", account: account)
+        else
+          conn
+          |> put_view(AccountView)
+          |> put_status(:ok)
+          |> render("show.json", account: account)
+        end
     end
   end
 

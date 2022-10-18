@@ -33,7 +33,13 @@ defmodule NabooAPI.Resolvers.NodeResolver do
     end
   end
 
-  def create_node(_root, args, _info) do
+  def create_node(_root, args, info) do
+    args =
+      args
+      |> Enum.into(%{
+        "account_id" => info.context.current_user.id
+      })
+
     Domains.create_node(args)
   end
 end

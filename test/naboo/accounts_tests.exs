@@ -20,10 +20,15 @@ defmodule Naboo.AccountsTest do
     end
 
     test "create_account/1 with valid data creates a account" do
-      valid_attrs = %{email: "some email", password: "some password", is_admin: true, name: "some name"}
+      valid_attrs = %{
+        email: "email@email.com",
+        password: "some password",
+        is_admin: true,
+        name: "some name"
+      }
 
       assert {:ok, %Account{} = account} = Accounts.create_account(valid_attrs)
-      assert account.email == "some email"
+      assert account.email == "email@email.com"
       assert account.is_admin == true
       assert account.name == "some name"
       assert account.encrypted_password != nil
@@ -37,14 +42,14 @@ defmodule Naboo.AccountsTest do
       account = account_fixture()
 
       update_attrs = %{
-        email: "some updated email",
+        email: "updated@email.com",
         password: "some updated password",
         is_admin: false,
         name: "some updated name"
       }
 
       assert {:ok, %Account{} = account} = Accounts.update_account(account, update_attrs)
-      assert account.email == "some updated email"
+      assert account.email == "updated@email.com"
       assert account.is_admin == false
       assert account.name == "some updated name"
       assert account.encrypted_password != nil

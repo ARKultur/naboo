@@ -11,16 +11,27 @@ defmodule Naboo.Accounts.Account do
     field(:is_admin, :boolean, default: false)
     field(:name, :string)
 
+    has_many(:domains, Naboo.Domain.Node)
+
     timestamps()
   end
 
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(map_castable(attrs), [:email, :password, :name, :is_admin])
-    |> validate_required([:email, :password, :name])
-    |> unique_constraint(:name)
-    |> unique_constraint(:email)
+    |> cast(map_castable(attrs), [:email, :name, :is_admin])
+    |> validate_required([:email, :name])
+    |> unique_constraint([:name, :email], name: :accounts_name_email_index)
+    |> validate_format(:email, ~r/@/)
+    |> foreign_key_constraint(:domains, name: :accounts_node_id_fkey, message: "No such domain exists")
+  end
+
+  def create_changeset(account, attrs) do
+    changeset(account, attrs)
+    |> cast(attrs, [:password])
+    |> validate_required(:password)
+    |> validate_length(:password, min: 8)
+    |> validate_confirmation(:password)
     |> put_encrypted_password()
   end
 

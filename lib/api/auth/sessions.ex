@@ -22,6 +22,10 @@ defmodule NabooAPI.Auth.Sessions do
     __MODULE__.Plug.sign_out(conn)
   end
 
+  def resource(conn) do
+    Guardian.Plug.current_resource(conn)
+  end
+
   def log_in(conn, account) do
     with conn <- __MODULE__.Plug.sign_in(conn, account),
          {:ok, token, _claims} <- Guardian.encode_and_sign(account) do
@@ -31,8 +35,8 @@ defmodule NabooAPI.Auth.Sessions do
     end
   end
 
-  def authenticate(%Account{} = account, password) do
-    authenticate(account, password, Argon2.verify_pass(password, account.encrypted_password))
+  def authenticate(%Account{} = account, pw) do
+    authenticate(account, pw, Argon2.verify_pass(pw, account.encrypted_password))
   end
 
   def authenticate(nil, password), do: authenticate(nil, password, Argon2.no_user_verify())

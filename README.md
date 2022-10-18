@@ -97,7 +97,7 @@ To log in, we can use the `POST /api/login` route with such `json` field:
 ```json
 {
 	"email": "sheev.palpatine@naboo.net",
-	"password": "sidious"
+	"password": "sidious1337"
 }
 ```
 
