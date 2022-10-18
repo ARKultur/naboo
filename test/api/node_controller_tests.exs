@@ -162,12 +162,15 @@ defmodule NabooAPI.NodeControllerTest do
                "longitude" => "some longitude",
                "name" => "some name",
                "address" => %{
-                 "city" => "some city",
-                 "country" => "some country",
-                 "country_code" => "some country_code",
-                 "postcode" => "some postcode",
-                 "state" => "some state",
-                 "state_district" => "some state_district"
+                 "data" => %{
+                   "city" => "some city",
+                   "country" => "some country",
+                   "country_code" => "some country_code",
+                   "postcode" => "some postcode",
+                   "state" => "some state",
+                   "state_district" => "some state_district",
+                   "id" => node.address.id
+                 }
                }
              } == json_response(conn, 200)["data"]
 
@@ -181,12 +184,15 @@ defmodule NabooAPI.NodeControllerTest do
                "longitude" => "some longitude",
                "name" => "Washington DC",
                "address" => %{
-                 "city" => "some city",
-                 "country" => "some country",
-                 "country_code" => "some country_code",
-                 "postcode" => "some postcode",
-                 "state" => "some state",
-                 "state_district" => "some state_district"
+                 "data" => %{
+                   "city" => "some city",
+                   "country" => "some country",
+                   "country_code" => "some country_code",
+                   "postcode" => "some postcode",
+                   "state" => "some state",
+                   "state_district" => "some state_district",
+                   "id" => node.address.id
+                 }
                }
              } == json_response(conn, 200)["data"]
     end
@@ -241,12 +247,15 @@ defmodule NabooAPI.NodeControllerTest do
                "longitude" => node.longitude,
                "name" => node.name,
                "address" => %{
-                 "city" => "some city",
-                 "country" => "some country",
-                 "country_code" => "some country_code",
-                 "postcode" => "some postcode",
-                 "state" => "some state",
-                 "state_district" => "some state_district"
+                 "data" => %{
+                   "city" => "some city",
+                   "country" => "some country",
+                   "country_code" => "some country_code",
+                   "postcode" => "some postcode",
+                   "state" => "some state",
+                   "state_district" => "some state_district",
+                   "id" => node.address.id
+                 }
                }
              } == json_response(conn, 200)["data"]
     end
