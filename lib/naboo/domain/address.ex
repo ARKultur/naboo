@@ -17,7 +17,6 @@ defmodule Naboo.Domain.Address do
     timestamps()
   end
 
-  # TODO(shelton): improve validation for each of these fields. This is good enough for now though.
   @doc false
   def changeset(address, attrs) do
     address
