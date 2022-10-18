@@ -19,12 +19,20 @@ defmodule Naboo.Accounts.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(map_castable(attrs), [:email, :password, :name, :is_admin])
-    |> validate_required([:email, :password, :name])
+    |> cast(map_castable(attrs), [:email, :name, :is_admin])
+    |> validate_required([:email, :name])
     |> unique_constraint([:name, :email], name: :accounts_name_email_index)
     |> validate_format(:email, ~r/@/)
+    |> foreign_key_constraint(:domains, name: :accounts_node_id_fkey, message: "No such domain exists")
+  end
+
+  def create_changeset(account, attrs) do
+    changeset(account, attrs)
+    |> cast(attrs, [:password])
+    |> validate_required(:password)
+    |> validate_length(:password, min: 8)
+    |> validate_confirmation(:password)
     |> put_encrypted_password()
-    |> foreign_key_constraint(:domains, name: :accounts_node_id_fkey, message: "No such node exists")
   end
 
   defp put_encrypted_password(%{valid?: true, changes: %{password: pw}} = changeset) do

@@ -4,6 +4,8 @@ defmodule Naboo.DomainsFixtures do
   entities via the `Naboo.Domains` context.
   """
 
+  import Naboo.AccountsFixtures
+
   @doc """
   Generate a address.
   """
@@ -28,6 +30,7 @@ defmodule Naboo.DomainsFixtures do
   """
   def node_fixture(attrs \\ %{}) do
     addr = address_fixture()
+    account = account_fixture()
 
     new_attrs =
       attrs
@@ -35,7 +38,8 @@ defmodule Naboo.DomainsFixtures do
         "latitude" => "some latitude",
         "longitude" => "some longitude",
         "name" => "some name",
-        "addr_id" => addr.id
+        "addr_id" => addr.id,
+        "account_id" => account.id
       })
 
     {:ok, node} = Naboo.Domains.create_node(new_attrs)

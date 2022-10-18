@@ -21,7 +21,7 @@ defmodule NabooAPI.NodeView do
       latitude: node.latitude,
       longitude: node.longitude,
       name: node.name,
-      address: render_one(node.address, AddressView, "show.json")
+      address: render_one(node.address, AddressView, "address.json")
     }
   end
 end

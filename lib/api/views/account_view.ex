@@ -17,7 +17,7 @@ defmodule NabooAPI.AccountView do
       name: account.name,
       email: account.email,
       is_admin: account.is_admin,
-      nodes: render_many(account.nodes, NodeView, "index.json")
+      domains: render_many(account.domains, NodeView, "node.json")
     }
   end
 

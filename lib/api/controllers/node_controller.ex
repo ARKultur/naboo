@@ -5,6 +5,7 @@ defmodule NabooAPI.NodeController do
   alias Naboo.Domain.Node
   alias Naboo.Domains
 
+  alias NabooAPI.Auth.Sessions
   alias NabooAPI.NodeView
   alias NabooAPI.Views.Errors
 
@@ -22,13 +23,33 @@ defmodule NabooAPI.NodeController do
             id: 1,
             latitude: "38.8951",
             longitude: "-77.0364",
-            name: "washington dc"
+            name: "washington dc",
+            address: %{
+              data: %{
+                id: 1,
+                city: "Washington DC",
+                country: "United States of America",
+                country_code: "US",
+                postcode: "20005",
+                state_district: "Washington DC"
+              }
+            }
           },
           %{
             id: 2,
             latitude: "48.8584",
             longitude: "2.2945",
-            name: "eiffel tower"
+            name: "eiffel tower",
+            address: %{
+              data: %{
+                id: 2,
+                city: "Paris",
+                country: "France",
+                country_code: "FR",
+                postcode: "75019",
+                state_district: "Paris"
+              }
+            }
           }
         ]
       }
@@ -67,14 +88,26 @@ defmodule NabooAPI.NodeController do
           id: 1,
           latitude: "38.8951",
           longitude: "-77.0364",
-          name: "washington dc"
+          name: "washington dc",
+          address: %{
+            data: %{
+              id: 1,
+              city: "Washington DC",
+              country: "United States of America",
+              country_code: "US",
+              postcode: "20005",
+              state_district: "Washington DC"
+            }
+          }
         }
       }
     )
   end
 
   def create(conn, %{"node" => node_params}) do
-    with {:ok, %Node{} = node} <- Domains.create_node(node_params) do
+    with account <- Sessions.resource(conn),
+         merged <- Map.put(node_params, :account_id, account.id),
+         {:ok, %Node{} = node} <- Domains.create_node(merged) do
       conn
       |> put_view(NodeView)
       |> put_status(:created)
@@ -108,7 +141,17 @@ defmodule NabooAPI.NodeController do
           id: 1,
           latitude: "38.8951",
           longitude: "-77.0364",
-          name: "washington dc"
+          name: "washington dc",
+          address: %{
+            data: %{
+              id: 1,
+              city: "Washington DC",
+              country: "United States of America",
+              country_code: "US",
+              postcode: "20005",
+              state_district: "Washington DC"
+            }
+          }
         }
       }
     )
@@ -146,7 +189,17 @@ defmodule NabooAPI.NodeController do
           id: 1,
           latitude: "38.8951",
           longitude: "-77.0364",
-          name: "Washington DC"
+          name: "Washington DC",
+          address: %{
+            data: %{
+              id: 1,
+              city: "Washington DC",
+              country: "United States of America",
+              country_code: "US",
+              postcode: "20005",
+              state_district: "Washington DC"
+            }
+          }
         }
       }
     )

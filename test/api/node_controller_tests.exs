@@ -4,7 +4,7 @@ defmodule NabooAPI.NodeControllerTest do
   import Naboo.DomainsFixtures
 
   alias Naboo.Accounts
-  alias NabooAPI.Auth.Guardian
+  alias NabooAPI.Auth.Sessions
   alias NabooAPI.Router.Urls.Helpers
 
   @bad_create_attrs %{
@@ -18,7 +18,7 @@ defmodule NabooAPI.NodeControllerTest do
 
   setup %{conn: conn} do
     user = Accounts.get_account(1)
-    {:ok, jwt, _claims} = Guardian.encode_and_sign(user)
+    {:ok, jwt, conn} = Sessions.log_in(conn, user)
 
     conn =
       conn
@@ -162,15 +162,13 @@ defmodule NabooAPI.NodeControllerTest do
                "longitude" => "some longitude",
                "name" => "some name",
                "address" => %{
-                 "data" => %{
-                   "city" => "some city",
-                   "country" => "some country",
-                   "country_code" => "some country_code",
-                   "postcode" => "some postcode",
-                   "state" => "some state",
-                   "state_district" => "some state_district",
-                   "id" => node.address.id
-                 }
+                 "city" => "some city",
+                 "country" => "some country",
+                 "country_code" => "some country_code",
+                 "postcode" => "some postcode",
+                 "state" => "some state",
+                 "state_district" => "some state_district",
+                 "id" => node.address.id
                }
              } == json_response(conn, 200)["data"]
 
@@ -184,15 +182,13 @@ defmodule NabooAPI.NodeControllerTest do
                "longitude" => "some longitude",
                "name" => "Washington DC",
                "address" => %{
-                 "data" => %{
-                   "city" => "some city",
-                   "country" => "some country",
-                   "country_code" => "some country_code",
-                   "postcode" => "some postcode",
-                   "state" => "some state",
-                   "state_district" => "some state_district",
-                   "id" => node.address.id
-                 }
+                 "city" => "some city",
+                 "country" => "some country",
+                 "country_code" => "some country_code",
+                 "postcode" => "some postcode",
+                 "state" => "some state",
+                 "state_district" => "some state_district",
+                 "id" => node.address.id
                }
              } == json_response(conn, 200)["data"]
     end
@@ -247,15 +243,13 @@ defmodule NabooAPI.NodeControllerTest do
                "longitude" => node.longitude,
                "name" => node.name,
                "address" => %{
-                 "data" => %{
-                   "city" => "some city",
-                   "country" => "some country",
-                   "country_code" => "some country_code",
-                   "postcode" => "some postcode",
-                   "state" => "some state",
-                   "state_district" => "some state_district",
-                   "id" => node.address.id
-                 }
+                 "city" => "some city",
+                 "country" => "some country",
+                 "country_code" => "some country_code",
+                 "postcode" => "some postcode",
+                 "state" => "some state",
+                 "state_district" => "some state_district",
+                 "id" => node.address.id
                }
              } == json_response(conn, 200)["data"]
     end

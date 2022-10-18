@@ -41,7 +41,7 @@ defmodule Naboo.Accounts do
   """
   def register(account_params) do
     %Account{}
-    |> Account.changeset(account_params)
+    |> Account.create_changeset(account_params)
     |> Naboo.Repo.insert()
   end
 
@@ -90,8 +90,12 @@ defmodule Naboo.Accounts do
   nil
   """
   def get_account_preload(id) do
-    get_account(id)
-    |> Repo.preload(:nodes)
+    Repo.one(
+      from(account in Naboo.Accounts.Account,
+        where: account.id == ^id,
+        preload: [domains: :address]
+      )
+    )
   end
 
   @doc """
@@ -158,7 +162,7 @@ defmodule Naboo.Accounts do
   """
   def create_account(attrs \\ %{}) do
     %Account{}
-    |> Account.changeset(attrs)
+    |> Account.create_changeset(attrs)
     |> Repo.insert()
   end
 
