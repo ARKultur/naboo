@@ -5,42 +5,10 @@ defmodule NabooAPI.AccountController do
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
   alias NabooAPI.AccountView
+  alias NabooAPI.Auth.Sessions
   alias NabooAPI.ChangesetView
   alias NabooAPI.Views.Errors
 
-  swagger_path(:index) do
-    get("api/account")
-    summary("Lists users")
-    description("Lists all users in the database")
-    produces("application/json")
-    deprecated(false)
-
-    response(200, "index.json", %{},
-      example: %{
-        accounts: [
-          %{
-            email: "test@test.com",
-            is_admin: false,
-            name: "test",
-            updated_at: "2022-04-15 03:00:02.123+02:00 CEST Europe/Paris"
-          },
-          %{
-            email: "test2@test.com",
-            is_admin: false,
-            name: "test2",
-            updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
-          }
-        ]
-      }
-    )
-  end
-
-  def index(conn, _params) do
-    conn
-    |> put_view(AccountView)
-    |> put_status(:ok)
-    |> render("index.json", accounts: Accounts.list_accounts())
-  end
 
   swagger_path(:create) do
     post("/api/account")
@@ -82,18 +50,17 @@ defmodule NabooAPI.AccountController do
       {:error, something} ->
         conn
         |> put_view(ChangesetView)
-        |> put_status(403)
+        |> put_status(:forbidden)
         |> render("error.json", %{changeset: something})
     end
   end
 
-  swagger_path(:show) do
-    get("/api/account/{id}")
-    summary("Show an user")
-    description("Show an user in the database")
+  swagger_path(:index) do
+    get("/api/account/")
+    summary("Show current user from the database")
+    description("Show current user")
     produces("application/json")
     deprecated(false)
-    parameter(:id, :path, :integer, "id of the user to show", required: true)
     parameter(:preload_nodes, :query, :boolean, "set to true if you want to receive domains as well", required: false, default: false)
 
     response(200, "show.json", %{},
@@ -108,7 +75,8 @@ defmodule NabooAPI.AccountController do
     )
   end
 
-  def show(conn, %{"id" => id}) do
+  def index(conn, _params) do
+    id = Sessions.get_resource(conn).id
     should_preload = conn.query_params |> Access.get("preload_nodes", false)
 
     value =
@@ -126,7 +94,7 @@ defmodule NabooAPI.AccountController do
         |> render("404.json", [])
 
       %Account{} = account ->
-        if should_preload do
+        if should_preload and not account.is_admin do
           conn
           |> put_view(AccountView)
           |> put_status(:ok)
@@ -141,13 +109,12 @@ defmodule NabooAPI.AccountController do
   end
 
   swagger_path(:update) do
-    patch("/api/account/{id}")
-    summary("Update an user")
-    description("Update an user in the database")
+    patch("/api/account/")
+    summary("Update current user")
+    description("Update the current user's data (except password, which shall go through a different flow)")
     produces("application/json")
     deprecated(false)
 
-    parameter(:id, :path, :integer, "id of the account to update", required: true)
     parameter(:account_params, :body, :Account, "new informations of the account", required: true)
 
     response(200, "show.json", %{},
@@ -162,8 +129,8 @@ defmodule NabooAPI.AccountController do
     )
   end
 
-  def update(conn, %{"id" => id, "account" => account_params}) do
-    with %Account{} = account <- Accounts.get_account(id),
+  def update(conn, %{"account" => account_params}) do
+    with %Account{} = account <- Sessions.get_resource(conn),
          {:ok, %Account{} = updated} <- Accounts.update_account(account, account_params) do
       conn
       |> put_view(AccountView)
@@ -179,23 +146,22 @@ defmodule NabooAPI.AccountController do
       {:error, _} ->
         conn
         |> put_view(Errors)
-        |> put_status(400)
+        |> put_status(:bad_request)
         |> render("error_messages.json", %{errors: "Could not update account"})
     end
   end
 
   swagger_path(:delete) do
-    PhoenixSwagger.Path.delete("/api/account/{id}")
-    summary("Delete an user")
-    description("Delete an user in the database")
+    PhoenixSwagger.Path.delete("/api/account/")
+    summary("Delete current user")
+    description("Delete current user account from the database")
     produces("application/json")
     deprecated(false)
-    parameter(:id, :path, :integer, "id of the user to delete", required: true)
     response(200, "account deleted")
   end
 
-  def delete(conn, %{"id" => id}) do
-    with %Account{} = account <- Accounts.get_account(id),
+  def delete(conn, _params) do
+    with %Account{} = account <- Sessions.get_resource(conn),
          {:ok, %Account{}} <- Accounts.delete_account(account) do
       conn
       |> put_resp_content_type("application/json")
@@ -211,7 +177,7 @@ defmodule NabooAPI.AccountController do
       {:error, _} ->
         conn
         |> put_view(Errors)
-        |> put_status(400)
+        |> put_status(:bad_request)
         |> render("error_messages.json", %{errors: "Could not delete account"})
     end
   end
