@@ -27,6 +27,25 @@ defmodule Naboo.Accounts do
   end
 
   @doc """
+  Registers an admin.
+
+  ## Example
+
+  iex> register(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
+    "password" => "anak1n"})
+  %Account{}
+
+  iex> register("Some wrong value")
+  {:error,  changeset = %Changeset{}}
+
+  """
+  def register(account_params) do
+    %Account{}
+    |> Account.create_admin_changeset(account_params)
+    |> Naboo.Repo.insert()
+  end
+
+  @doc """
   Registers an account.
 
   ## Example

@@ -35,6 +35,19 @@ defmodule Naboo.Accounts.Account do
     |> put_encrypted_password()
   end
 
+  def admin_changeset(account, attrs) do
+    account
+    |> cast(map_castable(attrs), [:email, :name])
+    |> validate_required([:email, :name])
+    |> unique_constraint([:name, :email], name: :accounts_name_email_index)
+    |> validate_format(:email, ~r/@/)
+  end
+
+  def create_admin_changeset(account, attrs) do
+    create_changeset(account, attrs)
+    |> put_change(:is_admin, true)
+  end
+
   defp put_encrypted_password(%{valid?: true, changes: %{password: pw}} = changeset) do
     put_change(changeset, :encrypted_password, Argon2.hash_pwd_salt(pw))
   end
