@@ -13,7 +13,6 @@ defmodule Naboo.AccountsFixtures do
       |> Enum.into(%{
         email: "email@email.com",
         password: "some password",
-        is_admin: true,
         name: "some name"
       })
       |> Naboo.Accounts.create_account()

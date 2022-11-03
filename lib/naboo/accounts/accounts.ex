@@ -31,15 +31,15 @@ defmodule Naboo.Accounts do
 
   ## Example
 
-  iex> register(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
+  iex> register_admin(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
     "password" => "anak1n"})
   %Account{}
 
-  iex> register("Some wrong value")
+  iex> register_admin("Some wrong value")
   {:error,  changeset = %Changeset{}}
 
   """
-  def register(account_params) do
+  def register_admin(account_params) do
     %Account{}
     |> Account.create_admin_changeset(account_params)
     |> Naboo.Repo.insert()
@@ -197,6 +197,8 @@ defmodule Naboo.Accounts do
   {:error, %Ecto.Changeset{}}
 
   """
+  def update_account(nil, _attrs), do: nil
+
   def update_account(%Account{} = account, attrs) do
     account
     |> Account.changeset(attrs)

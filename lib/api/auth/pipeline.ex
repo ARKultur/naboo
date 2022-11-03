@@ -6,4 +6,5 @@ defmodule NabooAPI.Auth.Guardian.Pipeline do
 
   plug(Guardian.Plug.VerifyHeader, scheme: "Bearer")
   plug(Guardian.Plug.EnsureAuthenticated)
+  plug(Guardian.Plug.LoadResource, allow_blank: true)
 end

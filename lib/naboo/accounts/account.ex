@@ -16,26 +16,7 @@ defmodule Naboo.Accounts.Account do
     timestamps()
   end
 
-  @doc false
-  def changeset(account, attrs) do
-    account
-    |> cast(map_castable(attrs), [:email, :name, :is_admin])
-    |> validate_required([:email, :name])
-    |> unique_constraint([:name, :email], name: :accounts_name_email_index)
-    |> validate_format(:email, ~r/@/)
-    |> foreign_key_constraint(:domains, name: :accounts_node_id_fkey, message: "No such domain exists")
-  end
-
-  def create_changeset(account, attrs) do
-    changeset(account, attrs)
-    |> cast(attrs, [:password])
-    |> validate_required(:password)
-    |> validate_length(:password, min: 8)
-    |> validate_confirmation(:password)
-    |> put_encrypted_password()
-  end
-
-  def admin_changeset(account, attrs) do
+  defp base_changeset(account, attrs) do
     account
     |> cast(map_castable(attrs), [:email, :name])
     |> validate_required([:email, :name])
@@ -43,8 +24,32 @@ defmodule Naboo.Accounts.Account do
     |> validate_format(:email, ~r/@/)
   end
 
+  defp base_create_changeset(account, attrs) do
+    base_changeset(account, attrs)
+    |> cast(attrs, [:password])
+    |> validate_required(:password)
+    |> validate_length(:password, min: 8)
+    |> validate_confirmation(:password)
+    |> put_encrypted_password()
+  end
+
+  @doc false
+  def changeset(account, attrs) do
+    base_changeset(account, attrs)
+    |> foreign_key_constraint(:domains, name: :accounts_node_id_fkey, message: "No such domain exists")
+  end
+
+  def create_changeset(account, attrs) do
+    base_create_changeset(account, attrs)
+    |> foreign_key_constraint(:domains, name: :accounts_node_id_fkey, message: "No such domain exists")
+  end
+
+  def admin_changeset(account, attrs) do
+    base_changeset(account, attrs)
+  end
+
   def create_admin_changeset(account, attrs) do
-    create_changeset(account, attrs)
+    base_create_changeset(account, attrs)
     |> put_change(:is_admin, true)
   end
 

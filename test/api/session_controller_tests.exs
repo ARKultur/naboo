@@ -44,7 +44,7 @@ defmodule NabooAPI.SessionControllerTests do
     end
 
     test "access unpermitted route should give error from middleware", %{conn: conn} do
-      conn = get(conn, Helpers.account_path(conn, :show, 1), %{})
+      conn = get(conn, Helpers.account_path(conn, :index), %{})
       assert _response = json_response(conn, 401)
     end
   end

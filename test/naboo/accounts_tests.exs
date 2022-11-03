@@ -23,13 +23,12 @@ defmodule Naboo.AccountsTest do
       valid_attrs = %{
         email: "email@email.com",
         password: "some password",
-        is_admin: true,
         name: "some name"
       }
 
       assert {:ok, %Account{} = account} = Accounts.create_account(valid_attrs)
       assert account.email == "email@email.com"
-      assert account.is_admin == true
+      assert account.is_admin == false
       assert account.name == "some name"
       assert account.encrypted_password != nil
     end

@@ -76,14 +76,14 @@ defmodule NabooAPI.AccountController do
   end
 
   def index(conn, _params) do
-    id = Sessions.get_resource(conn).id
+    account = Sessions.resource(conn)
     should_preload = conn.query_params |> Access.get("preload_nodes", false)
 
     value =
       if should_preload do
-        Accounts.get_account_preload(id)
+          Accounts.get_account_preload(account.id)
       else
-        Accounts.get_account(id)
+          Accounts.get_account(account.id)
       end
 
     case value do
@@ -94,7 +94,7 @@ defmodule NabooAPI.AccountController do
         |> render("404.json", [])
 
       %Account{} = account ->
-        if should_preload and not account.is_admin do
+        if should_preload && !account.is_admin do
           conn
           |> put_view(AccountView)
           |> put_status(:ok)
@@ -111,10 +111,11 @@ defmodule NabooAPI.AccountController do
   swagger_path(:update) do
     patch("/api/account/")
     summary("Update current user")
-    description("Update the current user's data (except password, which shall go through a different flow)")
+    description("Update the user's data (except password, which shall go through a different flow)")
     produces("application/json")
     deprecated(false)
 
+    parameter(:id, :path, :integer, "id of the account", required: true)
     parameter(:account_params, :body, :Account, "new informations of the account", required: true)
 
     response(200, "show.json", %{},
@@ -129,14 +130,23 @@ defmodule NabooAPI.AccountController do
     )
   end
 
-  def update(conn, %{"account" => account_params}) do
-    with %Account{} = account <- Sessions.get_resource(conn),
-         {:ok, %Account{} = updated} <- Accounts.update_account(account, account_params) do
-      conn
-      |> put_view(AccountView)
-      |> put_status(:ok)
-      |> render("show.json", account: updated)
-    else
+  def update(conn, %{"id" => id, "account" => account_params}) do
+
+    account = conn.assigns.current_user
+    to_update =
+      if account.is_admin do
+        Accounts.get_account(id)
+      else
+        account
+      end
+
+    case Accounts.update_account(to_update, account_params) do
+      {:ok, %Account{} = updated} ->
+        conn
+        |> put_view(AccountView)
+        |> put_status(:ok)
+        |> render("show.json", account: updated)
+
       nil ->
         conn
         |> put_view(Errors)
@@ -160,9 +170,20 @@ defmodule NabooAPI.AccountController do
     response(200, "account deleted")
   end
 
-  def delete(conn, _params) do
-    with %Account{} = account <- Sessions.get_resource(conn),
-         {:ok, %Account{}} <- Accounts.delete_account(account) do
+  def delete(conn, %{"id" => id}) do
+    account = Sessions.resource(conn)
+
+    to_delete =
+      cond do
+        account == nil ->
+          nil
+        account.is_admin ->
+          Accounts.get_account(id)
+        true ->
+          account
+      end
+
+    with {:ok, %Account{}} <- Accounts.delete_account(to_delete) do
       conn
       |> put_resp_content_type("application/json")
       |> send_resp(200, "account deleted")

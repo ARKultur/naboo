@@ -18,9 +18,16 @@ config :phoenix_swagger, json_library: Jason
 
 config :naboo, Corsica, allow_headers: :all
 
+config :guardian, Guardian.DB,
+  repo: Naboo.Repo,
+  schema_name: "guardian_tokens",
+  token_types: ["refresh_token"],
+  sweep_interval: 60
+
 config :naboo, NabooAPI.Auth.Guardian,
   issuer: "naboo",
-  secret_key: System.get_env("GUARDIAN_SECRET")
+  secret_key: System.get_env("GUARDIAN_SECRET"),
+  hooks: Guardian.DB
 
 config :naboo, NabooAPI.Auth.Sessions,
   issuer: "naboo",

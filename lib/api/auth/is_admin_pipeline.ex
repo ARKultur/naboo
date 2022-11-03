@@ -1,8 +1,9 @@
 defmodule NabooAPI.Auth.Guardian.IsAdminPipeline do
-  import Plug.Conn
-  import Plug.Controller
+  @behaviour Plug
 
-  alias NabooAPI.Auth.Guardian
+  import Phoenix.Controller
+  import Plug.Conn
+
   alias NabooAPI.Auth.Sessions
   alias NabooAPI.Views.Errors
   alias Naboo.Accounts.Account
