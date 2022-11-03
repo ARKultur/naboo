@@ -38,12 +38,7 @@ services:
     image: postgres:12-alpine
     network_mode: host
     environment:
-      POSTGRES_DB: naboo_db
-      POSTGRES_PASSWORD: ChangeMe
-      POSTGRES_USER: anon
-    volumes:
-      - database:/var/lib/postgresql/data
-
-volumes:
-  database:
+      - POSTGRES_USER=anon
+      - POSTGRES_DB=naboo_db
+      - POSTGRES_PASSWORD=ChangeMe
 
