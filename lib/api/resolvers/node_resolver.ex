@@ -1,6 +1,6 @@
 defmodule NabooAPI.Resolvers.NodeResolver do
-  alias Naboo.Domains
   alias Naboo.Domain.Node
+  alias Naboo.Domains
 
   def all_nodes(_root, _args, _info) do
     {:ok, Domains.list_nodes()}
@@ -33,7 +33,13 @@ defmodule NabooAPI.Resolvers.NodeResolver do
     end
   end
 
-  def create_node(_root, args, _info) do
+  def create_node(_root, args, info) do
+    args =
+      args
+      |> Enum.into(%{
+        "account_id" => info.context.current_user.id
+      })
+
     Domains.create_node(args)
   end
 end

@@ -32,29 +32,17 @@ defmodule Naboo.Accounts do
   ## Example
 
   iex> register(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
-    "password" => "anak1n", "password_confirmation" => anak1n"})
+    "password" => "anak1n"})
   %Account{}
 
-  iex> register(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
-    "password" => "anakin", "password_confirmation" => anak1n"})
-  {:error, :wrong_parameters}
-
   iex> register("Some wrong value")
-  {:error, :wrong_parameters}
+  {:error,  changeset = %Changeset{}}
 
   """
-  def register(%{"name" => n, "email" => e, "password" => p, "password_confirmation" => p}) do
-    if find_by_email!(e) do
-      {:error, :already_exists}
-    else
-      %Account{}
-      |> Account.changeset(%{name: n, email: e, password: p})
-      |> Naboo.Repo.insert()
-    end
-  end
-
-  def register(_) do
-    {:error, :wrong_parameters}
+  def register(account_params) do
+    %Account{}
+    |> Account.create_changeset(account_params)
+    |> Naboo.Repo.insert()
   end
 
   @doc """
@@ -89,6 +77,28 @@ defmodule Naboo.Accounts do
   end
 
   @doc """
+  Get an account & fetch related nodes
+
+  Returns nil if Account does not exist
+
+  ## Examples
+
+  iex > get_account_preload(123)
+  %Account{}
+
+  iex > get_account_preload(456)
+  nil
+  """
+  def get_account_preload(id) do
+    Repo.one(
+      from(account in Naboo.Accounts.Account,
+        where: account.id == ^id,
+        preload: [domains: :address]
+      )
+    )
+  end
+
+  @doc """
   Safely gets a single account.
 
   Returns nil if the Account does not exist.
@@ -98,7 +108,7 @@ defmodule Naboo.Accounts do
   iex> get_account(123)
   %Account{}
 
-  iex> get_account!(456)
+  iex> get_account(456)
   nil
 
   """
@@ -152,7 +162,7 @@ defmodule Naboo.Accounts do
   """
   def create_account(attrs \\ %{}) do
     %Account{}
-    |> Account.changeset(attrs)
+    |> Account.create_changeset(attrs)
     |> Repo.insert()
   end
 

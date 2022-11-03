@@ -1,7 +1,7 @@
 defmodule NabooAPI.AccountView do
   use Phoenix.View, root: "lib/api", namespace: NabooAPI
 
-  alias NabooAPI.AccountView
+  alias NabooAPI.{AccountView, NodeView}
 
   def render("index.json", %{accounts: accounts}) do
     %{data: render_many(accounts, AccountView, "account.json")}
@@ -9,6 +9,16 @@ defmodule NabooAPI.AccountView do
 
   def render("show.json", %{account: account}) do
     %{data: render_one(account, AccountView, "account.json")}
+  end
+
+  def render("show_preload.json", %{account: account}) do
+    %{
+      id: account.id,
+      name: account.name,
+      email: account.email,
+      is_admin: account.is_admin,
+      domains: render_many(account.domains, NodeView, "node.json")
+    }
   end
 
   def render("account.json", %{account: account}) do

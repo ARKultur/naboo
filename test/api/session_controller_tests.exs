@@ -7,12 +7,12 @@ defmodule NabooAPI.SessionControllerTests do
 
   describe "login feature" do
     @valid_login_attrs %{
-      email: "some cool email",
+      email: "email@email.com",
       password: "some password"
     }
 
     @create_attrs %{
-      email: "some cool email",
+      email: "email@email.com",
       password: "some password",
       password_confirmation: "some password",
       name: "some name"

@@ -1,6 +1,6 @@
 defmodule NabooAPI.Resolvers.AddressResolver do
-  alias Naboo.Domains
   alias Naboo.Domain.Address
+  alias Naboo.Domains
 
   def all_addresses(_root, _args, _info) do
     {:ok, Domains.list_addresses()}

@@ -19,8 +19,7 @@ defmodule NabooAPI.AddressView do
       country_code: address.country_code,
       postcode: address.postcode,
       state: address.state,
-      state_district: address.state_district,
-      district: address.state_district
+      state_district: address.state_district
     }
   end
 end

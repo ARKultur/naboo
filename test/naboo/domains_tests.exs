@@ -3,10 +3,11 @@ defmodule Naboo.DomainsTest do
 
   alias Naboo.Domains
 
+  import Naboo.AccountsFixtures
+  import Naboo.DomainsFixtures
+
   describe "addresses" do
     alias Naboo.Domain.Address
-
-    import Naboo.DomainsFixtures
 
     @invalid_attrs %{
       "country_code" => nil,
@@ -90,8 +91,8 @@ defmodule Naboo.DomainsTest do
     import Naboo.DomainsFixtures
 
     @invalid_attrs %{
-      "latitude" => nil,
-      "longitude" => nil,
+      "latitude" => "niqsdqsd4526l",
+      "longitude" => 12,
       "name" => nil,
       "addr_id" => 1
     }
@@ -107,31 +108,33 @@ defmodule Naboo.DomainsTest do
 
     test "create_node/1 with valid data creates a node" do
       address = address_fixture()
+      account = account_fixture()
 
       valid_attrs = %{
-        "latitude" => "some latitude",
-        "longitude" => "some longitude",
+        "latitude" => "100.0",
+        "longitude" => "100.0",
         "name" => "some name",
-        "addr_id" => address.id
+        "addr_id" => address.id,
+        "account_id" => account.id
       }
 
       assert {:ok, %Node{} = node} = Domains.create_node(valid_attrs)
-      assert node.latitude == "some latitude"
-      assert node.longitude == "some longitude"
+      assert node.latitude == "100.0"
+      assert node.longitude == "100.0"
       assert node.name == "some name"
       assert node.address.id == address.id
     end
 
     test "create_node/1 with invalid data returns error changeset" do
-      assert {:error, %{message: "could not find address"}} = Domains.create_node(@invalid_attrs)
+      assert {:error, %{message: "could not find resource"}} = Domains.create_node(@invalid_attrs)
     end
 
     test "update_node/2 with valid data updates the node" do
       node = node_fixture()
 
       update_attrs = %{
-        "latitude" => "some updated latitude",
-        "longitude" => "some updated longitude",
+        "latitude" => "120",
+        "longitude" => "120",
         "name" => "some updated name"
       }
 

@@ -88,6 +88,10 @@ dependencies: ## Install dependencies
 test: ## Run the test suite
 	mix test
 
+.PHONY: covr
+covr: ## Run the test suite and generate HTML coverage
+	mix coveralls.html
+
 # Check, lint and format targets
 # ------------------------------
 
