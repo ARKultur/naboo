@@ -12,7 +12,6 @@ defmodule NabooAPI.Auth.Guardian.IsAdminPipeline do
 
   def call(conn, _params) do
     case Sessions.resource(conn) do
-
       %Account{} = account ->
         if account.is_admin do
           conn

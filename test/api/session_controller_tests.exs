@@ -2,7 +2,7 @@ defmodule NabooAPI.SessionControllerTests do
   use Naboo.ConnCase
 
   alias Naboo.Accounts
-  alias NabooAPI.Auth.Guardian
+  alias NabooAPI.Auth.Sessions
   alias NabooAPI.Router.Urls.Helpers
 
   describe "login feature" do
@@ -52,7 +52,7 @@ defmodule NabooAPI.SessionControllerTests do
   describe "logout feature" do
     setup %{conn: conn} do
       user = Accounts.get_account(1)
-      {:ok, jwt, _claims} = Guardian.encode_and_sign(user)
+      {:ok, jwt, conn} = Sessions.log_in(conn, user)
 
       conn =
         conn

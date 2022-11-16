@@ -11,8 +11,7 @@ defmodule NabooAPI.AdminAccountController do
   swagger_path(:create) do
     post("/api/admin/account")
     summary("Create an admin user")
-    description(
-      "Create an admin user in the database. It is almost the same as a normal user, except it can administrate other users")
+    description("Create an admin user in the database. It is almost the same as a normal user, except it can administrate other users")
     produces("application/json")
     deprecated(false)
 

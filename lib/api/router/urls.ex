@@ -9,7 +9,6 @@ defmodule NabooAPI.Router.Urls do
   end
 
   pipeline :api_auth do
-    plug(NabooAPI.Auth.Plug.SetUser)
     plug(NabooAPI.Auth.Guardian.Pipeline)
   end
 

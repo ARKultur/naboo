@@ -9,7 +9,6 @@ defmodule Naboo.Application do
     children = [
       Naboo.Repo,
       {Phoenix.PubSub, [name: Naboo.PubSub, adapter: Phoenix.PubSub.PG2]},
-      {Guardian.DB.Token.SweeperServer, []},
       Naboo.Endpoint
     ]
 

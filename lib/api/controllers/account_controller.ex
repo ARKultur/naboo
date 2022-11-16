@@ -9,7 +9,6 @@ defmodule NabooAPI.AccountController do
   alias NabooAPI.ChangesetView
   alias NabooAPI.Views.Errors
 
-
   swagger_path(:create) do
     post("/api/account")
     summary("Create an user")
@@ -81,9 +80,9 @@ defmodule NabooAPI.AccountController do
 
     value =
       if should_preload do
-          Accounts.get_account_preload(account.id)
+        Accounts.get_account_preload(account.id)
       else
-          Accounts.get_account(account.id)
+        Accounts.get_account(account.id)
       end
 
     case value do
@@ -131,8 +130,8 @@ defmodule NabooAPI.AccountController do
   end
 
   def update(conn, %{"id" => id, "account" => account_params}) do
-
     account = conn.assigns.current_user
+
     to_update =
       if account.is_admin do
         Accounts.get_account(id)
@@ -177,8 +176,10 @@ defmodule NabooAPI.AccountController do
       cond do
         account == nil ->
           nil
+
         account.is_admin ->
           Accounts.get_account(id)
+
         true ->
           account
       end

@@ -143,7 +143,8 @@ defmodule NabooAPI.AccountControllerTest do
     test "renders account when data is valid", %{conn: conn} do
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
       assert %{"id" => id} = json_response(conn, 201)["data"]
-      conn = get(conn, Helpers.account_path(conn, :index))
+
+      conn = get(conn, Helpers.account_path(conn, :show, id))
 
       assert %{
                "id" => ^id,
@@ -245,14 +246,6 @@ defmodule NabooAPI.AccountControllerTest do
 
       conn = delete(conn, Helpers.account_path(conn, :delete, id))
       assert response(conn, 200)
-    end
-
-    test "fail if an account does not exist", %{conn: conn} do
-      conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
-
-      conn = delete(conn, Helpers.account_path(conn, :delete, id + 5))
-      assert response(conn, 404)
     end
   end
 
