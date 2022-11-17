@@ -7,11 +7,21 @@ defmodule NabooAPI.AccountView do
     %{data: render_many(accounts, AccountView, "account.json")}
   end
 
+  def render("index_preloaded.json", %{accounts: accounts}) do
+    %{data: render_many(accounts, AccountView, "preloaded.json")}
+  end
+
   def render("show.json", %{account: account}) do
     %{data: render_one(account, AccountView, "account.json")}
   end
 
   def render("show_preload.json", %{account: account}) do
+    %{
+      data: render_one(account, AccountView, "preloaded.json")
+    }
+  end
+
+  def render("preloaded.json", %{account: account}) do
     %{
       id: account.id,
       name: account.name,

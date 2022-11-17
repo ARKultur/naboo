@@ -14,7 +14,7 @@ alias Naboo.Accounts.Account
 alias Naboo.Repo
 
 %Account{}
-|> Account.create_changeset(%{
+|> Account.create_admin_changeset(%{
   email: "sheev.palpatine@naboo.net",
   password: "sidious1337",
   is_admin: true,

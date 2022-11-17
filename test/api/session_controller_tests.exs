@@ -2,7 +2,7 @@ defmodule NabooAPI.SessionControllerTests do
   use Naboo.ConnCase
 
   alias Naboo.Accounts
-  alias NabooAPI.Auth.Guardian
+  alias NabooAPI.Auth.Sessions
   alias NabooAPI.Router.Urls.Helpers
 
   describe "login feature" do
@@ -44,7 +44,7 @@ defmodule NabooAPI.SessionControllerTests do
     end
 
     test "access unpermitted route should give error from middleware", %{conn: conn} do
-      conn = get(conn, Helpers.account_path(conn, :show, 1), %{})
+      conn = get(conn, Helpers.account_path(conn, :index), %{})
       assert _response = json_response(conn, 401)
     end
   end
@@ -52,7 +52,7 @@ defmodule NabooAPI.SessionControllerTests do
   describe "logout feature" do
     setup %{conn: conn} do
       user = Accounts.get_account(1)
-      {:ok, jwt, _claims} = Guardian.encode_and_sign(user)
+      {:ok, jwt, conn} = Sessions.log_in(conn, user)
 
       conn =
         conn
