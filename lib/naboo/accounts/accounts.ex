@@ -210,9 +210,14 @@ defmodule Naboo.Accounts do
   def update_account(nil, _attrs), do: nil
 
   def update_account(%Account{} = account, attrs) do
-    account
-    |> Account.changeset(attrs)
-    |> Repo.update()
+    changeset =
+      if account.is_admin do
+        Account.admin_changeset(account, attrs)
+      else
+        Account.changeset(account, attrs)
+      end
+
+    Repo.update(changeset)
   end
 
   @doc """
