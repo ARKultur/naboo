@@ -1,32 +1,22 @@
 defmodule NabooAPI.Auth.Guardian.IsAdminPipeline do
   @behaviour Plug
 
-  import Phoenix.Controller
   import Plug.Conn
 
   alias NabooAPI.Auth.Sessions
-  alias NabooAPI.Views.Errors
-  alias Naboo.Accounts.Account
 
   def init(opts), do: opts
 
   def call(conn, _params) do
-    case Sessions.resource(conn) do
-      %Account{} = account ->
-        if account.is_admin do
-          conn
-        else
-          conn
-          |> put_view(Errors)
-          |> put_status(:forbidden)
-          |> render("error_messages.json", %{errors: "This account is not an admin"})
-        end
+    account = Sessions.resource(conn)
 
-      _ ->
-        conn
-        |> put_view(Errors)
-        |> put_status(:forbidden)
-        |> render("error_messages.json", %{errors: "Please login"})
+    if account.is_admin do
+      conn
+    else
+      conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(401, "{\"errors\": \"this account is not an admin\"}")
+      |> halt()
     end
   end
 end

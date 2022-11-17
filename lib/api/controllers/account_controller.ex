@@ -105,7 +105,7 @@ defmodule NabooAPI.AccountController do
   end
 
   swagger_path(:show) do
-    get("/api/account/:id")
+    get("/api/account/{id}")
     summary("Shows a user's details")
     description("Shows a user's account details")
     produces("application/json")
@@ -166,8 +166,8 @@ defmodule NabooAPI.AccountController do
   end
 
   swagger_path(:update) do
-    patch("/api/account/")
-    summary("Update current user")
+    patch("/api/account/{id}")
+    summary("Update an user")
     description("Update the user's data (except password, which shall go through a different flow)")
     produces("application/json")
     deprecated(false)
@@ -222,9 +222,9 @@ defmodule NabooAPI.AccountController do
   end
 
   swagger_path(:delete) do
-    PhoenixSwagger.Path.delete("/api/account/")
-    summary("Delete current user")
-    description("Delete current user account from the database")
+    PhoenixSwagger.Path.delete("/api/account/{id}")
+    summary("Delete an user")
+    description("Delete an user account from the database")
     produces("application/json")
     deprecated(false)
     response(200, "account deleted")

@@ -12,13 +12,26 @@ defmodule Naboo.AccountsFixtures do
   """
   def account_fixture(attrs \\ %{}) do
     {:ok, account} =
-      attrs
-      |> Enum.into(%{
+      %{
         email: Internet.email(),
         password: "very secret password",
         name: App.author()
-      })
+      }
+      |> Enum.into(attrs)
       |> Naboo.Accounts.create_account()
+
+    account
+  end
+
+  def admin_fixture(attrs \\ %{}) do
+    {:ok, account} =
+      %{
+        email: Internet.email(),
+        password: "very secret password",
+        name: App.author()
+      }
+      |> Enum.into(attrs)
+      |> Naboo.Accounts.register_admin()
 
     account
   end
