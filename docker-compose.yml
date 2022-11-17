@@ -8,6 +8,7 @@ services:
       network: host
       args:
         APP_VERSION: 0.4.1
+
     environment:
       - MIX_ENV=prod
       - DATABASE_URL=postgres://anon:ChangeMe@localhost/naboo_db
