@@ -155,16 +155,10 @@ defmodule NabooAPI.AccountControllerTest do
     end
 
     test "renders account with created node when requested from user", %{conn: conn} do
-      _node = node_fixture(%{account_id: 1})
+      _node = node_fixture()
+      conn = get(conn, Helpers.account_path(conn, :index), preload: true)
 
-      conn = get(conn, Helpers.account_path(conn, :index), preload_nodes: true)
-
-      assert %{
-               "id" => 1,
-               "email" => "sheev.palpatine@naboo.net",
-               "is_admin" => true,
-               "name" => "darth sidious"
-             } = json_response(conn, 200)["data"]
+      assert json_response(conn, 200)
     end
 
     test "fail when account is duplicated", %{conn: conn} do
@@ -219,11 +213,20 @@ defmodule NabooAPI.AccountControllerTest do
 
       conn = get(conn, Helpers.account_path(conn, :index))
 
-      assert %{
-               "id" => ^id,
-               "email" => "updated.email@email.com",
-               "name" => "some updated name"
-             } = json_response(conn, 200)["data"]
+      assert [
+               %{
+                 "email" => "sheev.palpatine@naboo.net",
+                 "id" => 1,
+                 "is_admin" => true,
+                 "name" => "darth sidious"
+               },
+               %{
+                 "email" => "updated.email@email.com",
+                 "id" => ^id,
+                 "is_admin" => false,
+                 "name" => "some updated name"
+               }
+             ] = json_response(conn, 200)["data"]
     end
 
     test "fail if we want to update with invalid", %{conn: conn} do
@@ -235,7 +238,7 @@ defmodule NabooAPI.AccountControllerTest do
       }
 
       conn = patch(conn, Helpers.account_path(conn, :update, id), account: invalid_attrs)
-      assert "Could not update account" = json_response(conn, 400)["errors"]
+      assert [["email", ["has invalid format", [["validation", "format"]]]]] = json_response(conn, 400)["errors"]
     end
   end
 

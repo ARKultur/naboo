@@ -4,6 +4,9 @@ defmodule Naboo.AccountsFixtures do
   entities via the `Naboo.Accounts` context.
   """
 
+  alias Faker.App
+  alias Faker.Internet
+
   @doc """
   Generate a account.
   """
@@ -11,9 +14,9 @@ defmodule Naboo.AccountsFixtures do
     {:ok, account} =
       attrs
       |> Enum.into(%{
-        email: "email@email.com",
-        password: "some password",
-        name: "some name"
+        email: Internet.email(),
+        password: "very secret password",
+        name: App.author()
       })
       |> Naboo.Accounts.create_account()
 

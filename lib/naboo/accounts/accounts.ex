@@ -72,9 +72,19 @@ defmodule Naboo.Accounts do
   iex> list_accounts()
   [%Account{}, ...]
 
+  iex> list_account(%{should_preload: true})
+  [%Account{..., [%Node{}]}]
+
   """
   def list_accounts do
     Repo.all(Account)
+  end
+
+  def list_accounts(%{should_preload: false}), do: list_accounts()
+
+  def list_accounts(%{should_preload: true}) do
+    list_accounts()
+    |> Repo.preload(domains: :address)
   end
 
   @doc """
