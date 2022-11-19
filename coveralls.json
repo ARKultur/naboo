@@ -9,6 +9,7 @@
     "scripts",
     "config",
     "deps",
+    "lib/api/router/urls.ex",
     "lib/naboo/application.ex",
     "lib/api/application/types.ex",
     "lib/api/errors.ex",
@@ -19,6 +20,8 @@
     "lib/naboo/socket.ex",
     "lib/health/naboo_health.ex",
     "lib/naboo/endpoint.ex",
+    "lib/api/schema.ex",
+    "lib/api/resolvers/node_resolver.ex",
     "lib/api/resolvers/account_resolver.ex",
     "lib/api/resolvers/address_resolver.ex"
   ]

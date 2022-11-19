@@ -47,9 +47,7 @@ defmodule Naboo.Utils do
   %{:ko, _}
 
   """
-  def validate_point_datatype_in_geojson(changeset) do
-    validate_point(changeset)
-  end
+  def validate_point_datatype_in_geojson(changeset), do: validate_point(changeset)
 
   def validate_point(changeset) do
     lat = get_change(changeset, :latitude)
@@ -60,7 +58,7 @@ defmodule Naboo.Utils do
     with {:ok, _} <- params |> Geo.JSON.encode() do
       changeset
     else
-      {:error, _} ->
+      _ ->
         add_error(changeset, :latitude, "invalid values")
         add_error(changeset, :longitude, "invalid values")
     end

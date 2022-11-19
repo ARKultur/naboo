@@ -2,6 +2,7 @@ defmodule NabooAPI.SessionControllerTests do
   use Naboo.ConnCase
 
   alias Naboo.Accounts
+  alias Naboo.AccountsFixtures
   alias NabooAPI.Auth.Sessions
   alias NabooAPI.Router.Urls.Helpers
 
@@ -46,6 +47,22 @@ defmodule NabooAPI.SessionControllerTests do
     test "access unpermitted route should give error from middleware", %{conn: conn} do
       conn = get(conn, Helpers.account_path(conn, :index), %{})
       assert _response = json_response(conn, 401)
+    end
+
+    test "send a two-factor authentication code & authenticate user with it", %{conn: conn} do
+      account = AccountsFixtures.account_fixture(%{has_2fa: true})
+
+      valid_login_attrs = %{
+        email: account.email,
+        password: "very secret password"
+      }
+
+      conn = post(conn, Helpers.session_path(conn, :sign_in), valid_login_attrs)
+      assert response(conn, 200)
+
+      # %{"2fa" => totp, "id" => _acc_id} = get_session(conn)
+      # conn = post(conn, Helpers.session_path(conn, :email_2fa), %{code_2fa: totp})
+      # assert response(conn, 200)
     end
   end
 

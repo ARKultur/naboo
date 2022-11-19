@@ -2,6 +2,7 @@ defmodule NabooAPI.Router.Urls do
   use Phoenix.Router
 
   pipeline :api do
+    ## HTML plug is required for swagger
     plug(:accepts, ["json", "html"])
     plug(:session)
     plug(:fetch_session)
@@ -19,6 +20,7 @@ defmodule NabooAPI.Router.Urls do
   scope "/api" do
     pipe_through(:api)
     post("/login", NabooAPI.SessionController, :sign_in)
+    post("/email_2fa", NabooAPI.SessionController, :email_2fa)
     resources("/account", NabooAPI.AccountController, only: [:create])
     forward("/swagger", PhoenixSwagger.Plug.SwaggerUI, otp_app: :naboo, swagger_file: "swagger.json")
   end

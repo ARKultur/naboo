@@ -151,7 +151,7 @@ defmodule NabooAPI.AccountControllerTest do
                "email" => "email@email.com",
                "is_admin" => false,
                "name" => "some name",
-               "has_2fa" => false,
+               "has_2fa" => false
              } = json_response(conn, 200)["data"]
     end
 

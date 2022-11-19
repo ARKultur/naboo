@@ -3,6 +3,7 @@ defmodule NabooAPI.SessionController do
   use PhoenixSwagger
 
   alias Naboo.Accounts
+  alias Naboo.Accounts.Account
   alias NabooAPI.Auth.TwoFactor
   alias NabooAPI.Auth.Sessions
   alias NabooAPI.Email
@@ -35,19 +36,52 @@ defmodule NabooAPI.SessionController do
         two_factor_token = TwoFactor.gen_token()
         Email.send_2fa(account.name, account.email, two_factor_token)
 
+        conn
+        |> put_session("totp", %{"2fa" => two_factor_token, "id" => account.id})
+        |> render("2fa.json", %{})
       else
         {:ok, token, _} = Sessions.log_in(conn, account)
         render(conn, "token.json", token: token)
       end
-
     rescue
       # probably uncool to do that, but whatever
-      _ ->
+      _err ->
         unauthorized(conn)
     end
   end
 
   def sign_in(conn, _params), do: unauthorized(conn)
+
+  swagger_path(:email_2fa) do
+    post("/validate_2fa")
+    summary("Submit 2FA code")
+    description("Confirm 2FA code")
+    produces("application/json")
+    deprecated(false)
+    parameter(:code_2fa, :body, :string, "2FA code", required: true)
+
+    response(200, "token.json", %{},
+      example: %{
+        token: "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+      }
+    )
+  end
+
+  def email_2fa(conn, %{"code_2fa" => submitted_totp}) do
+    with %{"2fa" => totp, "id" => acc_id} <- get_session(conn),
+         account = %Account{} <- Accounts.get_account(acc_id),
+         true <- totp == submitted_totp,
+         {:ok, token, _} <- Sessions.log_in(conn, account) do
+      conn
+      |> delete_session("totp")
+      |> render("token.json", token: token)
+    else
+      _ ->
+        conn
+        |> delete_session("totp")
+        |> unauthorized()
+    end
+  end
 
   def delete(conn, _params) do
     conn
