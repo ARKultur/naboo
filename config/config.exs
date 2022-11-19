@@ -18,14 +18,6 @@ config :phoenix_swagger, json_library: Jason
 
 config :naboo, Corsica, allow_headers: :all
 
-config :naboo, Guardian,
-  issuer: "naboo",
-  secret_key: System.get_env("GUARDIAN_SECRET")
-
-config :naboo, NabooAPI.Auth.Sessions,
-  issuer: "naboo",
-  secret_key: System.get_env("GUARDIAN_SECRET")
-
 config :logger, backends: [:console]
 
 config :phoenix_swagger, json_library: Jason

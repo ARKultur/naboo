@@ -31,6 +31,9 @@ services:
       - SESSION_SIGNING_SALT=some_very_secret_salt
       - SECRET_KEY_BASE=secret_key_base_very_secret_wow
       - GUARDIAN_SECRET=another_very_important_secret
+
+      - SENDGRID_SENDER_EMAIL=email@email.com
+      - SENDGRID_APIKEY=something
     network_mode: host
     depends_on:
       - database

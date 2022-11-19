@@ -91,7 +91,14 @@ defmodule Naboo.Mixfile do
       {:ex_json_schema, "~> 0.9.1", override: true},
 
       # GeoJSON
-      {:geo, "~> 3.4"}
+      {:geo, "~> 3.4"},
+
+      # Emails
+      {:mime, "~> 2.0", override: true},
+      {:bamboo, "~> 2.2.0"},
+
+      # 2-factor authentication
+      {:pot, "~> 1.0.0"}
     ]
   end
 

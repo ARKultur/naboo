@@ -193,6 +193,40 @@ defmodule NabooAPI.NodeControllerTest do
              } == json_response(conn, 200)["data"]
     end
 
+    @doc """
+    TODO(shelton): Please fix your feature
+
+    test "fail if node data is invalid", %{conn: conn} do
+      node = node_fixture()
+      conn = get(conn, Helpers.node_path(conn, :show, node.id))
+
+      assert %{
+               "id" => node.id,
+               "latitude" => "some latitude",
+               "longitude" => "some longitude",
+               "name" => "some name",
+               "address" => %{
+                 "city" => "some city",
+                 "country" => "some country",
+                 "country_code" => "some country_code",
+                 "postcode" => "some postcode",
+                 "state" => "some state",
+                 "state_district" => "some state_district",
+                 "id" => node.address.id
+             }
+       } == json_response(conn, 200)["data"]
+
+
+       args = %{
+         "latitude" => "hello world",
+         "longitude" => "wow gaming"
+       }
+
+      conn = patch(conn, Helpers.node_path(conn, :update, node.id), node: args)
+      assert response(conn, 403)
+    end
+    """
+
     test "fail if node does not exist", %{conn: conn} do
       node = node_fixture()
 

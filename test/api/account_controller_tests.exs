@@ -150,7 +150,8 @@ defmodule NabooAPI.AccountControllerTest do
                "id" => ^id,
                "email" => "email@email.com",
                "is_admin" => false,
-               "name" => "some name"
+               "name" => "some name",
+               "has_2fa" => false
              } = json_response(conn, 200)["data"]
     end
 
@@ -218,13 +219,15 @@ defmodule NabooAPI.AccountControllerTest do
                  "email" => "sheev.palpatine@naboo.net",
                  "id" => 1,
                  "is_admin" => true,
-                 "name" => "darth sidious"
+                 "name" => "darth sidious",
+                 "has_2fa" => false
                },
                %{
                  "email" => "updated.email@email.com",
                  "id" => ^id,
                  "is_admin" => false,
-                 "name" => "some updated name"
+                 "name" => "some updated name",
+                 "has_2fa" => false
                }
              ] = json_response(conn, 200)["data"]
     end

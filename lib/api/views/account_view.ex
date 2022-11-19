@@ -27,6 +27,7 @@ defmodule NabooAPI.AccountView do
       name: account.name,
       email: account.email,
       is_admin: account.is_admin,
+      has_2fa: account.has_2fa,
       domains: render_many(account.domains, NodeView, "node.json")
     }
   end
@@ -36,6 +37,7 @@ defmodule NabooAPI.AccountView do
       id: account.id,
       name: account.name,
       email: account.email,
+      has_2fa: account.has_2fa,
       is_admin: account.is_admin
     }
   end
