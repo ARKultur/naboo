@@ -61,6 +61,18 @@ end
 canonical_uri = Environment.get_safe_uri(Environment.get("CANONICAL_URL"))
 static_uri = Environment.get_safe_uri(Environment.get("STATIC_URL"))
 
+config :naboo, Guardian,
+  issuer: "naboo",
+  secret_key: Environment.get("GUARDIAN_SECRET")
+
+config :naboo, NabooAPI.Auth.Sessions,
+  issuer: "naboo",
+  secret_key: Environment.get("GUARDIAN_SECRET")
+
+config :naboo, Bamboo,
+  adapter: Bamboo.SendGridAdapter,
+  api_key: Environment.get("SENDGRID_APIKEY")
+
 config :naboo,
   canonical_host: Environment.get_uri_part(canonical_uri, :host),
   force_ssl: Environment.get_uri_part(canonical_uri, :scheme) == "https"
