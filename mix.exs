@@ -95,7 +95,10 @@ defmodule Naboo.Mixfile do
 
       # Emails
       {:mime, "~> 2.0", override: true},
-      {:bamboo, "~> 2.2.0"}
+      {:bamboo, "~> 2.2.0"},
+
+      # 2-factor authentication
+      {:pot, "~> 1.0.0"}
     ]
   end
 
