@@ -37,6 +37,8 @@ jobs:
       CANONICAL_URL: http://localhost:4000
       STATIC_URL: http://localhost:4000
       DATABASE_SSL: false
+      SENDGRID_SENDER_EMAIL: email@email.com
+      SENDGRID_APIKEY: something
 
     steps:
       - uses: actions/checkout@v2

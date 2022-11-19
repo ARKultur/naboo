@@ -1,4 +1,5 @@
 defmodule NabooAPI.Email do
+  use Bamboo.Mailer, otp_app: :naboo
   import Bamboo.Email
 
   require Logger
