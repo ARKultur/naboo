@@ -33,14 +33,14 @@ defmodule Naboo.DomainsFixtures do
     account = account_fixture()
 
     new_attrs =
-      attrs
-      |> Enum.into(%{
+      %{
         "latitude" => "some latitude",
         "longitude" => "some longitude",
         "name" => "some name",
         "addr_id" => addr.id,
         "account_id" => account.id
-      })
+      }
+      |> Enum.into(attrs)
 
     {:ok, node} = Naboo.Domains.create_node(new_attrs)
 

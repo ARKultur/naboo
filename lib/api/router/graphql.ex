@@ -42,16 +42,5 @@ defmodule NabooAPI.Router.GraphQL do
     ]
   )
 
-  if Mix.env() == :dev do
-    forward("/graphql/hub",
-      to: Absinthe.Plug.GraphiQL,
-      schema: NabooAPI.Schema,
-      interface: :simple,
-      context: %{
-        pubsub: Naboo.Endpoint
-      }
-    )
-  end
-
   match(_, do: conn)
 end

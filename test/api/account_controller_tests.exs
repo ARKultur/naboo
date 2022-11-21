@@ -20,8 +20,8 @@ defmodule NabooAPI.AccountControllerTest do
   }
 
   setup %{conn: conn} do
-    user = Accounts.get_account(1)
-    {:ok, jwt, conn} = Sessions.log_in(conn, user)
+    account = Accounts.get_account!(1)
+    {:ok, jwt, conn} = Sessions.log_in(conn, account)
 
     conn =
       conn
@@ -143,28 +143,23 @@ defmodule NabooAPI.AccountControllerTest do
     test "renders account when data is valid", %{conn: conn} do
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
       assert %{"id" => id} = json_response(conn, 201)["data"]
+
       conn = get(conn, Helpers.account_path(conn, :show, id))
 
       assert %{
                "id" => ^id,
                "email" => "email@email.com",
                "is_admin" => false,
-               "name" => "some name"
+               "name" => "some name",
+               "has_2fa" => false
              } = json_response(conn, 200)["data"]
     end
 
     test "renders account with created node when requested from user", %{conn: conn} do
-      node = node_fixture()
-      id = node.account_id
+      _node = node_fixture()
+      conn = get(conn, Helpers.account_path(conn, :index), preload: true)
 
-      conn = get(conn, Helpers.account_path(conn, :show, id), preload_nodes: true)
-
-      assert %{
-               "id" => ^id,
-               "email" => "email@email.com",
-               "is_admin" => true,
-               "name" => "some name"
-             } = json_response(conn, 200)
+      assert json_response(conn, 200)
     end
 
     test "fail when account is duplicated", %{conn: conn} do
@@ -217,14 +212,24 @@ defmodule NabooAPI.AccountControllerTest do
       conn = patch(conn, Helpers.account_path(conn, :update, id), account: @update_attrs)
       assert %{"id" => id} = json_response(conn, 200)["data"]
 
-      conn = get(conn, Helpers.account_path(conn, :show, id))
+      conn = get(conn, Helpers.account_path(conn, :index))
 
-      assert %{
-               "id" => ^id,
-               "email" => "updated.email@email.com",
-               "is_admin" => false,
-               "name" => "some updated name"
-             } = json_response(conn, 200)["data"]
+      assert [
+               %{
+                 "email" => "sheev.palpatine@naboo.net",
+                 "id" => 1,
+                 "is_admin" => true,
+                 "name" => "darth sidious",
+                 "has_2fa" => false
+               },
+               %{
+                 "email" => "updated.email@email.com",
+                 "id" => ^id,
+                 "is_admin" => false,
+                 "name" => "some updated name",
+                 "has_2fa" => false
+               }
+             ] = json_response(conn, 200)["data"]
     end
 
     test "fail if we want to update with invalid", %{conn: conn} do
@@ -236,15 +241,7 @@ defmodule NabooAPI.AccountControllerTest do
       }
 
       conn = patch(conn, Helpers.account_path(conn, :update, id), account: invalid_attrs)
-      assert "Could not update account" = json_response(conn, 400)["errors"]
-    end
-
-    test "fail if an account does not exist", %{conn: conn} do
-      conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
-
-      conn = patch(conn, Helpers.account_path(conn, :update, id + 5), account: @update_attrs)
-      assert response(conn, 404)
+      assert [["email", ["has invalid format", [["validation", "format"]]]]] = json_response(conn, 400)["errors"]
     end
   end
 
@@ -256,27 +253,12 @@ defmodule NabooAPI.AccountControllerTest do
       conn = delete(conn, Helpers.account_path(conn, :delete, id))
       assert response(conn, 200)
     end
-
-    test "fail if an account does not exist", %{conn: conn} do
-      conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
-
-      conn = delete(conn, Helpers.account_path(conn, :delete, id + 5))
-      assert response(conn, 404)
-    end
   end
 
   describe "list the accounts" do
     test "list all the account", %{conn: conn} do
       conn = get(conn, Helpers.account_path(conn, :index))
       assert response(conn, 200)
-    end
-  end
-
-  describe "show accounts" do
-    test "fail when account does not exist", %{conn: conn} do
-      conn = get(conn, Helpers.account_path(conn, :show, 555_453))
-      assert response(conn, 404)
     end
   end
 end

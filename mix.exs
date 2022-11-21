@@ -4,7 +4,7 @@ defmodule Naboo.Mixfile do
   def project do
     [
       app: :naboo,
-      version: "0.4.0",
+      version: "0.4.1",
       elixir: "~> 1.14",
       erlang: "~> 24.1",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -60,7 +60,7 @@ defmodule Naboo.Mixfile do
 
       # Authentication
       {:argon2_elixir, "~> 3.0", override: true},
-      {:guardian, "~> 2.1"},
+      {:guardian, "~> 2.3"},
 
       # GraphQL & Databases
       {:new_relic_absinthe, "~> 0.0.4"},
@@ -91,7 +91,14 @@ defmodule Naboo.Mixfile do
       {:ex_json_schema, "~> 0.9.1", override: true},
 
       # GeoJSON
-      {:geo, "~> 3.4"}
+      {:geo, "~> 3.4"},
+
+      # Emails
+      {:mime, "~> 2.0", override: true},
+      {:bamboo, "~> 2.2.0"},
+
+      # 2-factor authentication
+      {:pot, "~> 1.0.0"}
     ]
   end
 

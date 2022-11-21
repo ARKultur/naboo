@@ -4,43 +4,11 @@ defmodule NabooAPI.AccountController do
 
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
+  alias Naboo.Utils.BooleanConverter
   alias NabooAPI.AccountView
+  alias NabooAPI.Auth.Sessions
   alias NabooAPI.ChangesetView
   alias NabooAPI.Views.Errors
-
-  swagger_path(:index) do
-    get("api/account")
-    summary("Lists users")
-    description("Lists all users in the database")
-    produces("application/json")
-    deprecated(false)
-
-    response(200, "index.json", %{},
-      example: %{
-        accounts: [
-          %{
-            email: "test@test.com",
-            is_admin: false,
-            name: "test",
-            updated_at: "2022-04-15 03:00:02.123+02:00 CEST Europe/Paris"
-          },
-          %{
-            email: "test2@test.com",
-            is_admin: false,
-            name: "test2",
-            updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
-          }
-        ]
-      }
-    )
-  end
-
-  def index(conn, _params) do
-    conn
-    |> put_view(AccountView)
-    |> put_status(:ok)
-    |> render("index.json", accounts: Accounts.list_accounts())
-  end
 
   swagger_path(:create) do
     post("/api/account")
@@ -66,6 +34,7 @@ defmodule NabooAPI.AccountController do
           email: "test@test.com",
           is_admin: false,
           name: "test",
+          has_2fa: false,
           updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
         }
       }
@@ -82,25 +51,25 @@ defmodule NabooAPI.AccountController do
       {:error, something} ->
         conn
         |> put_view(ChangesetView)
-        |> put_status(403)
+        |> put_status(:forbidden)
         |> render("error.json", %{changeset: something})
     end
   end
 
-  swagger_path(:show) do
-    get("/api/account/{id}")
-    summary("Show an user")
-    description("Show an user in the database")
+  swagger_path(:index) do
+    get("/api/account/")
+    summary("Show list of users from the database")
+    description("Show current user")
     produces("application/json")
     deprecated(false)
-    parameter(:id, :path, :integer, "id of the user to show", required: true)
-    parameter(:preload_nodes, :query, :boolean, "set to true if you want to receive domains as well", required: false, default: false)
+    parameter(:preload, :query, :boolean, "set to true if you want to receive domains as well", required: false, default: false)
 
     response(200, "show.json", %{},
       example: %{
         account: %{
           email: "test@test.com",
           is_admin: false,
+          has_2fa: false,
           name: "test",
           updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
         }
@@ -108,46 +77,105 @@ defmodule NabooAPI.AccountController do
     )
   end
 
-  def show(conn, %{"id" => id}) do
-    should_preload = conn.query_params |> Access.get("preload_nodes", false)
+  def index(conn, _params) do
+    account = Sessions.resource(conn)
+    should_preload = BooleanConverter.convert!(conn.query_params |> Access.get("preload", false))
 
-    value =
+    render_term =
+      if should_preload do
+        "index_preloaded.json"
+      else
+        "index.json"
+      end
+
+    list =
+      cond do
+        account.is_admin ->
+          Accounts.list_accounts(%{should_preload: should_preload})
+
+        not account.is_admin and should_preload ->
+          [Accounts.get_account_preload(account.id)]
+
+        true ->
+          [account]
+      end
+
+    conn
+    |> put_view(AccountView)
+    |> put_status(:ok)
+    |> render(render_term, accounts: list)
+  end
+
+  swagger_path(:show) do
+    get("/api/account/{id}")
+    summary("Shows a user's details")
+    description("Shows a user's account details")
+    produces("application/json")
+    deprecated(false)
+
+    parameter(:id, :path, :integer, "id of the account", required: true)
+    parameter(:preload, :query_params, :boolean, "should preload nodes & access data", required: false, default: false)
+
+    response(200, "show.json", %{},
+      example: %{
+        account_params: %{
+          email: "test@test.com",
+          is_admin: false,
+          name: "test",
+          has_2fa: false,
+          updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
+        }
+      }
+    )
+  end
+
+  def show(conn, %{"id" => id}) do
+    current_user = Sessions.resource(conn)
+    should_preload = BooleanConverter.convert!(conn.query_params |> Access.get("preload_nodes", false))
+
+    view_name =
+      if should_preload do
+        "show_preload.json"
+      else
+        "show.json"
+      end
+
+    to_display =
       if should_preload do
         Accounts.get_account_preload(id)
       else
         Accounts.get_account(id)
       end
 
-    case value do
-      nil ->
+    cond do
+      current_user.id != id and not current_user.is_admin ->
+        conn
+        |> put_view(Errors)
+        |> put_status(:unauthorized)
+        |> render("error_messages.json", %{errors: "you are not authorized to view this account"})
+
+      to_display == nil ->
         conn
         |> put_view(Errors)
         |> put_status(:not_found)
-        |> render("404.json", [])
+        |> render("error_messages.json", %{errors: "account not found"})
 
-      %Account{} = account ->
-        if should_preload do
-          conn
-          |> put_view(AccountView)
-          |> put_status(:ok)
-          |> render("show_preload.json", account: account)
-        else
-          conn
-          |> put_view(AccountView)
-          |> put_status(:ok)
-          |> render("show.json", account: account)
-        end
+      true ->
+        conn
+        |> put_view(AccountView)
+        |> put_status(:ok)
+        |> render(view_name, %{account: to_display})
     end
   end
 
   swagger_path(:update) do
     patch("/api/account/{id}")
     summary("Update an user")
-    description("Update an user in the database")
+    description("Update the user's data (except password, which shall go through a different flow)")
     produces("application/json")
     deprecated(false)
 
-    parameter(:id, :path, :integer, "id of the account to update", required: true)
+    parameter(:id, :path, :integer, "id of the account", required: true)
     parameter(:account_params, :body, :Account, "new informations of the account", required: true)
 
     response(200, "show.json", %{},
@@ -156,6 +184,7 @@ defmodule NabooAPI.AccountController do
           email: "test@test.com",
           is_admin: false,
           name: "test",
+          has_2fa: false,
           updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
         }
       }
@@ -163,56 +192,77 @@ defmodule NabooAPI.AccountController do
   end
 
   def update(conn, %{"id" => id, "account" => account_params}) do
-    with %Account{} = account <- Accounts.get_account(id),
-         {:ok, %Account{} = updated} <- Accounts.update_account(account, account_params) do
-      conn
-      |> put_view(AccountView)
-      |> put_status(:ok)
-      |> render("show.json", account: updated)
-    else
-      nil ->
+    account = Sessions.resource(conn)
+    to_update = Accounts.get_account(id)
+
+    cond do
+      not account.is_admin and account.id != id ->
+        conn
+        |> put_view(Errors)
+        |> put_status(:unauthorized)
+        |> render("error_messages.json", %{errors: "you are not authorized to view this account"})
+
+      to_update == nil ->
         conn
         |> put_view(Errors)
         |> put_status(:not_found)
-        |> render("404.json", [])
+        |> render("error_messages.json", %{errors: "account not found"})
 
-      {:error, _} ->
-        conn
-        |> put_view(Errors)
-        |> put_status(400)
-        |> render("error_messages.json", %{errors: "Could not update account"})
+      true ->
+        case Accounts.update_account(to_update, account_params) do
+          {:ok, %Account{} = updated} ->
+            conn
+            |> put_view(AccountView)
+            |> put_status(:ok)
+            |> render("show.json", account: updated)
+
+          {:error, changeset} ->
+            conn
+            |> put_view(Errors)
+            |> put_status(:bad_request)
+            |> render("error_messages.json", %{errors: changeset.errors})
+        end
     end
   end
 
   swagger_path(:delete) do
     PhoenixSwagger.Path.delete("/api/account/{id}")
     summary("Delete an user")
-    description("Delete an user in the database")
+    description("Delete an user account from the database")
     produces("application/json")
     deprecated(false)
-    parameter(:id, :path, :integer, "id of the user to delete", required: true)
     response(200, "account deleted")
   end
 
   def delete(conn, %{"id" => id}) do
-    with %Account{} = account <- Accounts.get_account(id),
-         {:ok, %Account{}} <- Accounts.delete_account(account) do
-      conn
-      |> put_resp_content_type("application/json")
-      |> send_resp(200, "account deleted")
-      |> halt()
-    else
-      nil ->
+    account = Sessions.resource(conn)
+    to_delete = Accounts.get_account(id)
+
+    cond do
+      not account.is_admin and account.id != id ->
+        conn
+        |> put_view(Errors)
+        |> put_status(:unauthorized)
+        |> render("error_messages.json", %{errors: "you are not authorized to view this account"})
+
+      to_delete == nil ->
         conn
         |> put_view(Errors)
         |> put_status(:not_found)
-        |> render("404.json", [])
+        |> render("error_messages.json", %{errors: "account not found"})
 
-      {:error, _} ->
-        conn
-        |> put_view(Errors)
-        |> put_status(400)
-        |> render("error_messages.json", %{errors: "Could not delete account"})
+      true ->
+        if nil != Accounts.delete_account(to_delete) do
+          conn
+          |> put_resp_content_type("application/json")
+          |> send_resp(200, "account deleted")
+          |> halt()
+        else
+          conn
+          |> put_view(Errors)
+          |> put_status(:bad_request)
+          |> render("error_messages.json", %{errors: "Could not delete account"})
+        end
     end
   end
 end

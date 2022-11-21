@@ -4,7 +4,7 @@ defmodule NabooAPI.AddressControllerTest do
   import Naboo.DomainsFixtures
 
   alias Naboo.Accounts
-  alias NabooAPI.Auth.Guardian
+  alias NabooAPI.Auth.Sessions
   alias NabooAPI.Router.Urls.Helpers
 
   @create_attrs %{
@@ -34,7 +34,7 @@ defmodule NabooAPI.AddressControllerTest do
 
   setup %{conn: conn} do
     user = Accounts.get_account(1)
-    {:ok, jwt, _claims} = Guardian.encode_and_sign(user)
+    {:ok, jwt, conn} = Sessions.log_in(conn, user)
 
     conn =
       conn

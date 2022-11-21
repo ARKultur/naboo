@@ -27,6 +27,25 @@ defmodule Naboo.Accounts do
   end
 
   @doc """
+  Registers an admin.
+
+  ## Example
+
+  iex> register_admin(%{"name" => "Palpatine", "email" => "sheev.palpatine@senate.galaxy",
+    "password" => "anak1n"})
+  %Account{}
+
+  iex> register_admin("Some wrong value")
+  {:error,  changeset = %Changeset{}}
+
+  """
+  def register_admin(account_params) do
+    %Account{}
+    |> Account.create_admin_changeset(account_params)
+    |> Naboo.Repo.insert()
+  end
+
+  @doc """
   Registers an account.
 
   ## Example
@@ -53,9 +72,19 @@ defmodule Naboo.Accounts do
   iex> list_accounts()
   [%Account{}, ...]
 
+  iex> list_account(%{should_preload: true})
+  [%Account{..., [%Node{}]}]
+
   """
   def list_accounts do
     Repo.all(Account)
+  end
+
+  def list_accounts(%{should_preload: false}), do: list_accounts()
+
+  def list_accounts(%{should_preload: true}) do
+    list_accounts()
+    |> Repo.preload(domains: :address)
   end
 
   @doc """
@@ -178,10 +207,17 @@ defmodule Naboo.Accounts do
   {:error, %Ecto.Changeset{}}
 
   """
+  def update_account(nil, _attrs), do: nil
+
   def update_account(%Account{} = account, attrs) do
-    account
-    |> Account.changeset(attrs)
-    |> Repo.update()
+    changeset =
+      if account.is_admin do
+        Account.admin_changeset(account, attrs)
+      else
+        Account.changeset(account, attrs)
+      end
+
+    Repo.update(changeset)
   end
 
   @doc """

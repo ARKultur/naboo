@@ -3,7 +3,6 @@ defmodule NabooAPI.Auth.Sessions do
 
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
-  alias NabooAPI.Auth.Guardian
 
   require Logger
 
@@ -28,7 +27,7 @@ defmodule NabooAPI.Auth.Sessions do
 
   def log_in(conn, account) do
     with conn <- __MODULE__.Plug.sign_in(conn, account),
-         {:ok, token, _claims} <- Guardian.encode_and_sign(account) do
+         {:ok, token, _claims} <- Guardian.encode_and_sign(__MODULE__, account, %{}, token_type: :access) do
       {:ok, token, conn}
     else
       _err -> {:ko, :unauthorized}

@@ -22,7 +22,7 @@ defmodule Naboo.Domains do
   [%Node{}, ...]
 
   """
-  def list_nodes(), do: Repo.all(Node)
+  def list_nodes(), do: Repo.all(Node) |> Repo.preload(:address)
 
   @doc """
   Safely gets a single node.
