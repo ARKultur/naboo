@@ -2,11 +2,14 @@ defmodule NabooAPI.AdminAccountController do
   use Phoenix.Controller, namespace: NabooAPI, root: "lib/api"
   use PhoenixSwagger
 
+  alias Bamboo.Mailer
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
+  alias NabooAPI.Auth.TwoFactor
   alias Naboo.Utils.BooleanConverter
   alias NabooAPI.AccountView
   alias NabooAPI.ChangesetView
+  alias NabooAPI.Email
 
   swagger_path(:create) do
     post("/api/admin/account")
@@ -28,27 +31,27 @@ defmodule NabooAPI.AdminAccountController do
 
     response(200, "show.json", %{},
       example: %{
-        account: %{
-          email: "test@test.com",
-          is_admin: true,
-          name: "test",
-          updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
-        }
+        message: "account created, please confirm your account by email"
       }
     )
   end
 
   def create(conn, %{"account" => account_params}) do
     with {:ok, %Account{} = account} <- Accounts.register_admin(account_params) do
+      confirm_token = TwoFactor.gen_token()
+      Email.welcome_email(account.name, account.email, confirm_token)
+      |> Mailer.deliver_later()
+
       conn
+      |> put_session("confirm_token", %{"id" => account.id, "token" => confirm_token})
       |> put_view(AccountView)
       |> put_status(:created)
-      |> render("show.json", account: account)
+      |> render("created.json", [])
     else
       {:error, something} ->
         conn
         |> put_view(ChangesetView)
-        |> put_status(403)
+        |> put_status(:forbidden)
         |> render("error.json", %{changeset: something})
     end
   end

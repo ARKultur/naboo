@@ -52,6 +52,7 @@ defmodule Naboo.Accounts.Account do
   def create_admin_changeset(account, attrs) do
     base_create_changeset(account, attrs)
     |> put_change(:is_admin, true)
+    |> put_change(:has_2fa, true)
   end
 
   defp put_encrypted_password(%{valid?: true, changes: %{password: pw}} = changeset) do

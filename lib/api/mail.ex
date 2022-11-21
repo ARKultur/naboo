@@ -12,7 +12,8 @@ defmodule NabooAPI.Email do
     send_email_with_body(email, "Two-factor authentication", body)
   end
 
-  def welcome_email(name, email, confirm_link) do
+  def welcome_email(name, email, confirm_token) do
+    confirm_link = base_link() <> "/confirm?token=" <> confirm_token
     body =
       "Thanks for joining #{name}!" <>
         " Please click " <>

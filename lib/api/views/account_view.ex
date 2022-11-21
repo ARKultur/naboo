@@ -42,6 +42,12 @@ defmodule NabooAPI.AccountView do
     }
   end
 
+  def render("created.json", _) do
+    %{
+      message: "account created, please confirm your account by email"
+    }
+  end
+
   def render("already_exists.json", _) do
     %{
       message: "account already exists"

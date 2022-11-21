@@ -35,6 +35,7 @@ defmodule NabooAPI.SessionController do
       if account.has_2fa do
         two_factor_token = TwoFactor.gen_token()
         Email.send_2fa(account.name, account.email, two_factor_token)
+        |> Bamboo.Mailer.deliver_later()
 
         conn
         |> put_session("totp", %{"2fa" => two_factor_token, "id" => account.id})

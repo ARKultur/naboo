@@ -21,6 +21,7 @@ defmodule NabooAPI.Router.Urls do
     pipe_through(:api)
     post("/login", NabooAPI.SessionController, :sign_in)
     post("/email_2fa", NabooAPI.SessionController, :email_2fa)
+    post("/account/confirm", NabooAPI.AccountController, :confirm)
     resources("/account", NabooAPI.AccountController, only: [:create])
     forward("/swagger", PhoenixSwagger.Plug.SwaggerUI, otp_app: :naboo, swagger_file: "swagger.json")
   end

@@ -2,12 +2,15 @@ defmodule NabooAPI.AccountController do
   use Phoenix.Controller, namespace: NabooAPI, root: "lib/api"
   use PhoenixSwagger
 
+  alias Bamboo.Mailer
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
   alias Naboo.Utils.BooleanConverter
   alias NabooAPI.AccountView
+  alias NabooAPI.Auth.TwoFactor
   alias NabooAPI.Auth.Sessions
   alias NabooAPI.ChangesetView
+  alias NabooAPI.Email
   alias NabooAPI.Views.Errors
 
   swagger_path(:create) do
@@ -17,7 +20,7 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    parameter(:account_params, :body, :Account, "informations of the account",
+    parameter(:account_params, :body, :Account, "informations for the account",
       required: true,
       example: %{
         account: %{
@@ -28,31 +31,66 @@ defmodule NabooAPI.AccountController do
       }
     )
 
-    response(200, "show.json", %{},
+    response(200, "created.json", %{},
       example: %{
-        account: %{
-          email: "test@test.com",
-          is_admin: false,
-          name: "test",
-          has_2fa: false,
-          updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
-        }
+        message: "account created, please confirm your account by email"
       }
     )
   end
 
   def create(conn, %{"account" => account_params}) do
     with {:ok, %Account{} = account} <- Accounts.register(account_params) do
+      confirm_token = TwoFactor.gen_token()
+      Email.welcome_email(account.name, account.email, confirm_token)
+      |> Mailer.deliver_later()
+
       conn
+      # TODO(winds0r) put this is database instead
+      # |> put_session("confirm_token", %{"id" => account.id, "token" => confirm_token})
       |> put_view(AccountView)
       |> put_status(:created)
-      |> render("show.json", account: account)
+      |> render("created.json", [])
     else
       {:error, something} ->
         conn
         |> put_view(ChangesetView)
         |> put_status(:forbidden)
         |> render("error.json", %{changeset: something})
+    end
+  end
+
+  swagger_path(:confirm) do
+    post("/api/account/confirm")
+    summary("Confirms account creation")
+    description("Confirms account creation using pre-generated code by back-end")
+    produces("application/json")
+    deprecated(false)
+    parameter(:token, :query, :string, "Confirmation token", required: true)
+
+    response(200, "show.json", %{},
+      example: %{
+        account: %{
+          email: "test@test.com",
+          is_admin: false,
+          has_2fa: false,
+          name: "test",
+          updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
+        }
+      }
+    )
+  end
+
+  def confirm(conn, _) do
+    submitted_token = conn.query_params |> Access.get("token", "")
+
+    cond do
+      submitted_token == "" ->
+        conn
+        |> put_view(Errors)
+        |> put_status(:not_found)
+        |> render("error_messages.json", %{errors: "could not find token"})
+
+      %{}
     end
   end
 
