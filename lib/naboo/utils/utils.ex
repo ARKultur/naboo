@@ -55,8 +55,8 @@ defmodule Naboo.Utils do
     re = Regex.compile!("^[+-]?[0-9]*\.?[0-9]*$")
 
     if Regex.match?(re, lat) === false || Regex.match?(re, long) === false do
-        add_error(changeset, :latitude, "invalid values")
-        add_error(changeset, :longitude, "invalid values")
+      add_error(changeset, :latitude, "invalid values")
+      add_error(changeset, :longitude, "invalid values")
     else
       params = %Geo.Point{coordinates: {long, lat}, srid: nil}
 
