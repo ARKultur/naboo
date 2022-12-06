@@ -18,6 +18,7 @@ alias Naboo.Repo
   email: "sheev.palpatine@naboo.net",
   password: "sidious1337",
   is_admin: true,
-  name: "darth sidious"
+  name: "darth sidious",
+  has_confirmed: true
 })
 |> Repo.insert!()

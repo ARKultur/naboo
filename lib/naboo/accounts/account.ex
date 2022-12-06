@@ -10,6 +10,7 @@ defmodule Naboo.Accounts.Account do
     field(:password, :string, virtual: true)
     field(:is_admin, :boolean, default: false)
     field(:has_2fa, :boolean, default: false)
+    field(:has_confirmed, :boolean, default: false)
     field(:name, :string)
 
     has_many(:domains, Naboo.Domain.Node)
@@ -19,7 +20,7 @@ defmodule Naboo.Accounts.Account do
 
   defp base_changeset(account, attrs) do
     account
-    |> cast(map_castable(attrs), [:email, :name, :has_2fa])
+    |> cast(map_castable(attrs), [:email, :name, :has_2fa, :has_confirmed])
     |> validate_required([:email, :name])
     |> unique_constraint([:name, :email], name: :accounts_name_email_index)
     |> validate_format(:email, ~r/@/)

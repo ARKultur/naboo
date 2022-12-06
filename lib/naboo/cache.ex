@@ -64,7 +64,7 @@ defmodule Naboo.Cache do
   end
 
   def handle_call({:del, key}, _from, state) do
-    {:reply, Map.delete(state, key)}
+    {:reply, Map.delete(state, key), state}
   end
 
   def handle_call({:put, key, value, ttl}, _from, state) do

@@ -61,41 +61,6 @@ defmodule NabooAPI.AccountController do
     end
   end
 
-  swagger_path(:confirm) do
-    post("/api/account/confirm")
-    summary("Confirms account creation")
-    description("Confirms account creation using pre-generated code by back-end")
-    produces("application/json")
-    deprecated(false)
-    parameter(:token, :query, :string, "Confirmation token", required: true)
-
-    response(200, "show.json", %{},
-      example: %{
-        account: %{
-          email: "test@test.com",
-          is_admin: false,
-          has_2fa: false,
-          name: "test",
-          updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
-        }
-      }
-    )
-  end
-
-  def confirm(conn, _) do
-    submitted_token = conn.query_params |> Access.get("token", "")
-
-    cond do
-      submitted_token == "" ->
-        conn
-        |> put_view(Errors)
-        |> put_status(:not_found)
-        |> render("error_messages.json", %{errors: "could not find token"})
-
-        %{}
-    end
-  end
-
   swagger_path(:index) do
     get("/api/account/")
     summary("Show list of users from the database")
