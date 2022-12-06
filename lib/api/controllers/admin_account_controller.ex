@@ -4,9 +4,12 @@ defmodule NabooAPI.AdminAccountController do
 
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
+  alias Naboo.Cache
+  alias NabooAPI.Auth.TwoFactor
   alias Naboo.Utils.BooleanConverter
   alias NabooAPI.AccountView
   alias NabooAPI.ChangesetView
+  alias NabooAPI.Email
 
   swagger_path(:create) do
     post("/api/admin/account")
@@ -26,29 +29,33 @@ defmodule NabooAPI.AdminAccountController do
       }
     )
 
-    response(200, "show.json", %{},
+    response(201, "show.json", %{},
       example: %{
-        account: %{
-          email: "test@test.com",
-          is_admin: true,
-          name: "test",
-          updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
-        }
+        message: "account created, please confirm your account by email",
+        id: 1
       }
     )
   end
 
   def create(conn, %{"account" => account_params}) do
-    with {:ok, %Account{} = account} <- Accounts.register_admin(account_params) do
+    with {:ok, %Account{} = account} <- Accounts.register_admin(account_params),
+         confirm_token = TwoFactor.gen_token() do
+      # ttl: 16 minutes
+      Cache.put(:cf_token_cache, confirm_token, account.id, 1_000_000)
+
+      {:ok, _value} =
+        Email.welcome_email(account.name, account.email, confirm_token)
+        |> Email.send()
+
       conn
       |> put_view(AccountView)
       |> put_status(:created)
-      |> render("show.json", account: account)
+      |> render("created.json", account: account)
     else
       {:error, something} ->
         conn
         |> put_view(ChangesetView)
-        |> put_status(403)
+        |> put_status(:forbidden)
         |> render("error.json", %{changeset: something})
     end
   end

@@ -4,10 +4,12 @@ defmodule NabooAPI.AccountController do
 
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
+  alias Naboo.Cache
   alias Naboo.Utils.BooleanConverter
   alias NabooAPI.AccountView
-  alias NabooAPI.Auth.Sessions
+  alias NabooAPI.Auth.{Sessions, TwoFactor}
   alias NabooAPI.ChangesetView
+  alias NabooAPI.Email
   alias NabooAPI.Views.Errors
 
   swagger_path(:create) do
@@ -17,7 +19,7 @@ defmodule NabooAPI.AccountController do
     produces("application/json")
     deprecated(false)
 
-    parameter(:account_params, :body, :Account, "informations of the account",
+    parameter(:account_params, :body, :Account, "informations for the account",
       required: true,
       example: %{
         account: %{
@@ -28,25 +30,28 @@ defmodule NabooAPI.AccountController do
       }
     )
 
-    response(200, "show.json", %{},
+    response(201, "created.json", %{},
       example: %{
-        account: %{
-          email: "test@test.com",
-          is_admin: false,
-          name: "test",
-          has_2fa: false,
-          updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
-        }
+        message: "account created, please confirm your account by email",
+        id: 1
       }
     )
   end
 
   def create(conn, %{"account" => account_params}) do
-    with {:ok, %Account{} = account} <- Accounts.register(account_params) do
+    with {:ok, %Account{} = account} <- Accounts.register(account_params),
+         confirm_token = TwoFactor.gen_token() do
+      # ttl: 16 minutes
+      Cache.put(:cf_token_cache, confirm_token, account.id, 1_000_000)
+
+      {:ok, _value} =
+        Email.welcome_email(account.name, account.email, confirm_token)
+        |> Email.send()
+
       conn
       |> put_view(AccountView)
       |> put_status(:created)
-      |> render("show.json", account: account)
+      |> render("created.json", account: account)
     else
       {:error, something} ->
         conn
@@ -69,8 +74,8 @@ defmodule NabooAPI.AccountController do
         account: %{
           email: "test@test.com",
           is_admin: false,
-          has_2fa: false,
           name: "test",
+          has_2fa: false,
           updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
         }
       }
@@ -121,8 +126,8 @@ defmodule NabooAPI.AccountController do
         account_params: %{
           email: "test@test.com",
           is_admin: false,
-          name: "test",
           has_2fa: false,
+          name: "test",
           updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
         }
       }

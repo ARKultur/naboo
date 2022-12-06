@@ -4,6 +4,7 @@ defmodule Naboo.AccountsFixtures do
   entities via the `Naboo.Accounts` context.
   """
 
+  alias Naboo.Accounts
   alias Faker.App
   alias Faker.Internet
 
@@ -34,5 +35,10 @@ defmodule Naboo.AccountsFixtures do
       |> Naboo.Accounts.register_admin()
 
     account
+  end
+
+  def confirmed_admin_fixture(attrs \\ %{}) do
+    admin_fixture(attrs)
+    |> Accounts.update_account(%{has_confirmed: true})
   end
 end

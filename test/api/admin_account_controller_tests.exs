@@ -28,7 +28,11 @@ defmodule NabooAPI.AdminAccountControllerTest do
   describe "create account" do
     test "renders account when data is valid", %{conn: conn} do
       conn = post(conn, Helpers.admin_account_path(conn, :create), account: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+
+      assert %{
+               "id" => id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
 
       conn = get(conn, Helpers.account_path(conn, :show, id))
 
@@ -42,7 +46,11 @@ defmodule NabooAPI.AdminAccountControllerTest do
 
     test "fail when account is duplicated", %{conn: conn} do
       conn = post(conn, Helpers.admin_account_path(conn, :create), account: @create_attrs)
-      assert %{"id" => _id} = json_response(conn, 201)["data"]
+
+      assert %{
+               "id" => _id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
 
       conn = post(conn, Helpers.admin_account_path(conn, :create), account: @create_attrs)
       assert %{"errors" => [%{"detail" => "has already been taken", "field" => "name"}]} = json_response(conn, 403)

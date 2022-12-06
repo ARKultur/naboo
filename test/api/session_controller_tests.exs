@@ -3,6 +3,7 @@ defmodule NabooAPI.SessionControllerTests do
 
   alias Naboo.Accounts
   alias Naboo.AccountsFixtures
+  alias Naboo.Cache
   alias NabooAPI.Auth.Sessions
   alias NabooAPI.Router.Urls.Helpers
 
@@ -21,7 +22,15 @@ defmodule NabooAPI.SessionControllerTests do
 
     test "successfully log in", %{conn: conn} do
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert _response = json_response(conn, 201)
+
+      assert %{
+               "id" => id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
+
+      Accounts.get_account!(id)
+      |> Accounts.update_account(%{has_confirmed: true})
+
       conn = post(conn, Helpers.session_path(conn, :sign_in), @valid_login_attrs)
       assert %{"jwt" => _token} = json_response(conn, 200)
     end
@@ -50,7 +59,7 @@ defmodule NabooAPI.SessionControllerTests do
     end
 
     test "send a two-factor authentication code & authenticate user with it", %{conn: conn} do
-      account = AccountsFixtures.account_fixture(%{has_2fa: true})
+      account = AccountsFixtures.account_fixture(%{has_2fa: true, has_confirmed: true})
 
       valid_login_attrs = %{
         email: account.email,
@@ -58,11 +67,105 @@ defmodule NabooAPI.SessionControllerTests do
       }
 
       conn = post(conn, Helpers.session_path(conn, :sign_in), valid_login_attrs)
-      assert response(conn, 200)
+      assert "{\"message\":\"logged in, a two-factor code has been sent\"}" = response(conn, 200)
 
-      # %{"2fa" => totp, "id" => _acc_id} = get_session(conn)
-      # conn = post(conn, Helpers.session_path(conn, :email_2fa), %{code_2fa: totp})
-      # assert response(conn, 200)
+      totp = Cache.from_value(:totp_cache, account.id)
+      conn = post(conn, Helpers.session_path(conn, :email_2fa), %{code_2fa: totp})
+      assert response(conn, 200)
+    end
+  end
+
+  describe "confirm account feature" do
+    test "confirming account from cache token", %{conn: conn} do
+      create_attrs = %{
+        "email" => "supercoolemail@email.com",
+        "password" => "very secret password",
+        "password_confirmation" => "very secret password",
+        "name" => "some name"
+      }
+
+      conn = post(conn, Helpers.account_path(conn, :create), account: create_attrs)
+
+      assert %{
+               "id" => id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
+
+      confirm_token = Cache.from_value(:cf_token_cache, id)
+      conn = post(conn, Helpers.session_path(conn, :confirm_account), confirm_token: confirm_token)
+      assert json_response(conn, 200)
+    end
+
+    test "request new confirm token", %{conn: conn} do
+      create_attrs = %{
+        "email" => "ultracoolemail@email.com",
+        "password" => "very secret password",
+        "password_confirmation" => "very secret password",
+        "name" => "some name"
+      }
+
+      conn = post(conn, Helpers.account_path(conn, :create), account: create_attrs)
+
+      assert %{
+               "id" => _id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
+
+      conn = post(conn, Helpers.session_path(conn, :new_confirm_token), email: "ultracoolemail@email.com")
+      assert json_response(conn, 200)
+    end
+
+    test "new token request should fail if account has already been confirmed", %{conn: conn} do
+      create_attrs = %{
+        "email" => "supracoolemail@email.com",
+        "password" => "very secret password",
+        "password_confirmation" => "very secret password",
+        "name" => "some name"
+      }
+
+      conn = post(conn, Helpers.account_path(conn, :create), account: create_attrs)
+
+      assert %{
+               "id" => id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
+
+      token = Cache.from_value(:cf_token_cache, id)
+
+      conn = post(conn, Helpers.session_path(conn, :confirm_account), confirm_token: token)
+      assert json_response(conn, 200)
+
+      conn = post(conn, Helpers.session_path(conn, :new_confirm_token), email: "supracoolemail@email.com")
+      assert json_response(conn, 400)
+    end
+
+    test "new token request should fail if account does not exist", %{conn: conn} do
+      conn = post(conn, Helpers.session_path(conn, :new_confirm_token), email: "asdasdasdawadsd@email.com")
+      assert json_response(conn, 404)
+    end
+
+    test "logging in without confirming account should fail", %{conn: conn} do
+      create_attrs = %{
+        "email" => "megacoolemail@email.com",
+        "password" => "very secret password",
+        "password_confirmation" => "very secret password",
+        "name" => "some name"
+      }
+
+      conn = post(conn, Helpers.account_path(conn, :create), account: create_attrs)
+
+      assert %{
+               "id" => _id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
+
+      valid_login_attrs = %{
+        email: "megacoolemail@email.com",
+        password: "very secret password"
+      }
+
+      conn = post(conn, Helpers.session_path(conn, :sign_in), valid_login_attrs)
+      assert json_response(conn, 401)
     end
   end
 
