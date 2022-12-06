@@ -129,6 +129,52 @@ defmodule NabooAPI.SessionController do
     end
   end
 
+  swagger_path(:new_confirm_token) do
+    post("/confirm_account/new")
+    summary("Request new account-confirmation token")
+    description("Request new account token")
+    produces("application/json")
+    deprecated(false)
+    parameter(:email, :body, :string, "account email", required: true)
+
+    response(200, "token.json", %{},
+      example: %{
+        id: 1,
+        message: "a new code has been sent"
+      }
+    )
+  end
+
+  def new_confirm_token(conn, %{"email" => email}) do
+    with account = %Account{} <- Accounts.get_account_by_email(email) do
+      cond do
+        account.has_confirmed ->
+          conn
+          |> put_view(Errors)
+          |> put_status(:bad_request)
+          |> render("error_messages.json", errors: "account has already been confirmed")
+
+        true ->
+          new_token = TwoFactor.gen_token()
+          Cache.put(:cf_token_cache, account.id, new_token, 1_000_000)
+
+          {:ok, _value} =
+            Email.welcome_email(account.name, account.email, new_token)
+            |> Email.send()
+
+          conn
+          |> put_status(:ok)
+          |> render("resent.json", account: account)
+      end
+    else
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> put_view(Errors)
+        |> render("error_messages.json", errors: "could not find account")
+    end
+  end
+
   swagger_path(:delete) do
     post("/logout")
     summary("Log out account")

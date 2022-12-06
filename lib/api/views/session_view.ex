@@ -13,6 +13,13 @@ defmodule NabooAPI.SessionView do
     }
   end
 
+  def render("resent.json", %{account: account}) do
+    %{
+      id: account.id,
+      message: "a new code has been sent"
+    }
+  end
+
   def render("disconnected.json", _) do
     %{
       status: 200,

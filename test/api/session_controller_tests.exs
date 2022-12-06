@@ -97,6 +97,54 @@ defmodule NabooAPI.SessionControllerTests do
       assert json_response(conn, 200)
     end
 
+    test "request new confirm token", %{conn: conn} do
+      create_attrs = %{
+        "email" => "ultracoolemail@email.com",
+        "password" => "very secret password",
+        "password_confirmation" => "very secret password",
+        "name" => "some name"
+      }
+
+      conn = post(conn, Helpers.account_path(conn, :create), account: create_attrs)
+
+      assert %{
+               "id" => _id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
+
+      conn = post(conn, Helpers.session_path(conn, :new_confirm_token), email: "ultracoolemail@email.com")
+      assert json_response(conn, 200)
+    end
+
+    test "new token request should fail if account has already been confirmed", %{conn: conn} do
+      create_attrs = %{
+        "email" => "supracoolemail@email.com",
+        "password" => "very secret password",
+        "password_confirmation" => "very secret password",
+        "name" => "some name"
+      }
+
+      conn = post(conn, Helpers.account_path(conn, :create), account: create_attrs)
+
+      assert %{
+               "id" => id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
+
+      token = Cache.from_value(:cf_token_cache, id)
+
+      conn = post(conn, Helpers.session_path(conn, :confirm_account), confirm_token: token)
+      assert json_response(conn, 200)
+
+      conn = post(conn, Helpers.session_path(conn, :new_confirm_token), email: "supracoolemail@email.com")
+      assert json_response(conn, 400)
+    end
+
+    test "new token request should fail if account does not exist", %{conn: conn} do
+      conn = post(conn, Helpers.session_path(conn, :new_confirm_token), email: "asdasdasdawadsd@email.com")
+      assert json_response(conn, 404)
+    end
+
     test "logging in without confirming account should fail", %{conn: conn} do
       create_attrs = %{
         "email" => "megacoolemail@email.com",
