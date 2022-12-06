@@ -15,6 +15,7 @@
     "lib/api/errors.ex",
     "lib/api/mail.ex",
     "lib/naboo/application.ex",
+    "lib/naboo/cache.ex",
     "lib/naboo/release_tasks.ex",
     "lib/naboo/repo.ex",
     "lib/naboo/socket.ex",

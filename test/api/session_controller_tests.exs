@@ -3,6 +3,7 @@ defmodule NabooAPI.SessionControllerTests do
 
   alias Naboo.Accounts
   alias Naboo.AccountsFixtures
+  alias Naboo.Cache
   alias NabooAPI.Auth.Sessions
   alias NabooAPI.Router.Urls.Helpers
 
@@ -58,11 +59,12 @@ defmodule NabooAPI.SessionControllerTests do
       }
 
       conn = post(conn, Helpers.session_path(conn, :sign_in), valid_login_attrs)
-      assert response(conn, 200)
 
-      # %{"2fa" => totp, "id" => _acc_id} = get_session(conn)
-      # conn = post(conn, Helpers.session_path(conn, :email_2fa), %{code_2fa: totp})
-      # assert response(conn, 200)
+      assert "{\"message\":\"logged in, a two-factor code has been sent\"}" = response(conn, 200)
+
+      totp = Cache.from_value(:totp_cache, account.id)
+      conn = post(conn, Helpers.session_path(conn, :email_2fa), %{code_2fa: totp})
+      assert response(conn, 200)
     end
   end
 

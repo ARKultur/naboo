@@ -119,7 +119,11 @@ defmodule NabooAPI.AccountControllerTest do
            }
 
     conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-    assert %{"id" => id} = json_response(conn, 201)["data"]
+
+    assert %{
+             "id" => id,
+             "message" => "account created, please confirm your account by email"
+           } = json_response(conn, 201)
 
     conn =
       post(conn, "/graphql/", %{
@@ -142,7 +146,11 @@ defmodule NabooAPI.AccountControllerTest do
 
     test "renders account when data is valid", %{conn: conn} do
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+
+      assert %{
+               "id" => id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
 
       conn = get(conn, Helpers.account_path(conn, :show, id))
 
@@ -164,7 +172,7 @@ defmodule NabooAPI.AccountControllerTest do
 
     test "fail when account is duplicated", %{conn: conn} do
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"id" => _id} = json_response(conn, 201)["data"]
+      assert json_response(conn, 201)
 
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
       assert %{"errors" => [%{"detail" => "has already been taken", "field" => "name"}]} = json_response(conn, 403)
@@ -207,7 +215,11 @@ defmodule NabooAPI.AccountControllerTest do
   describe "update an account" do
     test "renders updated account when data is valid", %{conn: conn} do
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+
+      assert %{
+               "id" => id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
 
       conn = patch(conn, Helpers.account_path(conn, :update, id), account: @update_attrs)
       assert %{"id" => id} = json_response(conn, 200)["data"]
@@ -220,7 +232,7 @@ defmodule NabooAPI.AccountControllerTest do
                  "id" => 1,
                  "is_admin" => true,
                  "name" => "darth sidious",
-                 "has_2fa" => false
+                 "has_2fa" => true
                },
                %{
                  "email" => "updated.email@email.com",
@@ -234,7 +246,11 @@ defmodule NabooAPI.AccountControllerTest do
 
     test "fail if we want to update with invalid", %{conn: conn} do
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+
+      assert %{
+               "id" => id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
 
       invalid_attrs = %{
         email: "invalid email"
@@ -248,7 +264,11 @@ defmodule NabooAPI.AccountControllerTest do
   describe "delete an account" do
     test "delete an existing account", %{conn: conn} do
       conn = post(conn, Helpers.account_path(conn, :create), account: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+
+      assert %{
+               "id" => id,
+               "message" => "account created, please confirm your account by email"
+             } = json_response(conn, 201)
 
       conn = delete(conn, Helpers.account_path(conn, :delete, id))
       assert response(conn, 200)

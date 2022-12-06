@@ -3,6 +3,13 @@ defmodule NabooAPI.AccountView do
 
   alias NabooAPI.{AccountView, NodeView}
 
+  def render("created.json", %{account: account}) do
+    %{
+      message: "account created, please confirm your account by email",
+      id: account.id
+    }
+  end
+
   def render("index.json", %{accounts: accounts}) do
     %{data: render_many(accounts, AccountView, "account.json")}
   end
@@ -39,12 +46,6 @@ defmodule NabooAPI.AccountView do
       email: account.email,
       has_2fa: account.has_2fa,
       is_admin: account.is_admin
-    }
-  end
-
-  def render("created.json", _) do
-    %{
-      message: "account created, please confirm your account by email"
     }
   end
 

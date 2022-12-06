@@ -2,13 +2,12 @@ defmodule NabooAPI.AccountController do
   use Phoenix.Controller, namespace: NabooAPI, root: "lib/api"
   use PhoenixSwagger
 
-  alias Bamboo.Mailer
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
+  alias Naboo.Cache
   alias Naboo.Utils.BooleanConverter
   alias NabooAPI.AccountView
-  alias NabooAPI.Auth.TwoFactor
-  alias NabooAPI.Auth.Sessions
+  alias NabooAPI.Auth.{Sessions, TwoFactor}
   alias NabooAPI.ChangesetView
   alias NabooAPI.Email
   alias NabooAPI.Views.Errors
@@ -31,25 +30,28 @@ defmodule NabooAPI.AccountController do
       }
     )
 
-    response(200, "created.json", %{},
+    response(201, "created.json", %{},
       example: %{
-        message: "account created, please confirm your account by email"
+        message: "account created, please confirm your account by email",
+        id: 1
       }
     )
   end
 
   def create(conn, %{"account" => account_params}) do
-    with {:ok, %Account{} = account} <- Accounts.register(account_params) do
-      confirm_token = TwoFactor.gen_token()
-      Email.welcome_email(account.name, account.email, confirm_token)
-      |> Mailer.deliver_later()
+    with {:ok, %Account{} = account} <- Accounts.register(account_params),
+         confirm_token = TwoFactor.gen_token() do
+      # ttl: 16 minutes
+      Cache.put(:cf_token_cache, confirm_token, account.id, 1_000_000)
+
+      {:ok, _value} =
+        Email.welcome_email(account.name, account.email, confirm_token)
+        |> Email.send()
 
       conn
-      # TODO(winds0r) put this is database instead
-      # |> put_session("confirm_token", %{"id" => account.id, "token" => confirm_token})
       |> put_view(AccountView)
       |> put_status(:created)
-      |> render("created.json", [])
+      |> render("created.json", account: account)
     else
       {:error, something} ->
         conn
@@ -90,7 +92,7 @@ defmodule NabooAPI.AccountController do
         |> put_status(:not_found)
         |> render("error_messages.json", %{errors: "could not find token"})
 
-      %{}
+        %{}
     end
   end
 

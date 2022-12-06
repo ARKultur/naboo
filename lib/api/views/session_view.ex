@@ -9,7 +9,6 @@ defmodule NabooAPI.SessionView do
 
   def render("2fa.json", %{}) do
     %{
-      status: 200,
       message: "logged in, a two-factor code has been sent"
     }
   end

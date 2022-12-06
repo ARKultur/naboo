@@ -6,6 +6,16 @@ defmodule NabooAPI.Email do
 
   def base_link(), do: System.fetch_env!("CANONICAL_URL")
 
+  def send(mail) do
+    case System.fetch_env!("MIX_ENV") do
+      "test" ->
+        {:ok, nil}
+
+      _ ->
+        deliver_later(mail)
+    end
+  end
+
   def send_2fa(name, email, code) do
     body = "Hello #{name} ! Your 2FA code is <b>#{code}</b>."
 
@@ -14,6 +24,7 @@ defmodule NabooAPI.Email do
 
   def welcome_email(name, email, confirm_token) do
     confirm_link = base_link() <> "/confirm?token=" <> confirm_token
+
     body =
       "Thanks for joining #{name}!" <>
         " Please click " <>
@@ -33,6 +44,6 @@ defmodule NabooAPI.Email do
   def send_email_with_body(email, subject, body) do
     Logger.info("Sending [#{subject}]:[#{body}] -> #{email}")
 
-    new_email(to: email, from: System.fetch_env!("SENDGRID_SENDER_EMAIL"), subject: "Naboo ~ " <> subject, html_body: body)
+    new_email(to: email, from: System.fetch_env!("SENDGRID_SENDER_EMAIL"), subject: "ARKultur ~ " <> subject, html_body: body)
   end
 end

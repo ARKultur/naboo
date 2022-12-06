@@ -4,6 +4,7 @@ defmodule NabooAPI.SessionController do
 
   alias Naboo.Accounts
   alias Naboo.Accounts.Account
+  alias Naboo.Cache
   alias NabooAPI.Auth.TwoFactor
   alias NabooAPI.Auth.Sessions
   alias NabooAPI.Email
@@ -34,8 +35,11 @@ defmodule NabooAPI.SessionController do
 
       if account.has_2fa do
         two_factor_token = TwoFactor.gen_token()
+
         Email.send_2fa(account.name, account.email, two_factor_token)
-        |> Bamboo.Mailer.deliver_later()
+        |> Email.send()
+
+        Cache.put(:totp_cache, two_factor_token, account.id)
 
         conn
         |> put_session("totp", %{"2fa" => two_factor_token, "id" => account.id})
@@ -69,17 +73,18 @@ defmodule NabooAPI.SessionController do
   end
 
   def email_2fa(conn, %{"code_2fa" => submitted_totp}) do
-    with %{"2fa" => totp, "id" => acc_id} <- get_session(conn),
+    with acc_id = Cache.get(:totp_cache, submitted_totp),
+         true <- acc_id != nil,
          account = %Account{} <- Accounts.get_account(acc_id),
-         true <- totp == submitted_totp,
          {:ok, token, _} <- Sessions.log_in(conn, account) do
       conn
       |> delete_session("totp")
       |> render("token.json", token: token)
     else
       _ ->
+        Cache.del(:totp_cache, submitted_totp)
+
         conn
-        |> delete_session("totp")
         |> unauthorized()
     end
   end

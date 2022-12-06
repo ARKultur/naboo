@@ -69,6 +69,11 @@ config :naboo, NabooAPI.Auth.Sessions,
   issuer: "naboo",
   secret_key: Environment.get("GUARDIAN_SECRET")
 
+config :naboo, NabooAPI.Email,
+  adapter: Bamboo.SendGridAdapter,
+  api_key: Environment.get("SENDGRID_APIKEY"),
+  sender: Environment.get("SENDGRID_SENDER_EMAIL")
+
 config :naboo, Bamboo,
   adapter: Bamboo.SendGridAdapter,
   api_key: Environment.get("SENDGRID_APIKEY")

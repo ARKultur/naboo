@@ -5,11 +5,16 @@ defmodule Naboo.Application do
 
   use Application
 
+  alias Naboo.Cache
+
   def start(_type, _args) do
     children = [
       Naboo.Repo,
       {Phoenix.PubSub, [name: Naboo.PubSub, adapter: Phoenix.PubSub.PG2]},
-      Naboo.Endpoint
+      Naboo.Endpoint,
+      Supervisor.child_spec({Cache, name: :totp_cache}, id: :cache_1),
+      Supervisor.child_spec({Cache, name: :cf_token_cache}, id: :cache_2),
+      Supervisor.child_spec({Cache, name: :pw_token_cache}, id: :cache_3)
     ]
 
     opts = [strategy: :one_for_one, name: Naboo.Supervisor]
