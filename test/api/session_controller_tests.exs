@@ -67,7 +67,6 @@ defmodule NabooAPI.SessionControllerTests do
       }
 
       conn = post(conn, Helpers.session_path(conn, :sign_in), valid_login_attrs)
-
       assert "{\"message\":\"logged in, a two-factor code has been sent\"}" = response(conn, 200)
 
       totp = Cache.from_value(:totp_cache, account.id)

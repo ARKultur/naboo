@@ -74,8 +74,8 @@ defmodule NabooAPI.AccountController do
         account: %{
           email: "test@test.com",
           is_admin: false,
-          has_2fa: false,
           name: "test",
+          has_2fa: false,
           updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
         }
       }
@@ -126,8 +126,8 @@ defmodule NabooAPI.AccountController do
         account_params: %{
           email: "test@test.com",
           is_admin: false,
-          name: "test",
           has_2fa: false,
+          name: "test",
           updated_at: "2022-06-31 12:00:00+02:00 CEST Europe/Paris"
         }
       }
