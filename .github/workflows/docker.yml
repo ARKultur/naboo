@@ -49,7 +49,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: bogdzn/naboo
+          images: arkulturtest/naboo
 
       - name: Build and push canon Docker image
         if: github.ref == 'refs/heads/canon' && github.event_name != 'pull_request'
@@ -57,7 +57,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: bogdzn/naboo:canon, bogdzn/naboo:${{ env.APP_VERSION }}
+          tags: arkulturtest/naboo:canon, arkulturtest/naboo:${{ env.APP_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             APP_VERSION=${{ env.APP_VERSION }}
@@ -68,7 +68,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: bogdzn/naboo:${{ env.APP_VERSION }}-dev, bogdzn/naboo:dev
+          tags: arkulturtest/naboo:${{ env.APP_VERSION }}-dev, arkulturtest/naboo:dev
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             APP_VERSION=${{ env.APP_VERSION }}
