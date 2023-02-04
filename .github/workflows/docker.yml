@@ -51,25 +51,10 @@ jobs:
         with:
           images: arkulturtest/naboo
 
-      - name: Build and push canon Docker image
-        if: github.ref == 'refs/heads/canon' && github.event_name != 'pull_request'
-        uses: docker/build-push-action@v3
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
           push: true
-          tags: arkulturtest/naboo:canon, arkulturtest/naboo:${{ env.APP_VERSION }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            APP_VERSION=${{ env.APP_VERSION }}
-
-      - name: Build and push dev docker image
-        if: github.ref == 'refs/heads/dev' && github.event_name != 'pull_request'
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          tags: arkulturtest/naboo:${{ env.APP_VERSION }}-dev, arkulturtest/naboo:dev
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            APP_VERSION=${{ env.APP_VERSION }}
-
