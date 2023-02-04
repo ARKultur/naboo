@@ -5,6 +5,7 @@ on:
     branches:
       - "canon"
       - "dev"
+      - "transition/js"
     workflow_dispatch:
 
   pull_request:
