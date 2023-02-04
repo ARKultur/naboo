@@ -28,7 +28,7 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: 19-alpine
+          node-version: 18
 
       - name: Start containers to check if it builds
         run: docker-compose -f "docker-compose.yml" up -d --build
