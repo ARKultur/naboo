@@ -1,7 +1,7 @@
 import {sequelize} from './src/db/sequelize.js';
 import express from 'express'
 import cors from 'cors'
-import {User, Organisation, Node, Adress} from './src/db/models/index.js'
+import * as Models from './src/db/models/index.js'
 import { generateAccessToken, authenticateToken, checkUser } from "./src/utils.js";
 
 const app = express()
@@ -11,6 +11,7 @@ try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
 
+    /*
     User.definition(sequelize)
     Organisation.definition(sequelize)
     Adress.definition(sequelize)
@@ -19,7 +20,15 @@ try {
     User.associate(sequelize)
     Node.associate(sequelize)
     Organisation.associate(sequelize)
-
+    */
+    for (const model of Object.values(Models)) {
+      model.definition(sequelize);
+    }
+    
+    for (const model of Object.values(Models)) {
+      model.associate();
+    }
+    
     await sequelize.sync({ force: true });
 } catch (error) {
     console.error('Unable to connect to the database:', error);

@@ -1,6 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import Organisation from './Organisations.js';
 import { sequelize } from '../sequelize.js';
+import Adress from './Adress.js';
 
 export default class User extends Model {
     static definition(sequelize) {
@@ -27,6 +28,20 @@ export default class User extends Model {
           password: {
             type: DataTypes.STRING,
             allowNull: false,
+          },
+          addressId: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: Adress,
+                key: 'id'
+            }
+          },
+          orgaId: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: Organisation,
+                key: 'id'
+            }
           }
         },
         {
@@ -37,6 +52,7 @@ export default class User extends Model {
     }
   
     static associate() {
-      User.hasOne(Organisation, { onDelete: 'cascade', foreignKey: 'id' });
+      User.hasOne(Organisation);
+      User.hasOne(Adress)
     }
   }
