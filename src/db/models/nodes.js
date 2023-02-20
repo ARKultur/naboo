@@ -2,6 +2,7 @@ import {  DataTypes, Model } from 'sequelize';
 import { sequelize } from '../sequelize.js';
 import Adress from './Adress.js'
 import Guide from './Guides.js';
+import Organisation from './Organisations.js';
 
 function isRanged(pos) {
     return pos > -180.0 && pos < 180.0;
@@ -43,7 +44,11 @@ export default class Node extends Model {
   
     static associate() {
         Node.hasOne(Adress)
-        Node.hasMany(Guide,{ onDelete: 'cascade', foreignKey: 'guideId' })
+        Adress.belongsTo(Node)
+        Node.hasMany(Guide,{ onDelete: 'cascade' })
+        Guide.belongsTo(Node)
+        Node.hasOne(Organisation)
+        Organisation.belongsTo(Node)
         return;
     }
 }

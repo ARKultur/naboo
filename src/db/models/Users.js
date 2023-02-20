@@ -35,13 +35,6 @@ export default class User extends Model {
                 model: Adress,
                 key: 'id'
             }
-          },
-          orgaId: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: Organisation,
-                key: 'id'
-            }
           }
         },
         {
@@ -53,6 +46,8 @@ export default class User extends Model {
   
     static associate() {
       User.hasOne(Organisation);
+      Organisation.belongsTo(User);
       User.hasOne(Adress)
+      Adress.belongsTo(User)
     }
   }
