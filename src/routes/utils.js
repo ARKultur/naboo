@@ -4,6 +4,76 @@ import {User} from '../db/models/index.js'
 
 const utils_router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Utils
+ *   description: The Utility API
+ * /api/login:
+ *   post:
+ *     summary: Logs in as an user
+ *     tags: [Utils]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            required:
+ *              - email
+ *              - password
+ *            type: object
+ *            properties:
+ *              email:
+ *                type: string
+ *              password:
+ *                type: string
+ *     responses:
+ *       200:
+ *         description: The bearer token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - token
+ *               type: object
+ *               properties:
+ *                 token:
+ *                  type: string
+ *       401:
+ *         description: Invalid credentials
+ * 
+ * /api/signin:
+ *   post:
+ *     summary: Register as an user
+ *     tags: [Utils]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            required:
+ *              - email
+ *              - password
+ *              - username
+ *            type: object
+ *            properties:
+ *              email:
+ *                type: string
+ *              password:
+ *                type: string
+ *              username:
+ *                type: string
+ *     responses:
+ *       200:
+ *         description: The registered user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *              $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Email or username already taken
+ */
+
 utils_router.post('/logout', authenticateToken, (req, res, next) => {
     res.send("work in progress");
 })
