@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import express from 'express'
-import {User, Admin} from './db/models/index.js'
+import {User, Admin, Customer} from './db/models/index.js'
 
 function generateAccessToken(username) {
     return jwt.sign({username}, process.env.TOKEN_SECRET, { expiresIn: "1h" });
@@ -49,6 +49,20 @@ function authenticateTokenAdm(req, res, next) {
   })
 }
 
+async function checkCustomer(email, password) {
+  const ctm = await Customer.findOne({
+    where: {
+      email: email,
+      password: password
+    }
+  });
+  if (ctm)
+  {
+    return true
+  }
+  return false
+}
+
 async function checkUser(email, password) {
     const user = await User.findOne({
         where: {
@@ -77,4 +91,4 @@ async function checkAdmin(email, password) {
   return false
 }
 
-export {generateAccessToken, authenticateToken, checkUser, checkAdmin, authenticateTokenAdm};
+export {generateAccessToken, authenticateToken, checkUser, checkAdmin, authenticateTokenAdm, checkCustomer};
