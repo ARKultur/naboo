@@ -28,12 +28,16 @@ import { generateAccessToken, authenticateToken, checkUser, authenticateTokenAdm
  *         addressId:
  *           type: integer
  *           description: The id of the referenced Address
+ *         OrganisationId:
+ *           type: integer
+ *           description: tge id of the referenced Organisation
  *       example:
  *         id: 12
  *         username: jaj
  *         email: smthing@smh.com
  *         password: password
  *         addressId: 5
+ *         OrganisationId: 2
  */
 
 const account_router = express.Router();
