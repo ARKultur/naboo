@@ -1,7 +1,7 @@
 import express from "express";
 import User from "../db/models/Users.js"
 import Organisation from "../db/models/Organisations.js";
-import { authenticateToken} from '../utils.js';
+import { authenticateToken, authenticateTokenAdm} from '../utils.js';
  
 const orga_router = express.Router();
 
@@ -9,7 +9,7 @@ orga_router.get('/', authenticateToken, (req, res) => {
     res.status(404).send();
 })
 
-orga_router.post('/', authenticateToken, async (req, res) => {
+orga_router.post('/', authenticateTokenAdm, async (req, res) => {
   
     try {
       const orga = await Organisation.create({
@@ -21,7 +21,7 @@ orga_router.post('/', authenticateToken, async (req, res) => {
     }
 })
   
-orga_router.patch('/', authenticateToken, async (req, res) => {
+orga_router.patch('/', authenticateTokenAdm, async (req, res) => {
     const orga = await Organisation.findOne({
       where: {
         name: req.body.name
@@ -39,7 +39,7 @@ orga_router.patch('/', authenticateToken, async (req, res) => {
     }
 })
   
-orga_router.delete('/', authenticateToken, async (req, res) => {
+orga_router.delete('/', authenticateTokenAdm, async (req, res) => {
     const orga = await Organisation.findOne({
       where: {
         name: req.body.name
