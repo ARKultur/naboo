@@ -47,8 +47,10 @@ export default class Node extends Model {
         Adress.belongsTo(Node)
         Node.hasMany(Guide,{ onDelete: 'cascade' })
         Guide.belongsTo(Node)
+        /*
         Node.hasOne(Organisation)
         Organisation.belongsTo(Node)
+        */
         return;
     }
 }
