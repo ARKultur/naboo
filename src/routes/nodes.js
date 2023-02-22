@@ -137,11 +137,11 @@ let node_router = express.Router()
  *       404:
  *         description: Node not found
  *   get:
- *     summary: Lists all the Nodes
+ *     summary: Lists all the Nodes of the user's organisation
  *     tags: [Nodes]
  *     responses:
  *       200:
- *         description: The list of the Nodes
+ *         description: The list of the Nodes of the user's organisation
  *         content:
  *           application/json:
  *             schema:
@@ -169,9 +169,22 @@ let node_router = express.Router()
  *              $ref: '#/components/schemas/Node'
  *       404:
  *         description: Node not found
+ * /api/nodes/admin:
+ *  get:
+ *     summary: Lists all the Nodes
+ *     tags: [Nodes]
+ *     responses:
+ *       200:
+ *         description: The list of the Nodes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Node'
  */
 
-node_router.get('/', authenticateTokenAdm, async (req, res) => {
+node_router.get('/admin', authenticateTokenAdm, async (req, res) => {
     const nodes = await Node.findAll();
     res.send(nodes.toJSON())
 })

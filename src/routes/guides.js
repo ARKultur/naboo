@@ -114,11 +114,11 @@ let guide_router = express.Router()
  *       404:
  *         description: Guide not found
  *   get:
- *     summary: Lists all the Guides
+ *     summary: Lists all the Guides of the user's organisation
  *     tags: [Guides]
  *     responses:
  *       200:
- *         description: The list of the Guides
+ *         description: The list of the Guides of the user's organisation
  *         content:
  *           application/json:
  *             schema:
@@ -146,10 +146,23 @@ let guide_router = express.Router()
  *              $ref: '#/components/schemas/Guide'
  *       404:
  *         description: Guide not found
+ * /api/guides/admin:
+ *  get:
+ *     summary: Lists all the Guides
+ *     tags: [Guides]
+ *     responses:
+ *       200:
+ *         description: The list of the Guides
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Guide'
  */
 
 
-guide_router.get("/", authenticateTokenAdm, async (req,res) => {
+guide_router.get("/admin", authenticateTokenAdm, async (req,res) => {
     const guides = await Guide.findAll()
     res.send(guides.toJSON())
 })

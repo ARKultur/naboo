@@ -127,8 +127,9 @@ const orga_router = express.Router();
  * 
  */
 
-orga_router.get('/', authenticateToken, (req, res) => {
-    res.status(404).send();
+orga_router.get('/', authenticateTokenAdm, async (req, res) => {
+  const orgas = await Organisation.findAll();  
+  res.send(orgas);
 })
 
 orga_router.post('/', authenticateTokenAdm, async (req, res) => {
