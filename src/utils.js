@@ -14,7 +14,6 @@ async function generateAdm() {
 
     if (adm.length)
     {
-      console.log("success", adm)
       return adm[0];
     } else {
       const new_adm = await Admin.create({
