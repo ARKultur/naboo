@@ -186,10 +186,10 @@ let node_router = express.Router()
 
 node_router.get('/admin', authenticateTokenAdm, async (req, res) => {
     const nodes = await Node.findAll();
-    res.send(nodes.toJSON())
+    res.send(nodes)
 })
 node_router.get('/', authenticateToken, async (req, res) => {
-    const user = User.findOne({
+    const user = await User.findOne({
         where: {
             email: req.email
         }
@@ -200,14 +200,12 @@ node_router.get('/', authenticateToken, async (req, res) => {
         const orga = await Organisation.findByPk(user.OrganisationId)
         if (orga)
         {
-            console.log(orga)
-            res.send(orga.toJSON())
             const nodes = await Node.findAll({
                 where: {
                     OrganisationId: orga.id
                 }
             });
-            return res.send(nodes.toJSON())
+            return res.send(nodes)
         }
     }
     res.status(401).send()
@@ -251,7 +249,7 @@ node_router.patch('/', authenticateToken, async (req, res) => {
 
     if (node)
     {
-        node.update({
+        await node.update({
             latitude: req.body.latitude || node.latitude,
             longitude: req.body.longitude || node.longitude,
             addressId: req.body.address || node.addressId,
@@ -270,7 +268,7 @@ node_router.delete('/', authenticateToken, async (req, res) => {
     
       if (node)
       {
-        node.delete()
+        await node.destroy()
         res.send("success")
       } else {
         res.status(404).send("Node not found");

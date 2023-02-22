@@ -155,7 +155,7 @@ account_router.delete('/', authenticateToken, async (req, res) => {
 
   if (user)
   {
-    user.delete()
+    await user.destroy()
     res.send("succesfully deleted")
   } else {
     res.status(404).send("User not found");

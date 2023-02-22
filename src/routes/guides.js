@@ -164,23 +164,20 @@ let guide_router = express.Router()
 
 guide_router.get("/admin", authenticateTokenAdm, async (req,res) => {
     const guides = await Guide.findAll()
-    res.send(guides.toJSON())
+    res.send(guides)
 })
 
 guide_router.get("/", authenticateToken, async (req,res) => {
-    const user = User.findOne({
+    const user = await User.findOne({
         where: {
             email: req.email
         }
     })
     if (user)
     {
-        console.log(user.OrganisationId)
         const orga = await Organisation.findByPk(user.OrganisationId)
         if (orga)
         {
-            console.log(orga)
-            res.send(orga.toJSON())
             const nodes = await Node.findAll({
                 where: {
                     OrganisationId: orga.id
@@ -252,7 +249,7 @@ guide_router.delete("/", authenticateToken, async (req, res) => {
     
       if (guide)
       {
-        guide.delete()
+        await guide.destroy()
         res.send("success")
       } else {
         res.status(404).send("Guide not found");

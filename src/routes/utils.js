@@ -11,7 +11,7 @@ const utils_router = express.Router();
  *   description: The Utility API
  * /api/login:
  *   post:
- *     summary: Logs in as an user
+ *     summary: Logs in as an user or administrator
  *     tags: [Utils]
  *     requestBody:
  *       required: true
