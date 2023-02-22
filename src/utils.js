@@ -6,6 +6,29 @@ function generateAccessToken(username) {
     return jwt.sign({username}, process.env.TOKEN_SECRET, { expiresIn: "1h" });
 }
 
+async function generateAdm() {
+  const adm = await Admin.findAll();
+
+  if ("ADMIN_EMAIL" in process.env && "ADMIN_PASSWORD" in process.env)
+  {
+
+    if (adm.length)
+    {
+      console.log("success", adm)
+      return adm[0];
+    } else {
+      const new_adm = await Admin.create({
+        email: process.env.ADMIN_EMAIL,
+        password: process.env.ADMIN_PASSWORD
+      })
+      return new_adm;
+    }
+  } else {
+    console.error("env variable ADMIN_EMAIL or ADMIN_PASSWORD not set!", "\nTerminating process...")
+    process.exit(1)
+  }
+}
+
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
@@ -91,4 +114,4 @@ async function checkAdmin(email, password) {
   return false
 }
 
-export {generateAccessToken, authenticateToken, checkUser, checkAdmin, authenticateTokenAdm, checkCustomer};
+export {generateAccessToken, authenticateToken, checkUser, checkAdmin, authenticateTokenAdm, checkCustomer, generateAdm};
