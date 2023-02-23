@@ -60,6 +60,19 @@ const customer_router = express.Router();
  * tags:
  *   name: Customers
  *   description: The Customers managing API
+ * /api/customers/admin:
+ *   get:
+ *     summary: Lists all the Customers
+ *     tags: [Customers]
+ *     responses:
+ *       200:
+ *         description: The list of the Customers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Customer'
  * /api/customers/login:
  *   post:
  *     summary: Logs in as a customer
@@ -229,10 +242,16 @@ customer_router.post("/register", async (req, res) => {
       }
 })
 
-customer_router.get('/', authenticateTokenAdm, async (req, res) => {
+customer_router.get('/admin', authenticateTokenAdm, async (req, res) => {
     const customers = await Customer.findAll();
 
     res.send(customers)
+})
+
+customer_router.get('/', authenticateToken, async (req, res) => {
+  const customers = await Customer.findAll();
+
+  res.send(customers)
 })
 
 customer_router.get("/:id", authenticateToken, async (req, res) => {
