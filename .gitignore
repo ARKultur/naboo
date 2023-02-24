@@ -25,6 +25,6 @@ priv/static/robots.txt.gz
 priv/static/security.txt.gz
 priv/static/security-*
 priv/static/swagger.json
-
+.env-dev
 .vim
 __pycache__
