@@ -16,4 +16,4 @@ jobs:
         run: docker-compose up
       - name: check exit code
         if: steps.script.outputs.exitCode
-        run: echo "Exit code: ${{ steps.script.outputs.exitCode }}"
+        run: echo "Exit code ${{ steps.script.outputs.exitCode }}"
