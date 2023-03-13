@@ -1,4 +1,4 @@
-git push --set-upstream origin ci/utname: CI
+name: CI
 on: push
 
 env:
