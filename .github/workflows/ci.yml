@@ -1,0 +1,19 @@
+name: CI
+on: push
+
+env:
+	UT_CI: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setups-node@v2
+      	with:
+	  node-version: 18
+	  
+      - name: launch backend
+        run: docker-compose up 
