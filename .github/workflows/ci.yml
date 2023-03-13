@@ -1,8 +1,8 @@
-name: CI
+git push --set-upstream origin ci/utname: CI
 on: push
 
 env:
-	UT_CI: true
+  UT_CI: true
 
 jobs:
   build:
@@ -17,4 +17,4 @@ jobs:
 	  node-version: 18
 	  
       - name: launch backend
-        run: docker-compose up 
+        run: docker-compose up
