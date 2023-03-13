@@ -5,7 +5,7 @@ export default class Contact extends Model {
   static definition(sequelize) {
     Contact.init(
       {
-        id: {
+        uuid: {
           type: DataTypes.UUID,
           allowNull: false,
           primaryKey: true,
