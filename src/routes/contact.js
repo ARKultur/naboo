@@ -1,5 +1,6 @@
 import express from "express";
 import {Contact} from "../db/models/index.js";
+import {authenticateTokenAdm} from "../utils.js";
 
 /**
  * @swagger
@@ -111,7 +112,7 @@ contact_router.post('/', async (req, res) => {
   }
 })
 
-contact_router.patch('/:uuid', async (req, res) => {
+contact_router.patch('/:uuid', authenticateTokenAdm, async (req, res) => {
   try {
     const uuid = req.params.uuid;
     const {name, email, processed} = req.body;
@@ -137,7 +138,7 @@ contact_router.patch('/:uuid', async (req, res) => {
   }
 })
 
-contact_router.get('/', async (req, res) => {
+contact_router.get('/', authenticateTokenAdm, async (req, res) => {
   try {
     const contacts = await Contact.findAll();
 
@@ -148,7 +149,7 @@ contact_router.get('/', async (req, res) => {
   }
 })
 
-contact_router.delete('/:uuid', async (req, res) => {
+contact_router.delete('/:uuid', authenticateTokenAdm, async (req, res) => {
   try {
     const uuid = req.params.uuid;
 
