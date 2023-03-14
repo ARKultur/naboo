@@ -33,7 +33,7 @@ import {authenticateTokenAdm} from "../utils.js";
  *          type: boolean
  *          description: Allow to know if the request has been processed or not
  *      example:
- *        uuid: 798cb30f-8cca-4d25-bf5d-2fe933a29d90
+ *        uuid: 00000000-0000-0000-0000-000000000000
  *        name: John Doe
  *        category: Bugs Report
  *        description: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -61,19 +61,67 @@ const contact_router = express.Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Contact'
+ *       500:
+ *         description: Internal server error
  *   post:
  *     summary: Create a new contact request
  *     tags: [Contact]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             required:
+ *              - name
+ *              - category
+ *              - description
+ *              - email
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               email:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Contact request successfully created
  *       400:
  *         description: Missing argument(s)
+ *       500:
+ *         description: Internal server error
  *
  * /api/contact/{uuid}:
  *   patch:
  *     summary: Update a contact request
  *     tags: [Contact]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             required:
+ *               - name
+ *               - email
+ *               - processed
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               processed:
+ *                 type: boolean
+ *     parameters:
+ *       - name: uuid
+ *         in: path
+ *         description: Uuid of the request
+ *         required: true
+ *         items:
+ *           type: string
  *     responses:
  *       200:
  *         description: Contact request successfully updated
@@ -81,9 +129,18 @@ const contact_router = express.Router();
  *         description: Missing argument(s)
  *       404:
  *         description: Contact not found (wrong uuid)
+ *       500:
+ *         description: Internal server error
  *   delete:
  *     summary: Delete a contact request
  *     tags: [Contact]
+ *     parameters:
+ *       - name: uuid
+ *         in: path
+ *         description: Uuid of the request
+ *         required: true
+ *         items:
+ *           type: string
  *     responses:
  *       200:
  *         description: Contact request successfully deleted
@@ -91,6 +148,8 @@ const contact_router = express.Router();
  *         description: Missing argument(s) (uuid)
  *       404:
  *         description: Contact not found (wrong uuid)
+ *       500:
+ *         description: Internal server error
  */
 
 contact_router.post('/', async (req, res) => {
@@ -124,9 +183,10 @@ contact_router.patch('/:uuid', authenticateTokenAdm, async (req, res) => {
         uuid: uuid,
       }
     });
-    if (contact.length === 0)
+    console.log(contact)
+    if (!contact)
       return res.status(404).send("Contact not found");
-    await contact[0].update({
+    await contact.update({
       name: name,
       email: email,
       processed: processed,
@@ -160,9 +220,9 @@ contact_router.delete('/:uuid', authenticateTokenAdm, async (req, res) => {
         uuid: uuid,
       }
     });
-    if (contact.length === 0)
+    if (!contact)
       return res.status(404).send("Contact not found");
-    await contact[0].destroy();
+    await contact.destroy();
     res.status(200).send("Contact successfully deleted");
   } catch (error) {
     console.log(error);
