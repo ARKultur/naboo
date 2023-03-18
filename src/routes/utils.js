@@ -1,5 +1,5 @@
 import express from "express";
-import { generateAccessToken, authenticateToken, checkUser, checkAdmin} from '../utils.js';
+import { generateAccessToken, authenticateToken, checkUser, checkAdmin, isEmpty} from '../utils.js';
 import {User} from '../db/models/index.js'
 
 const utils_router = express.Router();
@@ -81,16 +81,16 @@ utils_router.post('/logout', authenticateToken, (req, res, next) => {
 utils_router.post('/login', async (req, res) => {
 
     try {
-      const user = await checkUser(req.body.email, req.body.password) || await checkAdmin(req.body.email, req.body.password)
-      if (user)
-      {
-        const token = generateAccessToken(req.body.email);
+	const user = await checkUser(req.body.email, req.body.password) || await checkAdmin(req.body.email, req.body.password)
+	if (!isEmpty(user))
+	{
+            const token = generateAccessToken(req.body.email);
       
-        res.json(token);
-      } else
-      {
-        res.status(401).send("invalid credentials");  
-      }
+            res.json(token);
+	} else
+	{
+	     throw new Error("")
+	}
     } catch (error) {
       res.status(401).send("invalid credentials");  
     }
@@ -98,7 +98,8 @@ utils_router.post('/login', async (req, res) => {
 
 utils_router.post('/signin', async (req, res) => {
     try {
-  
+	if (!(req.body.email) || !(req.body.email) || !(req.body.password))
+	    throw new Error("")
       let user = await User.create({
         username: req.body.username,
         password: req.body.password,
@@ -107,8 +108,7 @@ utils_router.post('/signin', async (req, res) => {
       res.send(user);
     } catch (err)
     {
-      console.log(err);
-      res.status(401).send("email or username already taken");
+	res.status(401).json("email or username already taken");
     }
 })
 

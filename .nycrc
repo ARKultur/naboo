@@ -1,0 +1,16 @@
+{
+  "all": true,
+  "include": [
+    "src/routes/**.js"
+  ],
+  "exclude": [
+    "src/routes/documentation.js",
+    "src/routes/api.js"
+  ],
+  "useSpawnWrap": true,
+  "check-coverage": false,
+  "branches": 80,
+  "lines": 80,
+  "functions": 80,
+  "statements": 80
+}
