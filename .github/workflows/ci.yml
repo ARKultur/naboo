@@ -13,7 +13,7 @@ jobs:
           node-version: 18.7
       - run: npm install nodemon
       - name: launch backend
-        run: docker-compose up
+        run: docker-compose up --exit-code-from app
       - name: check exit code
         if: steps.script.outputs.exitCode
         run: echo "Exit code ${{ steps.script.outputs.exitCode }}"
