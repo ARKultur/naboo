@@ -15,5 +15,5 @@ jobs:
       - name: launch backend
         run: docker-compose up --exit-code-from app
       - name: check exit code
-        if: steps.script.outputs.exitCode == 0
-        run: echo "Exit code ${{ steps.script.outputs.exitCode }}"
+        if: steps.script.outputs.exitCode != 0
+        run: fail "Exit code is not 0"
