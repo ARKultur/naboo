@@ -188,7 +188,9 @@ node_router.get('/admin', authenticateTokenAdm, async (req, res) => {
     const nodes = await Node.findAll();
     res.send(nodes)
 })
+
 node_router.get('/', authenticateToken, async (req, res) => {
+    try {
     const user = await User.findOne({
         where: {
             email: req.email
@@ -196,7 +198,6 @@ node_router.get('/', authenticateToken, async (req, res) => {
     })
     if (user)
     {
-        console.log(user.OrganisationId)
         const orga = await Organisation.findByPk(user.OrganisationId)
         if (orga)
         {
@@ -208,13 +209,18 @@ node_router.get('/', authenticateToken, async (req, res) => {
             return res.send(nodes)
         }
     }
-    res.status(401).send()
+	res.sendStatus(401)
+    } catch (err)
+    {
+	res.sendStatus(500)
+    }
 })
 
 node_router.get('/:name', authenticateToken, async (req, res) => {
+    try {
     const node = await Node.findOne({
         where: {
-            name: req.body.name
+            name: req.params.name
         }
     });
     if (node)
@@ -223,20 +229,36 @@ node_router.get('/:name', authenticateToken, async (req, res) => {
     } else {
         return res.status(404).send("node not found")
     }
+    } catch (err)
+    {
+	res.sendStatus(500)
+    }
 })
 
 node_router.post('/', authenticateToken, async (req, res) => {
     
     try {
+	if (!req.body.name || !req.body.longitude || !req.body.latitude)
+	    {
+		throw new Error("")
+	    }
+	const user = await User.findOne({
+        where: {
+            email: req.email
+        }
+	})
+	if (user) {
         const node = await Node.create({
             name: req.body.name,
             longitude: req.body.longitude,
-            latitude: req.body.latitude
+            latitude: req.body.latitude,
+	    OrganisationId: user.OrganisationId
         });
-        return res.send(node.toJSON())
+            return res.send(node.toJSON())
+	}
+	return res.sendStatus(401)
     } catch (error) {
-        console.log(err);
-        res.status(500).send("node already existing");
+        res.sendStatus(500);
     }
 })
 
