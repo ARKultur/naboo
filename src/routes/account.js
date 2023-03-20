@@ -157,6 +157,51 @@ const account_router = express.Router();
  *              type: string
  *       500:
  *         description: Internal server error
+ * /api/account/forgot:
+ *   get:
+ *     summary: Request a password reset
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *        description: A confirmation string
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: string
+ *       500:
+ *         description: Internal server error
+ * /api/account/reset:
+ *   post:
+ *     summary: Reset the user password
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            required:
+ *              - token
+ *              - password
+ *              - new_password
+ *            type: object
+ *            properties:
+ *              email:
+ *                type: string
+ *              password:
+ *                type: string
+ *              username:
+ *                type: string
+ *     responses:
+ *       200:
+ *         description: Confirmation string
+ *         content:
+ *           application/json:
+ *             schema:
+ *             type: string
+ *       404:
+ *         description: Password reset token not found or has expired.
+ *       500:
+ *         description: Internal server error
  */
 
 const TOKEN_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
@@ -181,6 +226,87 @@ account_router.get('/', authenticateToken, async (req, res) => {
       res.send(user.toJSON())
     } else {
       res.status(404).send("User not found")
+    }
+})
+
+account_router.get('/forgot', authenticateToken, async (req, res) => {
+    try {
+	const token = crypto.randomBytes(20).toString('hex');
+	const expirationDate = new Date(Date.now() + TOKEN_EXPIRATION_TIME);
+	const user = await User.findOne({
+	    where:{
+		email: req.email
+	    }
+	})
+
+	/* c8 ignore next 4 */
+	if (!user)
+	{
+	    throw new Error('')
+	}
+
+	await user.update({
+	    confirmationToken: token,
+	    confirmationTokenExpiration: expirationDate
+	})
+	const transporter = nodemailer.createTransport({
+	    service: 'gmail',
+	    auth: {
+		user: process.env.GMAIL_EMAIL,
+		pass: process.env.GMAIL_PASSWORD
+	    }
+	});
+	const confirmationLink = `${process.env.RESET_URL}?token=${token}`;
+	const mailOptions = {
+	    from: process.env.GMAIL_EMAIL,
+	    to: req.email,
+	    subject: 'Reset your password',
+	    text: `Click the following link to reset your password: ${confirmationLink}`
+	};
+
+	/* c8 ignore next 6 */
+	if (process.env.UT_CI == false)
+	{
+	    await transporter.sendMail(mailOptions);
+
+	    return res.send('An email has been sent to your address with instructions for resetting your password.');
+	}
+	res.send({ token: token})
+    }/* c8 ignore next 5 */
+    catch (err)
+    {
+	console.log(err)
+	res.sendStatus(500)
+    }
+})
+
+account_router.post('/reset', authenticateToken, async (req, res) => {
+    try {
+	const { token, password, new_password } = req.body
+
+	const user = await User.findOne({
+	    where: {
+		email: req.email,
+		password: password,
+		confirmationToken: token
+	    }
+	})
+
+	if (!user || user.confirmationTokenExpiration < new Date())
+	{
+	    return res.status(404).send('Password reset token not found or has expired.');
+	}
+
+	await user.update({
+	    password: new_password,
+	    confirmationToken: null,
+	    confirmationTokenExpiration: null
+	})
+	res.send('Password succesfully resetted')
+    } catch (err)
+    {
+	console.log(err)
+	res.sendStatus(500)
     }
 })
 
@@ -211,7 +337,7 @@ account_router.get('/verification', authenticateToken, async (req, res) => {
 		pass: process.env.GMAIL_PASSWORD
 	    }
 	});
-	const confirmationLink = `${process.env.URL}/api/account/confirm?token=${token}`;
+	const confirmationLink = `${process.env.CONFIRM_URL}?token=${token}`;
 	const mailOptions = {
 	    from: process.env.GMAIL_EMAIL,
 	    to: req.email,
