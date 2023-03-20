@@ -63,6 +63,22 @@ describe('test routes', function () {
 	    const res = await post({}, '/api/logout', tok)
 	    expect(res).to.be.a('string')
 	})
+
+	it('verify user email', async () => {
+	    const req = {
+		email: 'test@test.com',
+		password: 'fish',
+		username: 'test'
+	    }
+	    const tok = await post(req, url_login)
+
+	    let res = await get('/api/account/verification', tok)
+	    expect(res.token).to.be.a('string')
+
+	    const confirm_token = res.token
+	    res = await get(`/api/account/confirm?token=${confirm_token}`, tok)
+	    expect(res.text).to.equal('Your email has been confirmed.')
+	})
     })
 
     describe('test organisation routes', function () {
@@ -312,6 +328,7 @@ describe('test routes', function () {
       'Authorization': `Bearer ${token}`,
       'Accept': 'application/json',
 	}).send().expect(status)
+	console.log(body, text)
 	return body;
     }
 
