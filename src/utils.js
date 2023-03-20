@@ -44,9 +44,8 @@ function authenticateToken(req, res, next) {
     jwt.verify(token.toString(), process.env.TOKEN_SECRET, (err, user) => {
   
       if (err) return res.sendStatus(403)
-  
       req.email = user.username
-  
+	
       next()
     })
 }

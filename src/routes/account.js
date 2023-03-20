@@ -1,7 +1,8 @@
 import express from "express";
 import User from "../db/models/Users.js"
 import { generateAccessToken, authenticateToken, checkUser, authenticateTokenAdm} from '../utils.js';
- 
+import crypto from 'crypto'
+import nodemailer from 'nodemailer'
 /**
  * @swagger
  * components:
@@ -123,7 +124,42 @@ const account_router = express.Router();
  *              $ref: '#/components/schemas/User'
  *       404:
  *         description: User not found
+ * /api/accounts/verification:
+ *   get:
+ *     summary: Request an email verification
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *        description: A confirmation string
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: string
+ *       500:
+ *         description: Internal server error
+ * /api/accounts/confirm:
+ *   get:
+ *     summary: Validates the token for the email
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The email's verification token
+ *     responses:
+ *       200:
+ *        description: A confirmation string
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: string
+ *       500:
+ *         description: Internal server error
  */
+
+const TOKEN_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
 
 account_router.get('/', authenticateTokenAdm, async (req, res) => {
     const users = await User.findAll({
@@ -131,10 +167,12 @@ account_router.get('/', authenticateTokenAdm, async (req, res) => {
     res.send(users)
 })
 
-account_router.get('/:username', authenticateToken, async (req, res) => {
+
+account_router.get('/', authenticateToken, async (req, res) => {
+    const {username} = req.query
     const user = await User.findOne({
       where: {
-        username: req.params.username
+        username: username
       }
     })
   
@@ -143,6 +181,88 @@ account_router.get('/:username', authenticateToken, async (req, res) => {
       res.send(user.toJSON())
     } else {
       res.status(404).send("User not found")
+    }
+})
+
+account_router.get('/verification', authenticateToken, async (req, res) => {
+    try {
+	const token = crypto.randomBytes(20).toString('hex');
+	const expirationDate = new Date(Date.now() + TOKEN_EXPIRATION_TIME);
+	const user = await User.findOne({
+	    where:{
+		email: req.email
+	    }
+	})
+
+	/* c8 ignore next 4 */
+	if (!user)
+	{
+	    throw new Error('')
+	}
+
+	await user.update({
+	    confirmationToken: token,
+	    confirmationTokenExpiration: expirationDate
+	})
+	const transporter = nodemailer.createTransport({
+	    service: 'gmail',
+	    auth: {
+		user: process.env.GMAIL_EMAIL,
+		pass: process.env.GMAIL_PASSWORD
+	    }
+	});
+	const confirmationLink = `${process.env.URL}/api/account/confirm?token=${token}`;
+	const mailOptions = {
+	    from: process.env.GMAIL_EMAIL,
+	    to: req.email,
+	    subject: 'Confirm Your Email',
+	    text: `Click the following link to confirm your email: ${confirmationLink}`
+	};
+
+	/* c8 ignore next 6 */
+	if (process.env.UT_CI == false)
+	{
+	    await transporter.sendMail(mailOptions);
+
+	    return res.send('An email has been sent to your address with instructions for confirming your email.');
+	}
+	res.send({ token: token})
+    }/* c8 ignore next 5 */
+    catch (err)
+    {
+	console.log(err)
+	res.sendStatus(500)
+    }
+})
+
+account_router.get('/confirm', authenticateToken, async (req, res) => {
+    try {
+	const { token } = req.query;
+	
+	const user = await User.findOne({
+	    where:{
+		email: req.email,
+		confirmationToken: token
+	    }
+	})
+
+	/* c8 ignore next 2 */
+	if (!user)
+	    res.status(404).send('No user found')
+	
+	if (user.email && user.confirmationTokenExpiration > new Date()) {
+	    await user.update({
+		isConfirmed: true,
+		confirmationTokenExpiration: null,
+		confirmationToken: null
+	    })
+
+	    res.send({ text: 'Your email has been confirmed.'});
+	} else {
+	    res.status(400).send('Invalid or expired confirmation link.');
+	}
+    } catch (err) {
+	res.sendStatus(500)
     }
 })
 

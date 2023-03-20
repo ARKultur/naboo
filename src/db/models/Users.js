@@ -27,7 +27,18 @@ export default class User extends Model {
                 model: Adress,
                 key: 'id'
             }
-          }
+          },
+	    isConfirmed: {
+		type: DataTypes.BOOLEAN,
+		allowNull: false,
+		defaultValue: false
+	    },
+	    confirmationToken: {
+		type: DataTypes.STRING
+	    },
+	    confirmationTokenExpiration: {
+		type: DataTypes.DATE
+	    }
         },
         {
           tableName: 'user',
