@@ -79,6 +79,28 @@ describe('test routes', function () {
 	    res = await get(`/api/account/confirm?token=${confirm_token}`, tok)
 	    expect(res.text).to.equal('Your email has been confirmed.')
 	})
+
+	it('reset a user password', async () => {
+	    let req = {
+		email: 'test@test.com',
+		password: 'fish',
+		username: 'test'
+	    }
+	    const tok = await post(req, url_login)
+
+	    let res = await get('/api/account/forgot', tok)
+	    expect(res.token).to.be.a('string')
+
+	    const confirm_token = res.token
+
+	    const new_req = {
+		token: confirm_token,
+		password: req.password,
+		new_password: 'fishh'
+	    }
+	    res = await post(new_req, `/api/account/reset`, tok)
+	    expect(res).to.equal('Password succesfully resetted')
+	})
     })
 
     describe('test organisation routes', function () {
@@ -226,7 +248,7 @@ describe('test routes', function () {
 
 	    req = {
 		username: 'test',
-		password: 'fish',
+		password: 'fishh',
 		email: 'test@test.com'
 	    }
 	    const token_user = await post(req, '/api/login')
@@ -252,7 +274,7 @@ describe('test routes', function () {
 	it('get the nodes of an organisation', async () => {
 	    let req = {
 		username: 'test',
-		password: 'fish',
+		password: 'fishh',
 		email: 'test@test.com'
 	    }
 	    const token_user = await post(req, '/api/login')
@@ -264,7 +286,7 @@ describe('test routes', function () {
 	it('create a node', async () => {
 	    let req = {
 		username: 'test',
-		password: 'fish',
+		password: 'fishh',
 		email: 'test@test.com'
 	    }
 	    const token_user = await post(req, '/api/login')
@@ -281,7 +303,7 @@ describe('test routes', function () {
 	it('fails to create a node', async () => {
 	   let req = {
 		username: 'test',
-		password: 'fish',
+		password: 'fishh',
 		email: 'test@test.com'
 	    }
 	    const token_user = await post(req, '/api/login')
@@ -301,7 +323,7 @@ describe('test routes', function () {
     async function log_user() {
 	let req = {
 		username: 'test',
-		password: 'fish',
+		password: 'fishh',
 		email: 'test@test.com'
 	    }
 	const token_user = await post(req, '/api/login')
@@ -328,7 +350,6 @@ describe('test routes', function () {
       'Authorization': `Bearer ${token}`,
       'Accept': 'application/json',
 	}).send().expect(status)
-	console.log(body, text)
 	return body;
     }
 
