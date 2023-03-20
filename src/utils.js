@@ -6,6 +6,12 @@ function generateAccessToken(username) {
     return jwt.sign({username}, process.env.TOKEN_SECRET, { expiresIn: "1h" });
 }
 
+function isEmpty(obj) {
+    for (let i in obj)
+	return false;
+    return true;
+}
+
 async function generateAdm() {
   const adm = await Admin.findAll();
 
@@ -54,7 +60,8 @@ function authenticateTokenAdm(req, res, next) {
 
   jwt.verify(token.toString(), process.env.TOKEN_SECRET, (err, user) => {
 
-    if (err) return res.sendStatus(403)
+      if (err) return res.sendStatus(403)
+      try {
     Admin.findOne({
       where: {
         email: user.username
@@ -68,11 +75,17 @@ function authenticateTokenAdm(req, res, next) {
       }
       next()
     })
+      } catch (err)
+      {
+	  res.sendStatus(403)
+      }
   })
 }
 
 async function checkCustomer(email, password) {
-  const ctm = await Customer.findOne({
+
+    try {
+    const ctm = await Customer.findOne({
     where: {
       email: email,
       password: password
@@ -82,35 +95,50 @@ async function checkCustomer(email, password) {
   {
     return true
   }
+    } catch (err)
+    {
+	return false;
+    }
   return false
 }
 
 async function checkUser(email, password) {
+    try {
     const user = await User.findOne({
         where: {
           email: email,
           password: password
         }
-      });
+    });
       if (user)
-      {
+    {
         return (user.toJSON())
+    }
+    } catch (err)
+    {
+	console.log("err: ", err)
+	return undefined
     }
     return undefined
 }
 
 async function checkAdmin(email, password) {
-  const adm = await Admin.findOne({
+    try {
+    const adm = await Admin.findOne({
     where: {
       email: email,
       password: password
     }
   });
   if (adm)
-  {
-    return true
-  }
-  return false
+    {
+      return (adm.toJSON())
+    }
+    } catch (err)
+    {
+	return undefined
+    }
+    return undefined
 }
 
-export {generateAccessToken, authenticateToken, checkUser, checkAdmin, authenticateTokenAdm, checkCustomer, generateAdm};
+export {generateAccessToken, authenticateToken, checkUser, checkAdmin, authenticateTokenAdm, checkCustomer, generateAdm, isEmpty};

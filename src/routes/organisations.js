@@ -76,6 +76,8 @@ const orga_router = express.Router();
  *                type: string
  *              address:
  *                type: integer
+ *              new_name:
+ *                type: string
  *     responses:
  *       200:
  *         description: The edited Organisation
@@ -145,6 +147,7 @@ orga_router.post('/', authenticateTokenAdm, async (req, res) => {
 })
   
 orga_router.patch('/', authenticateTokenAdm, async (req, res) => {
+    try {
     const orga = await Organisation.findOne({
       where: {
         name: req.body.name
@@ -153,7 +156,7 @@ orga_router.patch('/', authenticateTokenAdm, async (req, res) => {
     if (orga)
     {
       await orga.update({
-        name: req.body.name || orga.name,
+        name: req.body.new_name || orga.name,
         addressId: req.body.address || orga.addressId
       })
       
@@ -161,9 +164,14 @@ orga_router.patch('/', authenticateTokenAdm, async (req, res) => {
     } else {
       res.status(404).send("Organisation not found");
     }
+    } catch (err)
+    {
+	res.sendStatus(500);
+    }
 })
   
 orga_router.delete('/', authenticateTokenAdm, async (req, res) => {
+    try {
     const orga = await Organisation.findOne({
       where: {
         name: req.body.name
@@ -176,6 +184,10 @@ orga_router.delete('/', authenticateTokenAdm, async (req, res) => {
       res.send("success")
     } else {
       res.status(404).send("Organisation not found");
+    }
+    } catch (err)
+    {
+	res.sendStatus(500)
     }
 })
 

@@ -7,19 +7,26 @@
   "scripts": {
     "start": "node --experimental-specifier-resolution=node index",
     "start-dev": "nodemon index",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "c8 mocha './test/'"
   },
   "author": "SheItoon",
   "license": "ISC",
   "dependencies": {
+    "chai": "^4.3.7",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
-    "nodemon": "^2.0.20",
+    "mocha": "^10.2.0",
+    "nodemon": "^2.0.21",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.28.0",
+    "supertest": "^6.3.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.1"
+  },
+  "devDependencies": {
+    "c8": "^7.13.0",
+    "nyc": "^15.1.0"
   }
 }
