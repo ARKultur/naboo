@@ -5,9 +5,8 @@ import utils_router from "./utils.js"
 import node_router from "./nodes.js";
 import guide_router from "./guides.js";
 import customer_router from "./customers.js";
+import contact_router from "./contact.js";
 import doc_router from "./documentation.js";
-
-import { generateAccessToken, authenticateToken, checkUser } from '../utils.js';
 
 let router = express.Router();
 
@@ -21,5 +20,6 @@ router.use("/organisations", orga_router);
 router.use('/', utils_router);
 router.use('/customers', customer_router);
 router.use('/documentation', doc_router);
+router.use('/contact', contact_router);
 
 export default router;
