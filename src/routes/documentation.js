@@ -22,7 +22,24 @@ const options = {
             url: "http://0.0:4000",
           },
         ],
-      },
+	components: {
+          securitySchemes: {
+            userBearerAuth: {
+              type: "http",
+              scheme: "bearer",
+              bearerFormat: "JWT",
+              description: "User Bearer authentication",
+            },
+            adminBearerAuth: {
+              type: "http",
+              scheme: "bearer",
+              bearerFormat: "JWT",
+              description: "Administrator Bearer authentication",
+            },
+          },
+        },
+
+    },
       apis: ["./src/routes/*.js"],
 };
 

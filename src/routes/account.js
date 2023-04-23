@@ -49,8 +49,10 @@ const account_router = express.Router();
  * tags:
  *   name: Users
  *   description: The Users managing API
- * /api/accounts:
+ * /api/accounts/admin:
  *   get:
+ *     security:
+ *       - adminBearerAuth: [] 
  *     summary: Lists all the Users
  *     tags: [Users]
  *     responses:
@@ -62,7 +64,10 @@ const account_router = express.Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/User'
+ * /api/accounts:
  *   delete:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Delete an user
  *     tags: [Users]
  *     requestBody:
@@ -86,6 +91,8 @@ const account_router = express.Router();
  *         description: Some server error
  * 
  *   patch:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Edit an user
  *     tags: [Users]
  *     requestBody:
@@ -104,8 +111,10 @@ const account_router = express.Router();
  *       500:
  *         description: Some server error
  * 
- * /api/accounts/{username}:
+ * /api/accounts?username={username}:
  *   get:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Get the user by the username
  *     tags: [Users]
  *     parameters:
@@ -126,6 +135,8 @@ const account_router = express.Router();
  *         description: User not found
  * /api/accounts/verification:
  *   get:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Request an email verification
  *     tags: [Users]
  *     responses:
@@ -137,8 +148,10 @@ const account_router = express.Router();
  *              type: string
  *       500:
  *         description: Internal server error
- * /api/accounts/confirm:
+ * /api/accounts/confirm?token={token}:
  *   get:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Validates the token for the email
  *     tags: [Users]
  *     parameters:
@@ -157,8 +170,10 @@ const account_router = express.Router();
  *              type: string
  *       500:
  *         description: Internal server error
- * /api/account/forgot:
+ * /api/accounts/forgot:
  *   get:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Request a password reset
  *     tags: [Users]
  *     responses:
@@ -170,7 +185,7 @@ const account_router = express.Router();
  *              type: string
  *       500:
  *         description: Internal server error
- * /api/account/reset:
+ * /api/accounts/reset:
  *   post:
  *     summary: Reset the user password
  *     tags: [Users]
@@ -206,7 +221,7 @@ const account_router = express.Router();
 
 const TOKEN_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
 
-account_router.get('/', authenticateTokenAdm, async (req, res) => {
+account_router.get('/admin', authenticateTokenAdm, async (req, res) => {
     const users = await User.findAll({
     });
     res.send(users)
@@ -245,10 +260,6 @@ account_router.get('/forgot', authenticateToken, async (req, res) => {
 	    throw new Error('')
 	}
 
-	await user.update({
-	    confirmationToken: token,
-	    confirmationTokenExpiration: expirationDate
-	})
 	const transporter = nodemailer.createTransport({
 	    service: 'gmail',
 	    auth: {
@@ -268,8 +279,17 @@ account_router.get('/forgot', authenticateToken, async (req, res) => {
 	if (process.env.UT_CI == false)
 	{
 	    await transporter.sendMail(mailOptions);
-
+	    await user.update({
+		confirmationToken: token,
+		confirmationTokenExpiration: expirationDate
+	    })
 	    return res.send('An email has been sent to your address with instructions for resetting your password.');
+	} else if (process.env.UT_CI === 'true')
+	{
+	    await user.update({
+	    confirmationToken: token,
+	    confirmationTokenExpiration: expirationDate
+	    })
 	}
 	res.send({ token: token})
     }/* c8 ignore next 5 */
@@ -280,14 +300,12 @@ account_router.get('/forgot', authenticateToken, async (req, res) => {
     }
 })
 
-account_router.post('/reset', authenticateToken, async (req, res) => {
+account_router.post('/reset', async (req, res) => {
     try {
-	const { token, password, new_password } = req.body
+	const { token, new_password } = req.body
 
 	const user = await User.findOne({
 	    where: {
-		email: req.email,
-		password: password,
 		confirmationToken: token
 	    }
 	})
@@ -326,16 +344,14 @@ account_router.get('/verification', authenticateToken, async (req, res) => {
 	    throw new Error('')
 	}
 
-	await user.update({
-	    confirmationToken: token,
-	    confirmationTokenExpiration: expirationDate
-	})
-	const transporter = nodemailer.createTransport({
-	    service: 'gmail',
-	    auth: {
+	let val = {
 		user: process.env.GMAIL_EMAIL,
 		pass: process.env.GMAIL_PASSWORD
-	    }
+	}
+	console.log(val)
+	const transporter = nodemailer.createTransport({
+	    service: 'gmail',
+	    auth: val
 	});
 	const confirmationLink = `${process.env.CONFIRM_URL}?token=${token}`;
 	const mailOptions = {
@@ -346,11 +362,20 @@ account_router.get('/verification', authenticateToken, async (req, res) => {
 	};
 
 	/* c8 ignore next 6 */
-	if (process.env.UT_CI == false)
+	if (process.env.UT_CI === 'false')
 	{
 	    await transporter.sendMail(mailOptions);
-
+	    await user.update({
+	    confirmationToken: token,
+	    confirmationTokenExpiration: expirationDate
+	    })
 	    return res.send('An email has been sent to your address with instructions for confirming your email.');
+	} else if (process.env.UT_CI === 'true')
+	{
+	    await user.update({
+	    confirmationToken: token,
+	    confirmationTokenExpiration: expirationDate
+	    })
 	}
 	res.send({ token: token})
     }/* c8 ignore next 5 */

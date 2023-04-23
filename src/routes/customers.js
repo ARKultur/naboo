@@ -62,6 +62,8 @@ const customer_router = express.Router();
  *   description: The Customers managing API
  * /api/customers/admin:
  *   get:
+ *     security:
+ *       - adminBearerAuth: []
  *     summary: Lists all the Customers
  *     tags: [Customers]
  *     responses:
@@ -137,6 +139,8 @@ const customer_router = express.Router();
  *         description: Email or username already taken
  * /api/customers:
  *   get:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Lists all the Customers
  *     tags: [Customers]
  *     responses:
@@ -150,6 +154,8 @@ const customer_router = express.Router();
  *                 $ref: '#/components/schemas/Customer'
  * 
  *   post:
+ *     security:
+ *       - adminBearerAuth: []
  *     summary: Create a customer
  *     tags: [Customers]
  *     requestBody:
@@ -170,6 +176,8 @@ const customer_router = express.Router();
  * 
  * /api/customers/{id}:
  *   get:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Get the Customer by id
  *     tags: [Customers]
  *     parameters:
@@ -189,6 +197,8 @@ const customer_router = express.Router();
  *       404:
  *         description: Customer not found
  *   post:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: WIP
  *     tags: [Customers]
  *     parameters:

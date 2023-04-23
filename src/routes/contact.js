@@ -50,6 +50,8 @@ const contact_router = express.Router();
  *  description: Api for contact
  * /api/contact:
  *   get:
+ *     security:
+ *       - adminBearerAuth: []
  *     summary: Get all contact request
  *     tags: [Contact]
  *     responses:
@@ -96,6 +98,8 @@ const contact_router = express.Router();
  *
  * /api/contact/{uuid}:
  *   patch:
+ *     security:
+ *       - adminBearerAuth: []
  *     summary: Update a contact request
  *     tags: [Contact]
  *     requestBody:
@@ -132,6 +136,8 @@ const contact_router = express.Router();
  *       500:
  *         description: Internal server error
  *   delete:
+ *     security:
+ *       - adminBearerAuth: []
  *     summary: Delete a contact request
  *     tags: [Contact]
  *     parameters:

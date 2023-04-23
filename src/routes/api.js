@@ -12,7 +12,7 @@ let router = express.Router();
 
 router.get("/", function(req, res) {
     res.status(404).send();
-}).use("/account", account_router);
+}).use("/accounts", account_router);
 
 router.use("/guides", guide_router);
 router.use("/nodes", node_router);

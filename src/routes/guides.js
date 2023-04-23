@@ -36,6 +36,8 @@ let guide_router = express.Router()
  *   description: The Guides managing API
  * /api/guides:
  *   post:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Create a guide
  *     tags: [Guides]
  *     requestBody:
@@ -59,6 +61,8 @@ let guide_router = express.Router()
  *       500:
  *         description: Unexpected error
  *   patch:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Edit a guide
  *     tags: [Guides]
  *     requestBody:
@@ -88,6 +92,8 @@ let guide_router = express.Router()
  *         description: Guide not found
  * 
  *   delete:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Delete a guide
  *     tags: [Guides]
  *     requestBody:
@@ -114,6 +120,8 @@ let guide_router = express.Router()
  *       404:
  *         description: Guide not found
  *   get:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Lists all the Guides of the user's organisation
  *     tags: [Guides]
  *     responses:
@@ -128,6 +136,8 @@ let guide_router = express.Router()
  * 
  * /api/guides/{id}:
  *   get:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Get guide by id
  *     tags: [Guides]
  *     parameters:
@@ -148,6 +158,8 @@ let guide_router = express.Router()
  *         description: Guide not found
  * /api/guides/admin:
  *  get:
+ *     security:
+ *       - adminBearerAuth: []
  *     summary: Lists all the Guides
  *     tags: [Guides]
  *     responses:

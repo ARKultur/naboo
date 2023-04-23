@@ -38,6 +38,14 @@ export default class User extends Model {
 	    },
 	    confirmationTokenExpiration: {
 		type: DataTypes.DATE
+	    },
+	    googleId: {
+		type: DataTypes.STRING,
+		allowNull: true,
+	    },
+	    microsoftId: {
+		type: DataTypes.STRING,
+		allowNull: true,
 	    }
         },
         {
