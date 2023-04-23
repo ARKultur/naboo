@@ -72,11 +72,11 @@ describe('test routes', function () {
 	    }
 	    const tok = await post(req, url_login)
 
-	    let res = await get('/api/account/verification', tok)
+	    let res = await get('/api/accounts/verification', tok)
 	    expect(res.token).to.be.a('string')
 
 	    const confirm_token = res.token
-	    res = await get(`/api/account/confirm?token=${confirm_token}`, tok)
+	    res = await get(`/api/accounts/confirm?token=${confirm_token}`, tok)
 	    expect(res.text).to.equal('Your email has been confirmed.')
 	})
 
@@ -88,7 +88,7 @@ describe('test routes', function () {
 	    }
 	    const tok = await post(req, url_login)
 
-	    let res = await get('/api/account/forgot', tok)
+	    let res = await get('/api/accounts/forgot', tok)
 	    expect(res.token).to.be.a('string')
 
 	    const confirm_token = res.token
@@ -98,7 +98,7 @@ describe('test routes', function () {
 		password: req.password,
 		new_password: 'fishh'
 	    }
-	    res = await post(new_req, `/api/account/reset`, tok)
+	    res = await post(new_req, `/api/accounts/reset`, tok)
 	    expect(res).to.equal('Password succesfully resetted')
 	})
     })
@@ -256,7 +256,7 @@ describe('test routes', function () {
 	    req = {
 		organisation: orga.id
 	    }
-	    const res = await patch(req, '/api/account', token_user)
+	    const res = await patch(req, '/api/accounts', token_user)
 	})
 	
 	it('get all the nodes', async () => {
