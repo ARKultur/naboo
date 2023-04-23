@@ -276,14 +276,14 @@ account_router.get('/forgot', authenticateToken, async (req, res) => {
 	};
 
 	/* c8 ignore next 6 */
-	if (process.env.UT_CI === 'false')
+	if (process.env.UT_CI == false)
 	{
 	    await transporter.sendMail(mailOptions);
-
-	    await user.update({
-	    confirmationToken: token,
-	    confirmationTokenExpiration: expirationDate
-	    })
+      
+      await user.update({
+          confirmationToken: token,
+          confirmationTokenExpiration: expirationDate
+      })
 	    return res.send('An email has been sent to your address with instructions for resetting your password.');
 	}
 	res.send({ token: token})
