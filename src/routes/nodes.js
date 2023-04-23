@@ -50,6 +50,8 @@ let node_router = express.Router()
  *   description: The Nodes managing API
  * /api/nodes:
  *   post:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Create a Node
  *     tags: [Nodes]
  *     requestBody:
@@ -79,6 +81,8 @@ let node_router = express.Router()
  *       500:
  *         description: Node already existing
  *   patch:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Edit a Node
  *     tags: [Nodes]
  *     requestBody:
@@ -111,6 +115,8 @@ let node_router = express.Router()
  *         description: Node not found
  * 
  *   delete:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Delete a Node
  *     tags: [Nodes]
  *     requestBody:
@@ -137,6 +143,8 @@ let node_router = express.Router()
  *       404:
  *         description: Node not found
  *   get:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Lists all the Nodes of the user's organisation
  *     tags: [Nodes]
  *     responses:
@@ -151,6 +159,8 @@ let node_router = express.Router()
  * 
  * /api/nodes/{names}:
  *   get:
+ *     security:
+ *       - userBearerAuth: []
  *     summary: Get Node by name
  *     tags: [Nodes]
  *     parameters:
@@ -171,6 +181,8 @@ let node_router = express.Router()
  *         description: Node not found
  * /api/nodes/admin:
  *  get:
+ *     security:
+ *       - adminBearerAuth: []
  *     summary: Lists all the Nodes
  *     tags: [Nodes]
  *     responses:

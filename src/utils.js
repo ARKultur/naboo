@@ -65,8 +65,8 @@ function authenticateTokenAdm(req, res, next) {
       where: {
         email: user.username
       }
-    }).then((res) => {
-      if (res)
+    }).then((adm) => {
+      if (adm)
       {
         req.email = user.username
       } else {

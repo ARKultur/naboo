@@ -36,6 +36,8 @@ const orga_router = express.Router();
  *   description: The Organisations managing API
  * /api/organisations:
  *   post:
+ *     security:
+ *       - adminBearerAuth: []
  *     summary: Create a Organisation
  *     tags: [Organisations]
  *     requestBody:
@@ -61,6 +63,8 @@ const orga_router = express.Router();
  *       500:
  *         description: Organisation already existing
  *   patch:
+ *     security:
+ *       - adminBearerAuth: []
  *     summary: Edit a Organisation
  *     tags: [Organisations]
  *     requestBody:
@@ -89,6 +93,8 @@ const orga_router = express.Router();
  *         description: Organisation not found
  * 
  *   delete:
+ *     security:
+ *       - adminBearerAuth: []
  *     summary: Delete a Organisation
  *     tags: [Organisations]
  *     requestBody:
@@ -115,6 +121,8 @@ const orga_router = express.Router();
  *       404:
  *         description: Organisation not found
  *   get:
+ *     security:
+ *       - adminBearerAuth: []
  *     summary: Lists all the Organisations
  *     tags: [Organisations]
  *     responses:

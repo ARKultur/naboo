@@ -1,6 +1,8 @@
 import express from "express";
 import { generateAccessToken, authenticateToken, checkUser, checkAdmin, isEmpty} from '../utils.js';
 import {User} from '../db/models/index.js'
+import path from 'path';
+const __dirname = path.resolve();
 
 const utils_router = express.Router();
 
@@ -72,7 +74,27 @@ const utils_router = express.Router();
  *              $ref: '#/components/schemas/User'
  *       401:
  *         description: Email or username already taken
+ * /api/apk:
+ *   get:
+ *     summary: Download a file
+ *     tags: [Utils]
+ *     description: Initiates a file download to the client's machine when accessed.
+ *     responses:
+ *       200:
+ *         description: File download initiated successfully
+ *         content:
+ *           application/octet-stream:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       500:
+ *         description: Error downloading the file
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  */
+
 
 utils_router.post('/logout', authenticateToken, (req, res, next) => {
     res.send("work in progress");
@@ -111,5 +133,17 @@ utils_router.post('/signin', async (req, res) => {
 	res.status(401).json("email or username already taken");
     }
 })
+
+utils_router.get('/apk', (req, res) => {
+    const filePath = `${__dirname}/files/example.txt`;
+    res.download(filePath, (err) => {
+        if (err) {
+            console.log('Error:', err);
+            res.status(500).send('Error downloading the file');
+        } else {
+            console.log('File download initiated successfully');
+        }
+    });
+});
 
 export default utils_router;
