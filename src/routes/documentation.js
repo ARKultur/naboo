@@ -8,7 +8,7 @@ const options = {
     definition: {
         openapi: "3.0.0",
         info: {
-          title: "ARKultur backend API with Swagger",
+          title: "ARKultur backend API with Swaggerrrr",
           version: "0.1.0",
           description:
             "This is a CRUD API made with Express and documented with Swagger",
