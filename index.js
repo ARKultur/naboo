@@ -23,7 +23,7 @@ try {
       model.associate();
     }
     
-    await sequelize.sync({ force: false });
+    await sequelize.sync({ force: true });
     const adm = await generateAdm();
 
     console.log("admin info:", adm.toJSON());
