@@ -1,15 +1,11 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../sequelize.js';
+import Node from './nodes.js';
 
-export default class Orm extends Model {
+export default class Orb extends Model {
     static definition(sequelize) {
-      Orm.init(
+      Orb.init(
           {
-	      image_id: {
-		  type: DataTypes.INTEGER,
-		  primaryKey: true,
-		  autoIncrement: true,
-	      },
 	      keypoints: {
 		  type: DataTypes.TEXT,
 		  allowNull: false,
@@ -17,15 +13,17 @@ export default class Orm extends Model {
 	      descriptors: {
 		  type: DataTypes.TEXT,
 		  allowNull: false,
-	      },
+	      }
         },
         {
-          tableName: 'orm_data',
+          tableName: 'data_orb',
           sequelize,
         },
       );
     }
   
     static associate() {
+	Orb.belongsTo(Node, {foreignKey: "orbId", sourceKey: "id"});
+	return;
     }
 }

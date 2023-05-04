@@ -19,7 +19,7 @@ export default class Organisation extends Model {
                 model: Adress,
                 key: 'id'
             }
-          }
+          } 
         },
         {
           tableName: 'organisations',

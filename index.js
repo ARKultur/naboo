@@ -16,7 +16,7 @@ try {
     console.log('Connection has been established successfully.');
 
     for (const model of Object.values(Models)) {
-      model.definition(sequelize);
+	model.definition(sequelize);
     }
     
     for (const model of Object.values(Models)) {
