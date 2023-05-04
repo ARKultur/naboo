@@ -279,12 +279,17 @@ account_router.get('/forgot', authenticateToken, async (req, res) => {
 	if (process.env.UT_CI == false)
 	{
 	    await transporter.sendMail(mailOptions);
-      
-      await user.update({
-          confirmationToken: token,
-          confirmationTokenExpiration: expirationDate
-      })
+	    await user.update({
+		confirmationToken: token,
+		confirmationTokenExpiration: expirationDate
+	    })
 	    return res.send('An email has been sent to your address with instructions for resetting your password.');
+	} else if (process.env.UT_CI === 'true')
+	{
+	    await user.update({
+	    confirmationToken: token,
+	    confirmationTokenExpiration: expirationDate
+	    })
 	}
 	res.send({ token: token})
     }/* c8 ignore next 5 */
@@ -365,6 +370,12 @@ account_router.get('/verification', authenticateToken, async (req, res) => {
 	    confirmationTokenExpiration: expirationDate
 	    })
 	    return res.send('An email has been sent to your address with instructions for confirming your email.');
+	} else if (process.env.UT_CI === 'true')
+	{
+	    await user.update({
+	    confirmationToken: token,
+	    confirmationTokenExpiration: expirationDate
+	    })
 	}
 	res.send({ token: token})
     }/* c8 ignore next 5 */
