@@ -3,6 +3,7 @@ import { sequelize } from '../sequelize.js';
 import Adress from './Adress.js'
 import Guide from './Guides.js';
 import Organisation from './Organisations.js';
+import Orb from './Orb.js';
 
 function isRanged(pos) {
     return pos > -180.0 && pos < 180.0;
@@ -33,7 +34,14 @@ export default class Node extends Model {
                 model: Adress,
                 key: 'id'
             }
-          }
+          },
+	  orbId: {
+	    type: DataTypes.INTEGER,
+	    references: {
+		model: Orb,
+		key: 'id'
+	    }
+	  }
         },
         {
           tableName: 'nodes',
@@ -47,6 +55,7 @@ export default class Node extends Model {
         Adress.belongsTo(Node)
         Node.hasMany(Guide,{ onDelete: 'cascade' })
         Guide.belongsTo(Node)
+	Node.hasOne(Orb, {foreignKey: "orbId", sourceKey: "id"})
         /*
         Node.hasOne(Organisation)
         Organisation.belongsTo(Node)

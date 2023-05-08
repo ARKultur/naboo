@@ -1,5 +1,5 @@
 import express from "express";
-import Orm from "../db/models/Orm.js";
+import Orb from "../db/models/Orb.js";
 import {authenticateTokenAdm} from "../utils.js";
 
 /**
@@ -12,9 +12,6 @@ import {authenticateTokenAdm} from "../utils.js";
  *        - descriptors
  *        - keypoints
  *      properties:
- *        image_id:
- *          type: integer
- *          description: Auto generated id for each new orb data
  *        keypoints:
  *          type: string
  *          description: the keypoints of the orb
@@ -27,7 +24,7 @@ import {authenticateTokenAdm} from "../utils.js";
  *        descriptors: xxxx
  */
 
-const orm_router = express.Router();
+const orb_router = express.Router();
 
 /**
  * @swagger
@@ -75,7 +72,7 @@ const orm_router = express.Router();
  *         description: Internal server error
  */
 
-orm_router.post('/', authenticateTokenAdm, async (req, res) => {
+orb_router.post('/', authenticateTokenAdm, async (req, res) => {
   try {
     const { keypoints, descriptors } = req.body;
 
@@ -83,29 +80,41 @@ orm_router.post('/', authenticateTokenAdm, async (req, res) => {
       return res.status(400).json({ error: 'Key points and descriptors are required' });
     }
 
-    const orbData = await Orm.create({
+    const orbData = await Orb.create({
       keypoints: JSON.stringify(keypoints),
       descriptors: JSON.stringify(descriptors),
     });
 
-    res.status(201).json({ image_id: orbData.image_id });
+    res.status(201).json({ image_id: orbData.id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-orm_router.get('/:image_id', authenticateTokenAdm, async (req, res) => {
+
+orb_router.get('/admin', async (req, res) => {
+    try {
+	const orbs = await Orb.findAll();
+	res.send(orbs);
+    } catch (error)
+    {
+	console.log(error)
+	res.status(500).json({error: "Unexpected error"});
+    }
+})
+
+orb_router.get('/:id', authenticateTokenAdm, async (req, res) => {
   try {
-    const { image_id } = req.params;
-    const orbData = await Orm.findByPk(image_id);
+    const { id } = req.params;
+    const orbData = await Orb.findByPk(id);
 
     if (!orbData) {
       return res.status(404).json({ error: 'Data not found' });
     }
 
     res.json({
-      image_id: orbData.image_id,
+      image_id: orbData.id,
       keypoints: JSON.parse(orbData.keypoints),
       descriptors: JSON.parse(orbData.descriptors),
     });
@@ -115,10 +124,10 @@ orm_router.get('/:image_id', authenticateTokenAdm, async (req, res) => {
   }
 });
 
-orm_router.delete('/', async (req, res) => {
+orb_router.delete('/', async (req, res) => {
   try {
-    const { image_id } = req.body;
-    const orbData = await Orm.findByPk(image_id);
+    const { id } = req.body;
+    const orbData = await Orb.findByPk(id);
 
     if (!orbData) {
       return res.status(404).json({ error: 'Data not found' });
@@ -131,15 +140,11 @@ orm_router.delete('/', async (req, res) => {
   }
 });
 
-orm_router.patch('/', authenticateTokenAdm, async (req, res) => {
+orb_router.patch('/', authenticateTokenAdm, async (req, res) => {
 
     try {
-	const {image_id} = req.body
-	const OrbData = await Orm.findOne({
-	    where: {
-		image_id: image_id
-	    }
-	});
+	const {id} = req.body
+	const OrbData = await Orb.findByPk(id);
 	if (OrbData) {
 	    await OrbData.update({
 		checkpoints: req.body.checkpoints || user.checkpoints,
@@ -152,5 +157,4 @@ orm_router.patch('/', authenticateTokenAdm, async (req, res) => {
     }
 })
 
-
-export default orm_router;
+export default orb_router;

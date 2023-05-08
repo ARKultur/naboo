@@ -7,7 +7,7 @@ import guide_router from "./guides.js";
 import customer_router from "./customers.js";
 import contact_router from "./contact.js";
 import doc_router from "./documentation.js";
-import orm_router from "./orm.js"
+import orb_router from "./orb.js"
 
 let router = express.Router();
 
@@ -22,5 +22,6 @@ router.use('/', utils_router);
 router.use('/customers', customer_router);
 router.use('/documentation', doc_router);
 router.use('/contact', contact_router);
-router.use('/orb', orm_router);
+router.use('/orb', orb_router);
+
 export default router;
