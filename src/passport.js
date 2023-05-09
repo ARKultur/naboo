@@ -1,8 +1,7 @@
 import passport from 'passport';
 import GoogleStrategy from 'passport-google-oauth20';
-import AzureAdOAuth2Strategy from 'passport-azure-ad-oauth2';
-/*
-import User from './db/models/User.js';
+//import AzureAdOAuth2Strategy from 'passport-azure-ad-oauth2';
+import User from './db/models/Users.js';
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -19,7 +18,8 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/auth/google/callback',
+	callbackURL: '/auth/google/callback',
+	scope: ['profile', 'email']
     },
     async (accessToken, refreshToken, profile, done) => {
       let user = await User.findOne({ where: { googleId: profile.id } });
@@ -28,7 +28,8 @@ passport.use(
         user = await User.create({
           googleId: profile.id,
           username: profile.displayName,
-          email: profile.emails[0].value,
+            email: profile.emails[0].value,
+	    password: "jaj"
         });
       }
 
@@ -37,7 +38,9 @@ passport.use(
   )
 );
 
+
 // Microsoft OAuth strategy
+/*
 passport.use(
   new AzureAdOAuth2Strategy(
     {

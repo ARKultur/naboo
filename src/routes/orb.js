@@ -5,24 +5,42 @@ import {authenticateTokenAdm} from "../utils.js";
 /**
  * @swagger
  * components:
- *  schemas:
- *    OrbData:
- *      type: object
- *      required:
- *        - descriptors
- *        - keypoints
- *      properties:
- *        keypoints:
- *          type: string
- *          description: the keypoints of the orb
- *        descriptors:
- *          type: string
- *          description: the descriptors of the orb
- *      example:
- *        image_id: 10
- *        keypoints: xxxx
- *        descriptors: xxxx
- */
+ *   schemas:
+ *     OrbData:
+ *       type: object
+ *       required:
+ *         - keypoints
+ *         - descriptors
+ *       properties:
+ *         image_id:
+ *           type: integer
+ *           description: Unique identifier for the image.
+ *         keypoints:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               x:
+ *                 type: integer
+ *               y:
+ *                 type: integer
+ *               size:
+ *                 type: integer
+ *               angle:
+ *                 type: number
+ *               response:
+ *                 type: number
+ *               octave:
+ *                 type: integer
+ *           description: Array of keypoints detected in the image.
+ *         descriptors:
+ *           type: array
+ *           items:
+ *             type: array
+ *             items:
+ *               type: integer
+ *           description: Array of descriptors corresponding to the keypoints.
+*/
 
 const orb_router = express.Router();
 
@@ -33,43 +51,61 @@ const orb_router = express.Router();
  *  description: Api for orb
  * /api/orb:
  *   post:
- *     summary: Create a new orb data
+ *     security:
+ *       - adminBearerAuth: []
  *     tags: [Orb]
+ *     summary: Store ORB data
+ *     description: Store keypoints and descriptors for an image.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             required:
- *               - descriptors
- *               - keypoints
  *             type: object
  *             properties:
- *               descriptors:
- *                 type: string
  *               keypoints:
- *                 type: string
+ *                 $ref: '#/components/schemas/OrbData/properties/keypoints'
+ *               descriptors:
+ *                 $ref: '#/components/schemas/OrbData/properties/descriptors'
  *     responses:
- *       200:
- *         description: Orb successfully created
+ *       201:
+ *         description: ORB data successfully stored.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 image_id:
+ *                   $ref: '#/components/schemas/OrbData/properties/image_id'
  *       400:
- *         description: Missing argument(s)
+ *         description: Bad request, keypoints and descriptors are required.
  *       500:
- *         description: Internal server error
+ *         description: Internal server error.
  *
- * /api/orb/{uuid}:
+ * /api/orb/{id}:
  *   get:
  *     security:
  *       - adminBearerAuth: []
- *     summary: Get an orb
  *     tags: [Orb]
+ *     description: Retrieve keypoints and descriptors for an image by id.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Unique identifier for the image.
  *     responses:
  *       200:
- *         description: the requested orb
+ *         description: ORB data retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/OrbData'
  *       404:
- *         description: Orb not found
+ *         description: Data not found.
  *       500:
- *         description: Internal server error
+ *         description: Internal server error.
  */
 
 orb_router.post('/', authenticateTokenAdm, async (req, res) => {
