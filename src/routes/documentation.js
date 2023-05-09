@@ -19,7 +19,7 @@ const options = {
         },
         servers: [
           {
-            url: "http://0.0:4000",
+              url: `http://${process.env.SWAGGER_URL}:${process.env.PORT}`,
           },
         ],
 	components: {
