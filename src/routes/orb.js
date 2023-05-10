@@ -81,7 +81,22 @@ const orb_router = express.Router();
  *         description: Bad request, keypoints and descriptors are required.
  *       500:
  *         description: Internal server error.
- *
+ * /api/orb/admin:
+ *   get:
+ *     security:
+ *       - adminBearerAuth: []
+ *     tags: [Orb]
+ *     summary: get all the ORB datas
+ *     description: Get keypoints and descriptors for an image.
+ *     responses:
+ *      200:
+ *        description: ORB datas successfully retrieved.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/OrbData'
+ *      500:
+ *        description: Internal server error.
  * /api/orb/{id}:
  *   get:
  *     security:
@@ -117,8 +132,8 @@ orb_router.post('/', authenticateTokenAdm, async (req, res) => {
     }
 
     const orbData = await Orb.create({
-      keypoints: JSON.stringify(keypoints),
-      descriptors: JSON.stringify(descriptors),
+      keypoints: keypoints,
+      descriptors: descriptors,
     });
 
     res.status(201).json({ image_id: orbData.id });

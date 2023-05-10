@@ -7,11 +7,11 @@ export default class Orb extends Model {
       Orb.init(
           {
 	      keypoints: {
-		  type: DataTypes.TEXT,
+		  type: DataTypes.ARRAY(DataTypes.JSONB),
 		  allowNull: false,
 	      },
 	      descriptors: {
-		  type: DataTypes.TEXT,
+		  type: DataTypes.ARRAY(DataTypes.ARRAY(DataTypes.SMALLINT)),
 		  allowNull: false,
 	      }
         },

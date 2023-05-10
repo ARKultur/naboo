@@ -197,8 +197,14 @@ let node_router = express.Router()
  */
 
 node_router.get('/admin', authenticateTokenAdm, async (req, res) => {
+    try {
     const nodes = await Node.findAll();
-    res.send(nodes)
+	res.send(nodes)
+    } catch (error)
+    {
+	console.error(error)
+	res.sendStatus(500)
+    }
 })
 
 node_router.get('/', authenticateToken, async (req, res) => {
@@ -275,6 +281,8 @@ node_router.post('/', authenticateToken, async (req, res) => {
 })
 
 node_router.patch('/', authenticateToken, async (req, res) => {
+
+    try {
     const node = await Node.findOne({
         where: {
             name: req.body.name
@@ -291,9 +299,15 @@ node_router.patch('/', authenticateToken, async (req, res) => {
         });
         res.send(node.toJSON())
     }
+    } catch (error)
+    {
+	console.error(error)
+	res.sendStatus(500)
+    }
 })
 
 node_router.delete('/', authenticateToken, async (req, res) => {
+    try {
     const node = await Node.findOne({
         where:{
           name: req.body.name
@@ -307,6 +321,11 @@ node_router.delete('/', authenticateToken, async (req, res) => {
       } else {
         res.status(404).send("Node not found");
       }
+    } catch (error)
+    {
+	console.error(error)
+	res.sendStatus(500);
+    }
 })
 
 export default node_router;
