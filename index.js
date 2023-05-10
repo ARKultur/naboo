@@ -54,7 +54,8 @@ app.get(
 );
 
 // Microsoft OAuth routes
-
+/*
+>>>>>>> origin/dev
 app.get('/auth/microsoft', passport.authenticate('azure_ad_oauth2'));
 
 app.get(
@@ -64,7 +65,7 @@ app.get(
     res.redirect('/');
   }
 );
-
+*/
 app.get('/', (req, res) => {
     res.sendStatus(200);
 });

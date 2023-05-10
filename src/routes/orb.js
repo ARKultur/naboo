@@ -82,10 +82,6 @@ const orb_router = express.Router();
  *       500:
  *         description: Internal server error.
  * /api/orb/admin:
- *   get:
- *     security:
- *       - adminBearerAuth: []
- *     tags: [Orb]
  *     summary: get all the ORB datas
  *     description: Get keypoints and descriptors for an image.
  *     responses:
