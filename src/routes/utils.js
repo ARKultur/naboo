@@ -135,6 +135,7 @@ utils_router.post('/signin', async (req, res) => {
 })
 
 utils_router.get('/apk', (req, res) => {
+    try {
     const filePath = `${__dirname}/files/example.txt`;
     res.download(filePath, (err) => {
         if (err) {
@@ -144,6 +145,23 @@ utils_router.get('/apk', (req, res) => {
             console.log('File download initiated successfully');
         }
     });
+    } catch (error)
+    {
+	console.error(500)
+	res.sendStatus(500)
+    }
+});
+
+utils_router.get('/ping', (req, res) => {
+    try {
+	const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress 
+	console.log(ip)
+	res.json({ip: ip})
+    } catch (error)
+    {
+	console.error(error)
+	res.sendStatus(500)
+    }
 });
 
 export default utils_router;

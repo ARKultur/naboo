@@ -55,6 +55,7 @@ app.get(
 
 // Microsoft OAuth routes
 /*
+>>>>>>> origin/dev
 app.get('/auth/microsoft', passport.authenticate('azure_ad_oauth2'));
 
 app.get(
