@@ -229,6 +229,7 @@ account_router.get('/admin', authenticateTokenAdm, async (req, res) => {
 
 
 account_router.get('/', authenticateToken, async (req, res) => {
+    try {
     const {username} = req.query
     const user = await User.findOne({
       where: {
@@ -241,6 +242,11 @@ account_router.get('/', authenticateToken, async (req, res) => {
       res.send(user.toJSON())
     } else {
       res.status(404).send("User not found")
+    }
+    } catch (error)
+    {
+	console.error(error)
+	res.sendStatus(500)
     }
 })
 
@@ -413,11 +419,13 @@ account_router.get('/confirm', authenticateToken, async (req, res) => {
 	    res.status(400).send('Invalid or expired confirmation link.');
 	}
     } catch (err) {
+	console.error(err)
 	res.sendStatus(500)
     }
 })
 
 account_router.delete('/', authenticateToken, async (req, res) => {
+    try {
   const user = await User.findOne({
     where:{
       email: req.body.email
@@ -431,6 +439,11 @@ account_router.delete('/', authenticateToken, async (req, res) => {
   } else {
     res.status(404).send("User not found");
   }
+    } catch (error)
+    {
+	console.error(error)
+	res.sendStatus(500)
+    }
 })
 
 account_router.patch('/', authenticateToken, async (req, res) => {

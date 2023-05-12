@@ -53,6 +53,17 @@ describe('test routes', function () {
 	    expect(res).to.equal("invalid credentials")
 	})
 
+	it('check who it is', async() => {
+	    const req = {
+		email: 'test@test.com',
+		password: 'fish',
+		username: 'test'
+	    }
+	    const tok = await post(req, url_login)
+	    const res = await get('/api/whoami', tok);
+	    expect(res.identity).to.equal('test@test.com')
+	})
+	
 	it('logs out', async () => {
 	    const req = {
 		email: 'test@test.com',
@@ -316,6 +327,23 @@ describe('test routes', function () {
 	    const token_user = await log_user()
 
 	    const res = await get('/api/nodes/test_node', token_user)
+	    expect(res.name).to.equal('test_node')
+	})
+
+	it('patch a node', async () => {
+	    let req = {
+		username: 'test',
+		password: 'fishh',
+		email: 'test@test.com'
+	    }
+	    const token_user = await post(req, '/api/login')
+
+	    req = {
+		name: 'test_node',
+		longitude: 12,
+		latitude: 1
+	    }
+	    const res = await patch(req, '/api/nodes', token_user)
 	    expect(res.name).to.equal('test_node')
 	})
     })

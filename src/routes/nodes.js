@@ -225,7 +225,8 @@ node_router.get('/', authenticateToken, async (req, res) => {
                 }
             });
             return res.send(nodes)
-        }
+        } else
+	    return res.status(404).send("This user is not part of any organisations.")
     }
 	res.sendStatus(401)
     } catch (err)

@@ -1,6 +1,6 @@
 import express from "express";
 import Orb from "../db/models/Orb.js";
-import {authenticateTokenAdm} from "../utils.js";
+import {authenticateTokenAdm, authenticateToken} from "../utils.js";
 
 /**
  * @swagger
@@ -171,7 +171,7 @@ orb_router.get('/:id', authenticateTokenAdm, async (req, res) => {
   }
 });
 
-orb_router.delete('/', async (req, res) => {
+orb_router.delete('/', authenticateToken, async (req, res) => {
   try {
     const { id } = req.body;
     const orbData = await Orb.findByPk(id);
@@ -187,7 +187,7 @@ orb_router.delete('/', async (req, res) => {
   }
 });
 
-orb_router.patch('/', authenticateTokenAdm, async (req, res) => {
+orb_router.patch('/', authenticateToken, async (req, res) => {
 
     try {
 	const {id} = req.body

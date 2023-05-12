@@ -20,7 +20,7 @@ passport.use(
 	callbackURL: '/auth/google/callback',
 	scope: ['profile', 'email']
     },
-    async (accessToken, refreshToken, profile, done) => {
+      async (accessToken, refreshToken, profile, done) => {
       let user = await User.findOne({ where: { googleId: profile.id } });
 
       if (!user) {
