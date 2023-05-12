@@ -35,6 +35,12 @@ async function generateAdm() {
 }
 
 function authenticateToken(req, res, next) {
+    if (req.isAuthenticated())
+    {
+	req.email = req.user.email;
+	next()
+    } else {
+
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
 
@@ -48,6 +54,7 @@ function authenticateToken(req, res, next) {
 	
       next()
     })
+    }
 }
 
 function authenticateTokenAdm(req, res, next) {

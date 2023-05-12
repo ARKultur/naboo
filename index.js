@@ -42,6 +42,7 @@ app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/api", router);
+app.set('trust proxy', true);
 
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
@@ -49,23 +50,10 @@ app.get(
   '/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/api/login' }),
   (req, res) => {
-    res.redirect('/');
+    res.redirect('/api/whoami');
   }
 );
 
-// Microsoft OAuth routes
-/*
->>>>>>> origin/dev
-app.get('/auth/microsoft', passport.authenticate('azure_ad_oauth2'));
-
-app.get(
-  '/auth/microsoft/callback',
-  passport.authenticate('azure_ad_oauth2', { failureRedirect: '/api/login' }),
-  (req, res) => {
-    res.redirect('/');
-  }
-);
-*/
 app.get('/', (req, res) => {
     res.sendStatus(200);
 });

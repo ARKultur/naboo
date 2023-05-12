@@ -154,14 +154,22 @@ utils_router.get('/apk', (req, res) => {
 
 utils_router.get('/ping', (req, res) => {
     try {
-	const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress 
-	console.log(ip)
-	res.json({ip: ip})
+	res.send("pong")
     } catch (error)
     {
 	console.error(error)
 	res.sendStatus(500)
     }
 });
+
+utils_router.get('/whoami', authenticateToken, (req, res) => {
+    try {
+	res.json({identity: req.email})
+    } catch (error)
+    {
+	console.error(error)
+	res.sendStatus(500)
+    }
+})
 
 export default utils_router;
