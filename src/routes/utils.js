@@ -172,4 +172,8 @@ utils_router.get('/whoami', authenticateToken, (req, res) => {
     }
 })
 
+utils_router.get('/version', (req, res) => {
+    res.json({version: process.env.VERSION})
+})
+
 export default utils_router;
