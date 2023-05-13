@@ -43,10 +43,18 @@ export default class User extends Model {
 		type: DataTypes.STRING,
 		allowNull: true,
 	    },
-	    microsoftId: {
+	    accessToken: {
 		type: DataTypes.STRING,
 		allowNull: true,
-	    }
+            },
+            refreshToken: {
+		type: DataTypes.STRING,
+		allowNull: true,
+            },
+            tokenExpiration: {
+		type: DataTypes.DATE,
+		allowNull: true,
+            }
         },
         {
           tableName: 'user',

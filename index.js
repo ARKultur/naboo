@@ -8,6 +8,7 @@ import { google } from 'googleapis';
 import session from 'express-session'
 import User from './src/db/models/Users.js';
 import axios from 'axios';
+import querystring from 'querystring'
 
 const app = express()
 const port = 4000
@@ -52,32 +53,54 @@ app.use(express.json());
 app.use("/api", router);
 
 app.get('/auth/google', (req, res) => {
+  const scopes = ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile'];
+
   const authUrl = oauth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: ['profile', 'email'],
+    access_type: 'offline', // Add this line
+    scope: scopes,
+    prompt: 'consent', // Add this line to force the consent screen and get a refresh token on each request
   });
+
   res.redirect(authUrl);
 });
 
 app.get('/auth/google/callback', async (req, res) => {
-  const { code } = req.query;
+    const { code } = req.query;
     try {
 
-	
-    const { tokens } = await axios.post('https://oauth2.googleapis.com/token', code, {
-	headers: {
-	    'Content-Type': 'application/x-www-form-urlencoded',
-	},
-    });
-	return res.send(tokens)
-	oauth2Client.setCredentials(tokens);
+
+	const postData = {
+	    code: code,
+	    client_id: CLIENT_ID,
+	    client_secret: CLIENT_SECRET,
+	    redirect_uri: REDIRECT_URL,
+	    grant_type: 'authorization_code',
+	};
+
+	const info = await axios.post('https://oauth2.googleapis.com/token', querystring.stringify(postData), {
+	    headers: {
+		'Content-Type': 'application/x-www-form-urlencoded',
+	    },
+	});
+	const tokens = info.data
+	console.log(tokens)
+	/*
+	oauth2Client.setCredentials(info.data);
 
     const oauth2 = google.oauth2({
       auth: oauth2Client,
       version: 'v2',
     });
+	*/
 
-    const { data } = await oauth2.userinfo.get();
+	const userInfoResponse = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+	    headers: {
+		'Authorization': `Bearer ${tokens.access_token}`,
+	    },
+	});
+
+	const { data } = userInfoResponse;
+	console.log(data)
     const { email, name, picture } = data;
 
     let user;
@@ -90,11 +113,15 @@ app.get('/auth/google/callback', async (req, res) => {
 
     if (!user) {
       // If the user doesn't exist, create a new user
-      try {
+	try {
+	    const expirationDate = new Date(Date.now() + tokens.expires_in * 1000);
         user = await User.create({
           username: name,
           email: email,
-          password: "jaj",
+            password: "jaj",
+	    accessToken: tokens.access_token,
+	    refreshToken: tokens.refresh_token,
+	    tokenExpiration: expirationDate
         });
       } catch (err) {
         console.error(err);
@@ -103,7 +130,7 @@ app.get('/auth/google/callback', async (req, res) => {
     }
 
     // Set the user information in the session (you can use req.session or a similar library)
-    req.session.userId = user.id;
+	req.session.userId = user.id;
 
     res.redirect('/api/whoami'); // Redirect to the desired page after successful login
   } catch (err) {

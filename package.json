@@ -28,6 +28,7 @@
     "passport-azure-ad-oauth2": "^0.0.4",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
+    "querystring": "^0.2.1",
     "sequelize": "^6.28.0",
     "supertest": "^6.3.3",
     "swagger-jsdoc": "^6.2.8",
