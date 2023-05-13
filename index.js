@@ -96,10 +96,10 @@ app.get('/auth/google/callback', async (req, res) => {
     // Set the user information in the session (you can use req.session or a similar library)
     req.session.userId = user.id;
 
-    res.redirect('/'); // Redirect to the desired page after successful login
+    res.redirect('/api/whoami'); // Redirect to the desired page after successful login
   } catch (err) {
     console.error(err);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send(err);
   }
 });
 
