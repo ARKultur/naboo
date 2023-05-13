@@ -60,7 +60,7 @@ app.get('/auth/google', (req, res) => {
     scope: scopes,
     prompt: 'consent', // Add this line to force the consent screen and get a refresh token on each request
   });
-
+    console.log(authUrl)
   res.redirect(authUrl);
 });
 
