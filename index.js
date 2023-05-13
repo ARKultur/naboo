@@ -7,6 +7,8 @@ import { generateAdm } from './src/utils.js';
 import { google } from 'googleapis';
 import session from 'express-session'
 import User from './src/db/models/Users.js';
+import axios from 'axios';
+
 const app = express()
 const port = 4000
 
@@ -60,8 +62,13 @@ app.get('/auth/google', (req, res) => {
 app.get('/auth/google/callback', async (req, res) => {
   const { code } = req.query;
     try {
+
 	
-    const { tokens } = await oauth2Client.getToken(code);
+    const { tokens } = await post('https://oauth2.googleapis.com/token', code, {
+	headers: {
+	    'Content-Type': 'application/x-www-form-urlencoded',
+	},
+    });
 	return res.send(tokens)
 	oauth2Client.setCredentials(tokens);
 
