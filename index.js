@@ -78,7 +78,7 @@ app.get('/auth/google/callback', async (req, res) => {
 	};
 	console.log(postData)
 	try {
-	await axios.post('https://oauth2.googleapis.com/token')
+	await axios.post('https://httpbin.org/ip')
 	    console.log("test")
 	} catch (err)
 	{
