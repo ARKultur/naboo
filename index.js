@@ -76,7 +76,7 @@ app.get('/auth/google/callback', async (req, res) => {
 	    redirect_uri: REDIRECT_URL,
 	    grant_type: 'authorization_code',
 	};
-
+	console.log(postData)
 	const info = await axios.post('https://oauth2.googleapis.com/token', querystring.stringify(postData), {
 	    headers: {
 		'Content-Type': 'application/x-www-form-urlencoded',
