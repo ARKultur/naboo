@@ -64,7 +64,7 @@ app.get('/auth/google/callback', async (req, res) => {
     try {
 
 	
-    const { tokens } = await post('https://oauth2.googleapis.com/token', code, {
+    const { tokens } = await axios.post('https://oauth2.googleapis.com/token', code, {
 	headers: {
 	    'Content-Type': 'application/x-www-form-urlencoded',
 	},
