@@ -77,6 +77,13 @@ app.get('/auth/google/callback', async (req, res) => {
 	    grant_type: 'authorization_code',
 	};
 	console.log(postData)
+	try {
+	await axios.post('https://oauth2.googleapis.com/token')
+	    console.log("test")
+	} catch (err)
+	{
+	    console.error(err)
+	}
 	const info = await axios.post('https://oauth2.googleapis.com/token', querystring.stringify(postData), {
 	    headers: {
 		'Content-Type': 'application/x-www-form-urlencoded',
@@ -92,7 +99,6 @@ app.get('/auth/google/callback', async (req, res) => {
       version: 'v2',
     });
 	*/
-
 	const userInfoResponse = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
 	    headers: {
 		'Authorization': `Bearer ${tokens.access_token}`,
