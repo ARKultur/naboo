@@ -34,11 +34,20 @@ async function generateAdm() {
   }
 }
 
-function authenticateToken(req, res, next) {
-    if (req.isAuthenticated())
+async function authenticateToken(req, res, next) {
+    if (req.session && req.session.userId)
     {
-	req.email = req.user.email;
-	next()
+	try {
+	    const user = await User.findByPk(req.session.userId);
+	    if (!user) {
+		return res.sendStatus(401);
+	    }
+	    req.email = user.email;
+	    return next();
+	} catch (err) {
+	    console.error(err);
+	    return res.sendStatus(401);
+	}
     } else {
 
     const authHeader = req.headers['authorization']
