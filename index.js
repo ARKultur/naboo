@@ -12,7 +12,7 @@ const port = 4000
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const REDIRECT_URL = 'http://localhost:4000/auth/google/callback';
+const REDIRECT_URL = process.env.GOOGLE_REDIRECT_URL;
 
 const OAuth2 = google.auth.OAuth2;
 const oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
