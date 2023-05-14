@@ -1,4 +1,4 @@
-FROM node:19-alpine
+FROM debian:stable-slim
 
 WORKDIR /app
 COPY package.json .
