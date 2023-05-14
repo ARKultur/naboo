@@ -4,6 +4,7 @@ WORKDIR /app
 COPY package.json .
 
 RUN apt update
+RUN apt install -y dnsutils
 RUN apt -y install curl software-properties-common
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - 
 RUN apt -y install nodejs
