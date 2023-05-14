@@ -3,6 +3,8 @@ FROM debian:stable-slim
 WORKDIR /app
 COPY package.json .
 
+RUN apt install nodejs npm -y
+
 RUN npm install
 
 COPY  . .
