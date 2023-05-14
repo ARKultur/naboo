@@ -4,9 +4,9 @@ WORKDIR /app
 COPY package.json .
 
 RUN apt update
-RUN apt-get -y install curl software-properties-common
+RUN apt -y install curl software-properties-common
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - 
-RUN apt install nodejs npm -y
+RUN apt -y install nodejs
 
 RUN npm install
 
