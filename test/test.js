@@ -348,11 +348,64 @@ describe('test routes', function () {
 	})
     })
 
-    async function log_user() {
+    describe('Test addresses routes', function() {
+	it('fetch all addresses', async () => {
+	    let req = {
+		email: process.env.ADMIN_EMAIL,
+		password: process.env.ADMIN_PASSWORD,
+		username: 'jaj'
+	    }
+	    const token = await post(req, '/api/login');
+
+	    const res = await get('/api/address/admin', token)
+	    expect(res).to.be.empty
+	})
+
+	it('creates an address', async () => {
+	    const token_user = await log_user();
+
+	    let req = {
+		country: "France",
+		postcode: 45140,
+		state: "Centre",
+		city: "Ormes",
+		street_address: "26 rue malherbe"
+	    }
+	    const res = await post(req, '/api/address', token_user);
+	    expect(res.id).to.equal(1)
+	})
+
+	it('fails to create an address', async () => {
+	    const token_user = await log_user();
+
+	    let req = {
+		postcode: "lol"
+	    }
+
+	    const res = await post(req, '/api/address', token_user, 500);
+	})
+
+	it('fetches a specific address', async () => {
+	    const token_user = await log_user();
+
+	    const res = await get('/api/address/1', token_user);
+	    expect(res.id).to.equal(1)
+	})
+
+	it('fails to fetch a specific address', async () => {
+	    const token_user = await log_user();
+
+	    const res = await get('/api/address/1000', token_user, 404);
+	    await get('/api/address/test', token_user, 500);
+	    expect(res.error).to.equal('Address not found')
+	})
+    })
+
+    async function log_user(user = 'test', pass = 'fishh', email = 'test@test.com') {
 	let req = {
-		username: 'test',
-		password: 'fishh',
-		email: 'test@test.com'
+		username: user,
+		password: pass,
+		email: email
 	    }
 	const token_user = await post(req, '/api/login')
 	return token_user
