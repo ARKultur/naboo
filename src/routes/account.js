@@ -446,6 +446,21 @@ account_router.delete('/', authenticateToken, async (req, res) => {
     }
 })
 
+account_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
+  const user = await User.findOne({
+    where: {
+      email: req.body.email
+    }
+  });
+  if (user) {
+    await user.update({
+      OrganisationId: req.body.OrganisationId || user.OrganisationId,
+    })
+    return res.send(user.toJSON())
+  }
+  res.status(500).send("Unexpected error")
+})
+
 account_router.patch('/', authenticateToken, async (req, res) => {
   const user = await User.findOne({
     where: {
@@ -456,8 +471,7 @@ account_router.patch('/', authenticateToken, async (req, res) => {
     await user.update({
       username: req.body.username || user.username,
       password: req.body.password || user.password,
-      addressId: req.body.address || user.addressId,
-      OrganisationId: req.body.organisation || user.OrganisationId
+      addressId: req.body.address || user.addressId
     })
     return res.send(user.toJSON())
   }
