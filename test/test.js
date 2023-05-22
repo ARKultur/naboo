@@ -265,9 +265,10 @@ describe('test routes', function () {
 	    const token_user = await post(req, '/api/login')
 
 	    req = {
-		organisation: orga.id
+		OrganisationId: orga.id,
+		email: 'test@test.com'
 	    }
-	    const res = await patch(req, '/api/accounts', token_user)
+	    const res = await patch(req, '/api/accounts/admin', token_adm)
 	})
 	
 	it('get all the nodes', async () => {
@@ -278,7 +279,7 @@ describe('test routes', function () {
 	    }
 	    const token = await post(req, '/api/login');
 
-	    const res = await get('/api/nodes/admin', token)
+	    const res = await get('/api/nodes/all', token)
 	    expect(res).to.be.empty
 	})
 

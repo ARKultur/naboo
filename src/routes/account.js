@@ -64,6 +64,27 @@ const account_router = express.Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/User'
+ *   patch:
+ *     security:
+ *       - adminBearerAuth: []
+ *     summary: Edit an user organisation id
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: The edited user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Some server error
+ *
  * /api/accounts:
  *   delete:
  *     security:
@@ -446,7 +467,26 @@ account_router.delete('/', authenticateToken, async (req, res) => {
     }
 })
 
+account_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
+	try {
+  const user = await User.findOne({
+    where: {
+      email: req.body.email
+    }
+  });
+  if (user) {
+    await user.update({
+      OrganisationId: req.body.OrganisationId || user.OrganisationId,
+    })
+    return res.send(user.toJSON())
+  }
+	} catch (err) {
+  res.status(500).send("Unexpected error")
+	}
+})
+
 account_router.patch('/', authenticateToken, async (req, res) => {
+	try {
   const user = await User.findOne({
     where: {
       email: req.email
@@ -456,12 +496,13 @@ account_router.patch('/', authenticateToken, async (req, res) => {
     await user.update({
       username: req.body.username || user.username,
       password: req.body.password || user.password,
-      addressId: req.body.address || user.addressId,
-      OrganisationId: req.body.organisation || user.OrganisationId
+      addressId: req.body.address || user.addressId
     })
     return res.send(user.toJSON())
   }
+	} catch (err) {
   res.status(500).send("Unexpected error")
+	}
 })
 
 export default account_router;

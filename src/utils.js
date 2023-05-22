@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import express from 'express'
 import {User, Admin, Customer} from './db/models/index.js'
+import axios from 'axios'
 
 function generateAccessToken(username) {
     return jwt.sign({username}, process.env.TOKEN_SECRET, { expiresIn: "1h" });
@@ -34,28 +35,38 @@ async function generateAdm() {
   }
 }
 
-function authenticateToken(req, res, next) {
-    if (req.isAuthenticated())
+async function authenticateToken(req, res, next) {
+    if (req.session && req.session.userId)
     {
-	req.email = req.user.email;
-	next()
+	try {
+	    const user = await User.findByPk(req.session.userId);
+	    if (!user) {
+		return res.sendStatus(401);
+	    }
+	    req.email = user.email;
+	    return next();
+	} catch (err) {
+	    console.error(err);
+	    return res.sendStatus(401);
+	}
     } else {
 
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
+	const authHeader = req.headers['authorization']
+	const token = authHeader && authHeader.split(' ')[1]
 
-  
-    if (token == null) return res.sendStatus(401)
-  
-    jwt.verify(token.toString(), process.env.TOKEN_SECRET, (err, user) => {
-  
-      if (err) return res.sendStatus(403)
-      req.email = user.username
 	
-      next()
-    })
+	if (token == null) return res.sendStatus(401)
+	
+	jwt.verify(token.toString(), process.env.TOKEN_SECRET, (err, user) => {
+	    
+	    if (err) return res.sendStatus(403)
+	    req.email = user.username
+	    
+	    next()
+	})
     }
 }
+
 
 function authenticateTokenAdm(req, res, next) {
   const authHeader = req.headers['authorization']
