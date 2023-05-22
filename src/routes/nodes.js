@@ -67,7 +67,8 @@ let node_router = express.Router()
  *            required:
  *             - name
  *             - longitude
- *             - latitude 
+ *             - latitude
+ *             - description
  *            type: object
  *            properties:
  *              name:
@@ -76,6 +77,8 @@ let node_router = express.Router()
  *                type: number
  *              latitude:
  *                type: number
+ *              description:
+ *                type: string
  *     responses:
  *       200:
  *         description: The created Node
@@ -109,6 +112,8 @@ let node_router = express.Router()
  *                type: integer
  *              organisation:
  *                type: integer
+ *              description:
+ *                type: string
  *     responses:
  *       200:
  *         description: The edited Node
