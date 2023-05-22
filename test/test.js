@@ -306,7 +306,8 @@ describe('test routes', function () {
 	    req = {
 		name: 'test_node',
 		longitude: 102,
-		latitude: 103
+		latitude: 103,
+		description: 'cool'
 	    }
 	    const res = await post(req, '/api/nodes', token_user)
 	    expect(res.name).to.equal('test_node')
