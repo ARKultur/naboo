@@ -265,7 +265,8 @@ describe('test routes', function () {
 	    const token_user = await post(req, '/api/login')
 
 	    req = {
-		OrganisationId: orga.id
+		OrganisationId: orga.id,
+		email: 'test@test.com'
 	    }
 	    const res = await patch(req, '/api/accounts/admin', token_adm)
 	})
