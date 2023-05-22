@@ -260,7 +260,7 @@ node_router.get('/:name', authenticateToken, async (req, res) => {
 node_router.post('/', authenticateToken, async (req, res) => {
     
     try {
-	if (!req.body.name || !req.body.longitude || !req.body.latitude)
+	if (!req.body.name || !req.body.longitude || !req.body.latitude || !req.body.description)
 	    {
 		throw new Error("")
 	    }
@@ -276,7 +276,8 @@ node_router.post('/', authenticateToken, async (req, res) => {
 		    name: req.body.name,
 		    longitude: req.body.longitude,
 		    latitude: req.body.latitude,
-		    OrganisationId: user.OrganisationId
+		    OrganisationId: user.OrganisationId,
+		    description: req.body.description
 		});
             	return res.send(node.toJSON())
 		}
@@ -302,7 +303,8 @@ node_router.patch('/', authenticateToken, async (req, res) => {
             latitude: req.body.latitude || node.latitude,
             longitude: req.body.longitude || node.longitude,
             addressId: req.body.address || node.addressId,
-            OrganisationId:req.body.organisation || node.OrganisationId 
+            OrganisationId:req.body.organisation || node.OrganisationId,
+	    description: req.body.description || node.description
         });
         res.send(node.toJSON())
     }
