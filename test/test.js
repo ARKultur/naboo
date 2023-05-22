@@ -278,7 +278,7 @@ describe('test routes', function () {
 	    }
 	    const token = await post(req, '/api/login');
 
-	    const res = await get('/api/nodes/admin', token)
+	    const res = await get('/api/nodes/all', token)
 	    expect(res).to.be.empty
 	})
 
