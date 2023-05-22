@@ -132,7 +132,7 @@ const account_router = express.Router();
  *       500:
  *         description: Some server error
  * 
- * /api/accounts?username={username}:
+ * /api/accounts?email={email}:
  *   get:
  *     security:
  *       - userBearerAuth: []
@@ -251,10 +251,10 @@ account_router.get('/admin', authenticateTokenAdm, async (req, res) => {
 
 account_router.get('/', authenticateToken, async (req, res) => {
     try {
-    const {username} = req.query
+    const {email} = req.query
     const user = await User.findOne({
       where: {
-        username: username
+        email: email
       }
     })
   
