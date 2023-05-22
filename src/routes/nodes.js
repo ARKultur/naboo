@@ -179,10 +179,8 @@ let node_router = express.Router()
  *              $ref: '#/components/schemas/Node'
  *       404:
  *         description: Node not found
- * /api/nodes/admin:
+ * /api/nodes/all:
  *  get:
- *     security:
- *       - adminBearerAuth: []
  *     summary: Lists all the Nodes
  *     tags: [Nodes]
  *     responses:
@@ -196,7 +194,7 @@ let node_router = express.Router()
  *                 $ref: '#/components/schemas/Node'
  */
 
-node_router.get('/admin', authenticateTokenAdm, async (req, res) => {
+node_router.get('/all', async (req, res) => {
     try {
     const nodes = await Node.findAll();
 	res.send(nodes)
@@ -267,13 +265,16 @@ node_router.post('/', authenticateToken, async (req, res) => {
         }
 	})
 	if (user) {
-        const node = await Node.create({
-            name: req.body.name,
-            longitude: req.body.longitude,
-            latitude: req.body.latitude,
-	    OrganisationId: user.OrganisationId
-        });
-            return res.send(node.toJSON())
+		if (user.OrganisationId)
+		{
+		const node = await Node.create({
+		    name: req.body.name,
+		    longitude: req.body.longitude,
+		    latitude: req.body.latitude,
+		    OrganisationId: user.OrganisationId
+		});
+            	return res.send(node.toJSON())
+		}
 	}
 	return res.sendStatus(401)
     } catch (error) {
