@@ -16,6 +16,7 @@ const adress_router = express.Router();
  *          - state
  *          - street_address
  *          - city
+ *          - id
  *        properties:
  *          country:
  *            type: string
@@ -32,19 +33,68 @@ const adress_router = express.Router();
  *          city:
  *            type: string
  *            description: The city where the address is located.
+ *          id:
+ *            type: number
+ *            description: The id of the address
  *        example:
  *           country: USA
  *           postcode: 90210
  *           state: California
  *           street_address: 123 Beverly Hills
  *           city: Los Angeles
+ *           id: 1
  */
 
+
+/**
+ * @swagger
+ * /api/address/admin:
+ *   get:
+ *     summary: Retrieve a list of all addresses
+ *     security:
+ *       - adminBearerAuth: []
+ *     tags: [Address]
+ *     responses:
+ *       200:
+ *         description: A list of addresses
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Address'
+ */
 adress_router.get('/admin', authenticateTokenAdm, async (req, res) => {
     const addresses = await Adress.findAll();
     res.send(addresses);
 })
 
+
+/**
+ * @swagger
+ * /api/address/{id}:
+ *   get:
+ *     summary: Retrieve a single address by its id
+ *     security:
+ *       - userBearerAuth: []
+ *     tags: [Address]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Unique id of the address
+ *     responses:
+ *       200:
+ *         description: An address object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Address'
+ *       404:
+ *         description: Address not found
+ */
 adress_router.get('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     try {
@@ -64,6 +114,31 @@ adress_router.get('/:id', authenticateToken, async (req, res) => {
     }
 })
 
+/**
+ * @swagger
+ * /api/address/:
+ *   post:
+ *     summary: Create a new address
+ *     security:
+ *       - userBearerAuth: []
+ *     tags: [Address]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Address'
+ *     responses:
+ *       200:
+ *         description: The id of the created address
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ */
 adress_router.post('/', authenticateToken, async (req, res) => {
     try {
 	const { country, postcode, state, city, street_address} = req.body;
@@ -83,6 +158,30 @@ adress_router.post('/', authenticateToken, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/address/:
+ *   patch:
+ *     summary: Update an existing address
+ *     security:
+ *       - userBearerAuth: []
+ *     tags: [Address]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Address'
+ *     responses:
+ *       200:
+ *         description: The updated address object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Address'
+ *       404:
+ *         description: Address not found
+ */
 adress_router.patch('/', authenticateToken, async (req, res) => {
     try {
 	const {id, country, postcode, state, city, street_address, CustomerId, NodeId, OrganisationId, UserId} = req.body
@@ -113,6 +212,30 @@ adress_router.patch('/', authenticateToken, async (req, res) => {
     }
 });
 
+
+/**
+ * @swagger
+ * /api/address/:
+ *   delete:
+ *     summary: Delete an address
+ *     security:
+ *       - userBearerAuth: []
+ *     tags: [Address]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Message confirming address deletion
+ *       404:
+ *         description: Address not found
+ */
 adress_router.delete('/', authenticateToken, async (req, res) => {
     try {
 	const addr = await Adress.findOne({
