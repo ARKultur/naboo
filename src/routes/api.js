@@ -8,6 +8,7 @@ import customer_router from "./customers.js";
 import contact_router from "./contact.js";
 import doc_router from "./documentation.js";
 import orb_router from "./orb.js"
+import adress_router from "./adresses.js";
 
 let router = express.Router();
 
@@ -23,5 +24,6 @@ router.use('/customers', customer_router);
 router.use('/documentation', doc_router);
 router.use('/contact', contact_router);
 router.use('/orb', orb_router);
+router.use('/address', adress_router);
 
 export default router;
