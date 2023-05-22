@@ -64,6 +64,27 @@ const account_router = express.Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/User'
+ *   patch:
+ *     security:
+ *       - adminBearerAuth: []
+ *     summary: Edit an user organisation id
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: The edited user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Some server error
+ *
  * /api/accounts:
  *   delete:
  *     security:
