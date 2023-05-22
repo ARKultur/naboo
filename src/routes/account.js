@@ -468,6 +468,7 @@ account_router.delete('/', authenticateToken, async (req, res) => {
 })
 
 account_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
+	try {
   const user = await User.findOne({
     where: {
       email: req.body.email
@@ -479,10 +480,13 @@ account_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
     })
     return res.send(user.toJSON())
   }
+	} catch (err) {
   res.status(500).send("Unexpected error")
+	}
 })
 
 account_router.patch('/', authenticateToken, async (req, res) => {
+	try {
   const user = await User.findOne({
     where: {
       email: req.email
@@ -496,7 +500,9 @@ account_router.patch('/', authenticateToken, async (req, res) => {
     })
     return res.send(user.toJSON())
   }
+	} catch (err) {
   res.status(500).send("Unexpected error")
+	}
 })
 
 export default account_router;
