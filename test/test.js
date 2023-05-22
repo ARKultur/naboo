@@ -265,9 +265,9 @@ describe('test routes', function () {
 	    const token_user = await post(req, '/api/login')
 
 	    req = {
-		organisation: orga.id
+		OrganisationId: orga.id
 	    }
-	    const res = await patch(req, '/api/accounts', token_user)
+	    const res = await patch(req, '/api/accounts/admin', token_adm)
 	})
 	
 	it('get all the nodes', async () => {
