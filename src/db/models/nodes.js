@@ -41,7 +41,12 @@ export default class Node extends Model {
 		model: Orb,
 		key: 'id'
 	    }
-	  }
+	  },
+	    description: {
+		type: DataTypes.STRING,
+		allowNull: false,
+		unique: false
+	    }
         },
         {
           tableName: 'nodes',

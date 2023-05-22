@@ -15,6 +15,7 @@ let node_router = express.Router()
  *         - name
  *         - longitude
  *         - latitude
+ *         - description
  *       properties:
  *         id:
  *           type: integer
@@ -22,6 +23,9 @@ let node_router = express.Router()
  *         name:
  *           type: string
  *           description: The node's name
+ *         description:
+ *           type: string
+ *           description: The node's description
  *         addressId:
  *           type: integer
  *           description: The referenced address's id
@@ -39,6 +43,7 @@ let node_router = express.Router()
  *         name: Louvre
  *         addressId: 5
  *         OrganisationId: 1
+ *         description: A museum
  *         longitude: 152
  *         latitude: 35
  */
