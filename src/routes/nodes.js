@@ -53,6 +53,35 @@ let node_router = express.Router()
  * tags:
  *   name: Nodes
  *   description: The Nodes managing API
+ * /api/nodes/admin:
+ *   patch:
+ *     security:
+ *       - adminBearerAuth: []
+ *     summary: Modify the node's organisation id
+ *     tags: [Nodes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            required:
+ *             - name
+ *             - OrganisationId
+ *            type: object
+ *            properties:
+ *              name:
+ *                type: string
+ *              OrganisationId:
+ *                type: number
+ *     responses:
+ *       200:
+ *         description: The modified Node
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Node'
+ *       500:
+ *         descripton: Internal Server Error
  * /api/nodes:
  *   post:
  *     security:
@@ -109,8 +138,6 @@ let node_router = express.Router()
  *              latitude:
  *                type: number
  *              address:
- *                type: integer
- *              organisation:
  *                type: integer
  *              description:
  *                type: string
@@ -215,6 +242,28 @@ node_router.get('/all', async (req, res) => {
     }
 })
 
+node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
+    try {
+	const node = await Node.findOne({
+            where: {
+		name: req.body.name
+            }
+	});
+
+	if (node)
+	{
+            await node.update({
+		OrganisationId: req.body.OrganisationId || node.OrganisationId
+            });
+            res.send(node.toJSON())
+	}
+    } catch (err)
+    {
+	console.error(err)
+	res.sendStatus(500)
+    }
+})
+
 node_router.get('/', authenticateToken, async (req, res) => {
     try {
     const user = await User.findOne({
@@ -308,7 +357,6 @@ node_router.patch('/', authenticateToken, async (req, res) => {
             latitude: req.body.latitude || node.latitude,
             longitude: req.body.longitude || node.longitude,
             addressId: req.body.address || node.addressId,
-            OrganisationId:req.body.organisation || node.OrganisationId,
 	    description: req.body.description || node.description
         });
         res.send(node.toJSON())
