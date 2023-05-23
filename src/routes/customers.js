@@ -2,7 +2,7 @@ import express from "express";
 
 import {Customer} from '../db/models/index.js'
 
-import { authenticateToken, authenticateTokenAdm, checkCustomer} from '../utils.js';
+import { authenticateToken, authenticateTokenAdm, checkCustomer, generateAccessToken} from '../utils.js';
 
 /**
  * @swagger
@@ -243,18 +243,19 @@ const customer_router = express.Router();
 
 customer_router.post("/login", async (req, res) => {
     try {
-        const user = await checkCustomer(req.body.email, req.body.password) || await checkAdmin(req.body.email, req.body.password)
-        if (user)
+        const user = await checkCustomer(req.body.email, req.body.password)
+	console.log(user)
+	if (user)
         {
           const token = generateAccessToken(req.body.email);
-        
           res.json(token);
         } else
         {
           res.status(401).send("invalid credentials");  
         }
       } catch (error) {
-        res.status(401).send("invalid credentials");  
+	  console.error(error)
+	  res.sendStatus(500);  
       }
 })
 
