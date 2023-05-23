@@ -84,19 +84,31 @@ const account_router = express.Router();
  *               $ref: '#/components/schemas/User'
  *       500:
  *         description: Some server error
- *
- * /api/accounts:
  *   delete:
  *     security:
- *       - userBearerAuth: []
- *     summary: Delete an user
+ *       - adminBearerAuth: []
+ *     summary: delete an user by id
  *     tags: [Users]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *            required:
+ *             - id
+ *            type: object
+ *            properties:
+ *              id:
+ *                type: number
+ *     responses:
+ *       200:
+ *         description: User succesfully deleted
+ * /api/accounts:
+ *   delete:
+ *     security:
+ *       - userBearerAuth: []
+ *     summary: Delete the user account
+ *     tags: [Users]
  *     responses:
  *       200:
  *         description: 'Confirmation string'
@@ -107,7 +119,7 @@ const account_router = express.Router();
  *              properties:
  *                confirmation:
  *                  type: string
- *                  description: Test
+ *                  description: User succesfully deleted
  *       500:
  *         description: Some server error
  * 
@@ -449,7 +461,7 @@ account_router.delete('/', authenticateToken, async (req, res) => {
     try {
   const user = await User.findOne({
     where:{
-      email: req.body.email
+      email: req.email
     }
   })
 
@@ -466,6 +478,24 @@ account_router.delete('/', authenticateToken, async (req, res) => {
 	res.sendStatus(500)
     }
 })
+
+account_router.delete('/admin', authenticateTokenAdm, async (req, res)=> {
+    try {
+	const user = await User.findOne({
+	    where:{
+		id: req.body.id
+	    }
+	})
+	if (!user)
+	    return res.status(404).send('User not found')
+	await user.destroy();
+	res.send("Succesfully deleted")
+    } catch (err)
+    {
+	console.error(err)
+	res.sendStatus(500)
+    }
+}) 
 
 account_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
 	try {

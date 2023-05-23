@@ -9,11 +9,11 @@ export default class Customer extends Model {
         {
           first_name: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           last_name: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           addressId: {
             type: DataTypes.INTEGER,
@@ -33,7 +33,7 @@ export default class Customer extends Model {
           },
           phone_number: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
             unique: true,
           },
           username: {
