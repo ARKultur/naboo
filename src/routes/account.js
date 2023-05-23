@@ -75,10 +75,13 @@ const account_router = express.Router();
  *         application/json:
  *           schema:
  *            required:
+ *             - id
  *             - OrganisationId
  *            type: object
  *            properties:
  *              OrganisationId:
+ *                type: number
+ *              id:
  *                type: number
  *     responses:
  *       200:
@@ -504,11 +507,7 @@ account_router.delete('/admin', authenticateTokenAdm, async (req, res)=> {
 
 account_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
 	try {
-  const user = await User.findOne({
-    where: {
-      email: req.body.email
-    }
-  });
+	    const user = await User.findByPk(req.body.id)
   if (user) {
     await user.update({
       OrganisationId: req.body.OrganisationId || user.OrganisationId,
