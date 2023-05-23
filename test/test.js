@@ -164,7 +164,7 @@ describe('test routes', function () {
 
 	    req = {
 		new_name: 'new_orga_test',
-		name: 'orga_test'
+		id: 1
 	    }
 
 	    const res = await patch(req, '/api/organisations', token)
@@ -195,8 +195,8 @@ describe('test routes', function () {
 	    }
 	    const token = await post(req, '/api/login');
 
-	    const res = await patch({}, '/api/organisations', token, 500)
-	    expect(res).to.equal('Internal Server Error')
+	    const res = await patch({}, '/api/organisations', token, 404)
+	    expect(res).to.equal('Organisation not found')
 	})
 
 
@@ -209,7 +209,7 @@ describe('test routes', function () {
 	    const token = await post(req, '/api/login');
 
 	    req = {
-		name: 'new_orga_test'
+		id: 1
 	    }
 	    const res = await del(req, '/api/organisations', token)
 	    expect(res).to.equal('success')
@@ -228,18 +228,6 @@ describe('test routes', function () {
 	    }
 	    const res = await del(req, '/api/organisations', token, 404)
 	    expect(res).to.equal("Organisation not found")
-	})
-
-	it('server error on empty delete', async () => {
-	    let req = {
-		email: process.env.ADMIN_EMAIL,
-		password: process.env.ADMIN_PASSWORD,
-		username: 'jaj'
-	    }
-	    const token = await post(req, '/api/login');
-
-	    const res = await del({}, '/api/organisations', token, 500)
-	    expect(res).to.equal('Internal Server Error')
 	})
     })
 
@@ -266,7 +254,7 @@ describe('test routes', function () {
 
 	    req = {
 		OrganisationId: orga.id,
-		email: 'test@test.com'
+		id: 1
 	    }
 	    const res = await patch(req, '/api/accounts/admin', token_adm)
 	})

@@ -154,11 +154,7 @@ orga_router.post('/', authenticateTokenAdm, async (req, res) => {
   
 orga_router.patch('/', authenticateTokenAdm, async (req, res) => {
     try {
-    const orga = await Organisation.findOne({
-      where: {
-        name: req.body.id
-      }
-    });
+	const orga = await Organisation.findByPk(req.body.id)
     if (orga)
     {
       await orga.update({
@@ -178,11 +174,7 @@ orga_router.patch('/', authenticateTokenAdm, async (req, res) => {
   
 orga_router.delete('/', authenticateTokenAdm, async (req, res) => {
     try {
-    const orga = await Organisation.findOne({
-      where: {
-        name: req.body.id
-      }
-    })
+	const orga = await Organisation.findByPk(req.body.id)
   
     if (orga)
     {
