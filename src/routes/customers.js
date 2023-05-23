@@ -258,20 +258,32 @@ customer_router.get('/admin', authenticateTokenAdm, async (req, res) => {
     res.send(customers)
 })
 
-customer_router.get('/', authenticateToken, async (req, res) => {
+customer_router.get('/all', authenticateToken, async (req, res) => {
   const customers = await Customer.findAll();
 
   res.send(customers)
 })
 
-customer_router.get("/:id", authenticateToken, async (req, res) => {
-    const customer = await Customer.findByPk(req.params.id)
-
+customer_router.get("/", authenticateToken, async (req, res) => {
+    try {
+    const {email} = req.query
+    const customer = await Customer.findOne({
+      where: {
+        email: email
+      }
+    })
+  
     if (customer)
     {
-        return res.send(customer.toJSON())
+      res.send(customer.toJSON())
+    } else {
+      res.status(404).send("User not found")
     }
-    res.status(404).send("Customer not found")
+    } catch (error)
+    {
+	console.error(error)
+	res.sendStatus(500)
+    }
 })
 
 customer_router.post("/", authenticateTokenAdm, async (req, res) => {
