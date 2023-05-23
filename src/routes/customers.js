@@ -137,7 +137,7 @@ const customer_router = express.Router();
  *               $ref: '#/components/schemas/Customer'
  *       401:
  *         description: Email or username already taken
- * /api/customers:
+ * /api/customers/all:
  *   get:
  *     security:
  *       - userBearerAuth: []
@@ -152,7 +152,29 @@ const customer_router = express.Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Customer'
- * 
+ * /api/customers?email={email}:
+ *   get:
+ *     security:
+ *       - userBearerAuth: []
+ *     summary: Get the customer by the email
+ *     tags: [Customers]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The customer's email
+ *     responses:
+ *       200:
+ *        description: The customer's data
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/User'
+ *       404:
+ *         description: customer not found
+ * /api/customers:
  *   post:
  *     security:
  *       - adminBearerAuth: []
@@ -277,7 +299,7 @@ customer_router.get("/", authenticateToken, async (req, res) => {
     {
       res.send(customer.toJSON())
     } else {
-      res.status(404).send("User not found")
+      res.status(404).send("Customer not found")
     }
     } catch (error)
     {
