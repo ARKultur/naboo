@@ -74,7 +74,12 @@ const account_router = express.Router();
  *       content:
  *         application/json:
  *           schema:
- *            $ref: '#/components/schemas/User'
+ *            required:
+ *             - OrganisationId
+ *            type: object
+ *            properties:
+ *              OrganisationId:
+ *                type: number
  *     responses:
  *       200:
  *         description: The edited user.

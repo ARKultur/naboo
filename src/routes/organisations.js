@@ -47,8 +47,6 @@ const orga_router = express.Router();
  *           schema:
  *            required:
  *             - name
- *             - longitude
- *             - latitude 
  *            type: object
  *            properties:
  *              name:
@@ -73,11 +71,11 @@ const orga_router = express.Router();
  *         application/json:
  *           schema:
  *            required:
- *             - name 
+ *             - id 
  *            type: object
  *            properties:
- *              name:
- *                type: string
+ *              id:
+ *                type: number
  *              address:
  *                type: integer
  *              new_name:
@@ -103,11 +101,11 @@ const orga_router = express.Router();
  *         application/json:
  *           schema:
  *            required:
- *             - name 
+ *             - id
  *            type: object
  *            properties:
- *              name:
- *                type: string
+ *              id:
+ *                type: number
  *     responses:
  *       200:
  *         description: Confirmation string
@@ -158,7 +156,7 @@ orga_router.patch('/', authenticateTokenAdm, async (req, res) => {
     try {
     const orga = await Organisation.findOne({
       where: {
-        name: req.body.name
+        name: req.body.id
       }
     });
     if (orga)
@@ -182,7 +180,7 @@ orga_router.delete('/', authenticateTokenAdm, async (req, res) => {
     try {
     const orga = await Organisation.findOne({
       where: {
-        name: req.body.name
+        name: req.body.id
       }
     })
   
