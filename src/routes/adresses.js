@@ -116,7 +116,7 @@ adress_router.get('/:id', authenticateToken, async (req, res) => {
 
 /**
  * @swagger
- * /api/address/:
+ * /api/address:
  *   post:
  *     summary: Create a new address
  *     security:
@@ -127,7 +127,24 @@ adress_router.get('/:id', authenticateToken, async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Address'
+ *             type: object
+ *             properties:
+ *               country:
+ *                 type: string
+ *               postcode:
+ *                 type: number
+ *               state:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               street_address:
+ *                 type: string
+ *             required:
+ *               - country
+ *               - postcode
+ *               - state
+ *               - city
+ *               - street_address
  *     responses:
  *       200:
  *         description: The id of the created address
@@ -160,7 +177,7 @@ adress_router.post('/', authenticateToken, async (req, res) => {
 
 /**
  * @swagger
- * /api/address/:
+ * /api/address:
  *   patch:
  *     summary: Update an existing address
  *     security:
@@ -171,7 +188,22 @@ adress_router.post('/', authenticateToken, async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Address'
+ *             type: object
+ *             properties:
+ *               country:
+ *                 type: string
+ *               postcode:
+ *                 type: number
+ *               state:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               street_address:
+ *                 type: string
+ *               id:
+ *                 type: number
+ *             required:
+ *               - id
  *     responses:
  *       200:
  *         description: The updated address object
@@ -184,7 +216,7 @@ adress_router.post('/', authenticateToken, async (req, res) => {
  */
 adress_router.patch('/', authenticateToken, async (req, res) => {
     try {
-	const {id, country, postcode, state, city, street_address, CustomerId, NodeId, OrganisationId, UserId} = req.body
+	const {id, country, postcode, state, city, street_address} = req.body
 	const addr = await Adress.findOne({
 	    where: {
 		id: id

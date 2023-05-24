@@ -76,7 +76,6 @@ const account_router = express.Router();
  *           schema:
  *            required:
  *             - id
- *             - OrganisationId
  *            type: object
  *            properties:
  *              OrganisationId:
@@ -134,14 +133,22 @@ const account_router = express.Router();
  *   patch:
  *     security:
  *       - userBearerAuth: []
- *     summary: Edit an user
+ *     summary: Edit the user
  *     tags: [Users]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *            $ref: '#/components/schemas/User'
+ *             type: object
+ *             properties:
+ *               address:
+ *                 type: number
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             
  *     responses:
  *       200:
  *         description: The edited user.
