@@ -156,18 +156,18 @@ const account_router = express.Router();
  *   get:
  *     security:
  *       - userBearerAuth: []
- *     summary: Get the user by the username
+ *     summary: Get the user by email
  *     tags: [Users]
  *     parameters:
  *       - in: path
- *         name: username
+ *         name: email
  *         schema:
  *           type: string
  *         required: true
- *         description: The user's username
+ *         description: The user's email
  *     responses:
  *       200:
- *        description: The user response by username
+ *        description: The user response by email
  *        content:
  *          application/json:
  *            schema:
@@ -271,7 +271,8 @@ account_router.get('/admin', authenticateTokenAdm, async (req, res) => {
 
 account_router.get('/', authenticateToken, async (req, res) => {
     try {
-    const {email} = req.query
+	const {email} = req.query
+	console.log(email)
     const user = await User.findOne({
       where: {
         email: email
