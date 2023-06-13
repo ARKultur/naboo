@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Orb {
+  id          Int    @id @default(autoincrement())
+  keypoints   String
+  descriptors String
+  NodeId      Int?
+}
+
+model admin {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique @db.VarChar(255)
+  password String  @db.VarChar(255)
+  isAdmin  Boolean @default(true)
+}
+
+model adresses {
+  id                                                   Int             @id @default(autoincrement())
+  country                                              String          @db.VarChar(255)
+  postcode                                             Float
+  state                                                String          @db.VarChar(255)
+  street_address                                       String          @db.VarChar(255)
+  city                                                 String          @db.VarChar(255)
+  CustomerId                                           Int?
+  NodeId                                               Int?
+  OrganisationId                                       Int?
+  UserId                                               Int?
+  customers_adresses_CustomerIdTocustomers             customers?      @relation("adresses_CustomerIdTocustomers", fields: [CustomerId], references: [id])
+  nodes_adresses_NodeIdTonodes                         nodes?          @relation("adresses_NodeIdTonodes", fields: [NodeId], references: [id])
+  organisations_adresses_OrganisationIdToorganisations organisations?  @relation("adresses_OrganisationIdToorganisations", fields: [OrganisationId], references: [id])
+  user_adresses_UserIdTouser                           user?           @relation("adresses_UserIdTouser", fields: [UserId], references: [id])
+  customers_customers_addressIdToadresses              customers[]     @relation("customers_addressIdToadresses")
+  nodes_nodes_addressIdToadresses                      nodes[]         @relation("nodes_addressIdToadresses")
+  organisations_organisations_addressIdToadresses      organisations[] @relation("organisations_addressIdToadresses")
+  user_user_addressIdToadresses                        user[]          @relation("user_addressIdToadresses")
+}
+
+model contact {
+  uuid        String  @id @db.Uuid
+  name        String  @db.VarChar(255)
+  category    String  @db.VarChar(255)
+  description String  @db.VarChar(255)
+  email       String  @db.VarChar(255)
+  processed   Boolean @default(false)
+}
+
+model customers {
+  id                                      Int        @id @default(autoincrement())
+  first_name                              String?    @db.VarChar(255)
+  last_name                               String?    @db.VarChar(255)
+  addressId                               Int?
+  email                                   String     @unique @db.VarChar(255)
+  password                                String     @db.VarChar(255)
+  phone_number                            String?    @unique @db.VarChar(255)
+  username                                String     @unique @db.VarChar(255)
+  adresses_adresses_CustomerIdTocustomers adresses[] @relation("adresses_CustomerIdTocustomers")
+  adresses_customers_addressIdToadresses  adresses?  @relation("customers_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model data_orb {
+  id                          Int     @id @default(autoincrement())
+  keypoints                   Json[]
+  descriptors                 Int[]   @db.SmallInt
+  orbId                       Int?
+  nodes_data_orb_orbIdTonodes nodes?  @relation("data_orb_orbIdTonodes", fields: [orbId], references: [id])
+  nodes_nodes_orbIdTodata_orb nodes[] @relation("nodes_orbIdTodata_orb")
+}
+
+model guide {
+  id     Int    @id @default(autoincrement())
+  text   String @db.VarChar(255)
+  NodeId Int?
+  nodes  nodes? @relation(fields: [NodeId], references: [id], onDelete: Cascade)
+}
+
+model nodes {
+  id                                 Int            @id @default(autoincrement())
+  name                               String         @unique @db.VarChar(255)
+  longitude                          Float
+  latitude                           Float
+  addressId                          Int?
+  orbId                              Int?
+  description                        String         @db.VarChar(255)
+  OrganisationId                     Int?
+  adresses_adresses_NodeIdTonodes    adresses[]     @relation("adresses_NodeIdTonodes")
+  data_orb_data_orb_orbIdTonodes     data_orb[]     @relation("data_orb_orbIdTonodes")
+  guide                              guide[]
+  organisations                      organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
+  adresses_nodes_addressIdToadresses adresses?      @relation("nodes_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  data_orb_nodes_orbIdTodata_orb     data_orb?      @relation("nodes_orbIdTodata_orb", fields: [orbId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model organisations {
+  id                                              Int        @id @default(autoincrement())
+  name                                            String     @unique @db.VarChar(255)
+  addressId                                       Int?
+  adresses_adresses_OrganisationIdToorganisations adresses[] @relation("adresses_OrganisationIdToorganisations")
+  nodes                                           nodes[]
+  adresses_organisations_addressIdToadresses      adresses?  @relation("organisations_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                                            user[]
+}
+
+model orm_data {
+  image_id    Int    @id @default(autoincrement())
+  keypoints   String
+  descriptors String
+  NodeId      Int?
+}
+
+model user {
+  id                                Int            @id @default(autoincrement())
+  username                          String         @unique @db.VarChar(255)
+  email                             String         @unique @db.VarChar(255)
+  password                          String         @db.VarChar(255)
+  addressId                         Int?
+  isConfirmed                       Boolean        @default(false)
+  confirmationToken                 String?        @db.VarChar(255)
+  confirmationTokenExpiration       DateTime?      @db.Timestamptz(6)
+  googleId                          String?        @db.VarChar(255)
+  accessToken                       String?        @db.VarChar(255)
+  refreshToken                      String?        @db.VarChar(255)
+  tokenExpiration                   DateTime?      @db.Timestamptz(6)
+  OrganisationId                    Int?
+  adresses_adresses_UserIdTouser    adresses[]     @relation("adresses_UserIdTouser")
+  organisations                     organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
+  adresses_user_addressIdToadresses adresses?      @relation("user_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}

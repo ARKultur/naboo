@@ -64,11 +64,7 @@ export default class User extends Model {
     }
   
     static associate() {
-      /*
-      User.hasOne(Organisation);
-      Organisation.belongsTo(User);
-      */
-      User.hasOne(Adress)
-      Adress.belongsTo(User)
+	User.hasOne(Adress)
+	Adress.belongsTo(User)
     }
-  }
+}
