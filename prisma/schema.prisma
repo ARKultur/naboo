@@ -90,6 +90,7 @@ model nodes {
   orbId                              Int?
   description                        String         @db.VarChar(255)
   OrganisationId                     Int?
+  status			     String?
   adresses_adresses_NodeIdTonodes    adresses[]     @relation("adresses_NodeIdTonodes")
   data_orb_data_orb_orbIdTonodes     data_orb[]     @relation("data_orb_orbIdTonodes")
   guide                              guide[]

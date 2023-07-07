@@ -15,35 +15,65 @@ function isEmpty(obj) {
     return true;
 }
 
-async function generateAdm() {
-    const adm = await prisma.admin.findMany()
-  //const adm = await Admin.findAll();
+async function checkTable(tableName) {
+  try {
+      const result = await prisma.$executeRaw`SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '${tableName}')`;
 
-  if ("ADMIN_EMAIL" in process.env && "ADMIN_PASSWORD" in process.env)
-  {
-
-    if (adm.length)
-    {
-      return adm[0];
-    } else {
-	/*
-      const new_adm = await Admin.create({
-        email: process.env.ADMIN_EMAIL,
-        password: process.env.ADMIN_PASSWORD
-	})*/
-	const new_adm = await prisma.admin.create({
-            data: {
-		email: process.env.ADMIN_EMAIL,
-		password: process.env.ADMIN_PASSWORD
-            }
-	})
-
-      return new_adm;
-    }
-  } else {
-    console.error("env variable ADMIN_EMAIL or ADMIN_PASSWORD not set!", "\nTerminating process...")
-    process.exit(1)
+      if (!result)
+	  return false
+      return true;
+  } catch (error) {
+    console.error(error);
+    return false;
   }
+}
+
+
+async function generateAdm() {
+
+    //const adm = await Admin.findAll();
+    try {
+	if ("ADMIN_EMAIL" in process.env && "ADMIN_PASSWORD" in process.env)
+	{
+	    if (!await checkTable("admin"))
+	    {
+		const new_adm = await prisma.admin.create({
+		    data: {
+			email: process.env.ADMIN_EMAIL,
+			password: process.env.ADMIN_PASSWORD
+		    }
+		})
+
+		return new_adm;
+	    }
+	    const adm = await prisma.admin.findMany();
+	    if (adm.length)
+	    {
+		return adm[0];
+	    } else {
+		/*
+		  const new_adm = await Admin.create({
+		  email: process.env.ADMIN_EMAIL,
+		  password: process.env.ADMIN_PASSWORD
+		  })*/
+		const new_adm = await prisma.admin.create({
+		    data: {
+			email: process.env.ADMIN_EMAIL,
+			password: process.env.ADMIN_PASSWORD
+		    }
+		})
+
+		return new_adm;
+	    }
+	} else {
+	    console.error("env variable ADMIN_EMAIL or ADMIN_PASSWORD not set!", "\nTerminating process...")
+	    process.exit(1)
+	}
+    } catch (err)
+    {
+	console.error(err)
+	process.exit(1)
+    }
 }
 
 async function authenticateToken(req, res, next) {
@@ -153,7 +183,7 @@ async function checkUser(email, password) {
 	const user = await prisma.user.findFirst({ where: { email: email, password: password } });
       if (user)
     {
-        return (user.toJSON())
+        return (user)
     }
     } catch (err)
     {
@@ -176,7 +206,7 @@ async function checkAdmin(email, password) {
 	const adm = await prisma.admin.findFirst({ where: { email: email, password: password } });
   if (adm)
     {
-      return (adm.toJSON())
+      return (adm)
     }
     } catch (err)
     {

@@ -1,8 +1,10 @@
 import express from "express";
 import { generateAccessToken, authenticateToken, checkUser, checkAdmin, isEmpty} from '../utils.js';
-import {User} from '../db/models/index.js'
+//import {User} from '../db/models/index.js'
 import path from 'path';
 const __dirname = path.resolve();
+
+import prisma from '../db/prisma.js'
 
 const utils_router = express.Router();
 
@@ -103,9 +105,12 @@ utils_router.post('/logout', authenticateToken, (req, res, next) => {
 utils_router.post('/login', async (req, res) => {
 
     try {
+	if (isEmpty(req.body))
+	    throw new Error("")
 	const user = await checkUser(req.body.email, req.body.password) || await checkAdmin(req.body.email, req.body.password)
 	if (!isEmpty(user))
 	{
+	    //console.log(user)
             const token = generateAccessToken(req.body.email);
       
             res.json(token);
@@ -114,22 +119,35 @@ utils_router.post('/login', async (req, res) => {
 	     throw new Error("")
 	}
     } catch (error) {
-      res.status(401).send("invalid credentials");  
+	console.log(error)
+	res.status(401).send("invalid credentials");  
     }
 })
 
 utils_router.post('/signin', async (req, res) => {
     try {
+	console.log(req.body)
 	if (!(req.body.email) || !(req.body.email) || !(req.body.password))
-	    throw new Error("")
-      let user = await User.create({
-        username: req.body.username,
-        password: req.body.password,
-        email: req.body.email
-      });
-      res.send(user);
+	    throw new Error("Missing arguments")
+	/*
+	  let user = await User.create({
+          username: req.body.username,
+          password: req.body.password,
+          email: req.body.email
+	  });
+	*/
+	let user = await prisma.user.create({
+            data: {
+                username: req.body.username,
+                password: req.body.password,
+                email: req.body.email
+            }
+        });
+
+	res.send(user);
     } catch (err)
     {
+	console.log(err)
 	res.status(401).json("email or username already taken");
     }
 })

@@ -1,7 +1,10 @@
 import express from "express";
 
+
+import prisma from '../db/prisma.js'
+
 import { authenticateToken, authenticateTokenAdm} from '../utils.js';
-import {Guide, User, Organisation, Node} from "../db/models/index.js"
+//import {Guide, User, Organisation, Node} from "../db/models/index.js"
 
 let guide_router = express.Router()
 
@@ -175,63 +178,113 @@ let guide_router = express.Router()
 
 
 guide_router.get("/admin", authenticateTokenAdm, async (req,res) => {
-    const guides = await Guide.findAll()
+    //const guides = await Guide.findAll()
+    const guides = await prisma.guide.findMany();
     res.send(guides)
 })
 
 guide_router.get("/", authenticateToken, async (req,res) => {
-    const user = await User.findOne({
+    /*const user = await User.findOne({
         where: {
             email: req.email
         }
+	})*/
+    const user = await prisma.user.findUnique({
+	where: {
+	    email: req.email
+	}
     })
     if (user)
     {
-        const orga = await Organisation.findByPk(user.OrganisationId)
+        //const orga = await Organisation.findByPk(user.OrganisationId)
+	const orga = await prisma.organisations.findUnique({
+	    where: {
+		id: user.OrganisationId
+	    }
+	})
         if (orga)
         {
+	    /*
             const nodes = await Node.findAll({
                 where: {
                     OrganisationId: orga.id
                 }
-            });
+		});
+	    */
+	    const nodes = await prisma.nodes.findMany({
+		where: {
+		    OrganisationId: orga.id
+		}
+	    })
             let all_guides = [];
             for (const iterator of nodes) {
+		/*
                 const guides = await Guide.findAll({
                     where: {
                         NodeId: iterator.id
                     }
                 });
-                all_guides.push(guides);
+		*/
+		const guides = await prisma.guide.findMany({
+		    where: {
+			NodeId: iterator.id
+		    }
+		})
+		all_guides.push(guides);
             }
-            return res.send(all_guides)
+            return res.json(all_guides)
         }
     }
     res.status(401).send()
 })
 
 guide_router.get("/:id", authenticateToken, async (req, res) => {
+    /*
     const guide = await Guide.findOne({
         where: {
           id: req.params.id
         }
       })
-    
+    */
+    try {
+	const guide = await prisma.guide.findUnique({
+	    where: {
+		id: parseInt(req.params.id)
+	    }
+	})
+	if (!guide || guide == null)
+	{
+	    return res.status(404).json({error: "Guide not found"})
+	}
+	res.json(guide)
+    } catch (err)
+    {
+	console.log('error: ',err)
+	res.sendStatus(500)
+    }
+    /*
       if (guide)
       {
-        res.send(guide.toJSON())
+      res.send(guide.toJSON())
       } else {
-        res.status(404).send("Guide not found")
+      res.status(404).send("Guide not found")
       }
+    */
 })
 
 guide_router.post("/", authenticateToken, async (req, res) => {
     try {
-  
+	/*
         let guide = await Guide.create({
           text: req.body.text
-        });
-        res.send(guide.toJSON());
+          });
+	*/
+	const guide = await prisma.guide.create({
+	    data: {
+		text: req.body.text
+	    }
+	})
+        res.json(guide);
       } catch (err)
       {
         console.log(err);
@@ -240,19 +293,45 @@ guide_router.post("/", authenticateToken, async (req, res) => {
 })
 
 guide_router.patch("/", authenticateToken, async (req,res) => {
-    const guide = await Guide.findOne({
-        where: {
-            id: req.body.id
-        }
-      });
-      await guide.update({
-          text: req.body.text || guide.text,
-          NodeId: req.body.node || guide.NodeId
-      })
-      res.send(guide.toJSON())
+    try {
+	/*
+	const guide = await Guide.findOne({
+            where: {
+		id: req.body.id
+            }
+	});
+	
+	await guide.update({
+            text: req.body.text || guide.text,
+            NodeId: req.body.node || guide.NodeId
+	})
+	*/
+
+	const guide = await prisma.guide.findUnique({
+	    where: {
+		id: req.body.id
+	    }
+	})
+	
+	if (!guide)
+	    return res.status(404).send("Guide not found")
+	const new_guide = await prisma.guide.update({
+	    where: {
+		id: guide.id
+	    },
+	    data: {
+		text: req.body.text || guide.text,
+		NodeId: req.body.node || guide.NodeId
+	    }
+	}) 
+	res.json(new_guide)
+    } catch (err) {
+	res.sendStatus(500);
+    }
 })
 
 guide_router.delete("/", authenticateToken, async (req, res) => {
+    /*
     const guide = await Guide.findOne({
         where:{
           id: req.body.id
@@ -265,7 +344,21 @@ guide_router.delete("/", authenticateToken, async (req, res) => {
         res.send("success")
       } else {
         res.status(404).send("Guide not found");
-      }
+	}
+    */
+    try {
+	const deleted = await prisma.guide.delete({
+	    where: {
+		id: req.body.id
+	    }
+	})
+
+	if (!deleted)
+	    return res.status(404).send("Guide not found")
+	res.send("success")
+    } catch (err) {
+	res.sendStatus(500)
+    }
 })
 
 export default guide_router;

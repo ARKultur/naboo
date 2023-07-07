@@ -45,7 +45,7 @@ try {
     */
     const adm = await generateAdm();
 
-    console.log("admin info:", adm.toJSON());
+    console.log("admin info:", adm);
 } catch (error) {
     console.error('Unable to connect to the database:', error);
 }  
@@ -210,9 +210,26 @@ app.get('/', (req, res) => {
     res.sendStatus(200);
 });
 
-app.listen(port, () => {
-  console.log(`app listening on port ${port}`)
-}).finally( async () => {
+/*
+async main() => {
+    app.listen(port, () => {
+	console.log(`app listening on port ${port}`)
+    })
+}
+*/
+const main = async () => {
+  return new Promise((resolve, reject) => {
+    const server = app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+      resolve(server);
+    }).on('error', (err) => {
+      reject(err);
+    });
+  });
+};
+
+// Call the function and handle potential errors
+main().catch(console.error).finally(async () => {
     await prisma.$disconnect()
 })
 

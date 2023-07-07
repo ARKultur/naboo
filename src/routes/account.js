@@ -302,7 +302,7 @@ account_router.get('/', authenticateToken, async (req, res) => {
 
 	if (user)
 	{
-	    res.send(user.toJSON())
+	    res.send(user)
 	} else {
 	    res.status(404).send("User not found")
 	}
@@ -654,7 +654,7 @@ account_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
                 }
             })
 
-	    return res.send(user.toJSON())
+	    return res.send(user)
 	}
     } catch (err) {
 	res.status(500).send("Unexpected error")
@@ -695,7 +695,7 @@ account_router.patch('/', authenticateToken, async (req, res) => {
                 }
             })
 
-	    return res.send(user.toJSON())
+	    return res.send(user)
 	}
     } catch (err) {
 	res.status(500).send("Unexpected error")

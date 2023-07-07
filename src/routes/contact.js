@@ -1,6 +1,8 @@
 import express from "express";
-import {Contact} from "../db/models/index.js";
+//import {Contact} from "../db/models/index.js";
 import {authenticateTokenAdm} from "../utils.js";
+
+import prisma from '../db/prisma.js'
 
 /**
  * @swagger
@@ -159,55 +161,84 @@ const contact_router = express.Router();
  */
 
 contact_router.post('/', async (req, res) => {
-  try {
-    const {name, category, description, email} = req.body;
+    try {
+	const {name, category, description, email} = req.body;
 
-    if (!(name && category && description && email))
-      return res.status(400).send("Missing value")
-    await Contact.create({
-      name: name,
-      category: category,
-      description: description,
-      email: email,
-    })
-    res.status(200).send("Contact successfully created");
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal Error");
-  }
+	if (!(name && category && description && email))
+	    return res.status(400).send("Missing value")
+	/*
+	await Contact.create({
+	    name: name,
+	    category: category,
+	    description: description,
+	    email: email,
+	    })
+	*/
+	await prisma.contact.create({
+	    data: {
+		name: name,
+		category: category,
+		description: description,
+		email: email
+	    }
+	})
+	res.status(200).send("Contact successfully created");
+    } catch (error) {
+	console.log(error);
+	res.status(500).send("Internal Error");
+    }
 })
 
 contact_router.patch('/:uuid', authenticateTokenAdm, async (req, res) => {
-  try {
-    const uuid = req.params.uuid;
-    const {name, email, processed} = req.body;
+    try {
+	const uuid = req.params.uuid;
+	const {name, email, processed} = req.body;
 
-    if (!(name && processed && email && uuid))
-      return res.status(400).send("Missing value")
-    const contact = await Contact.findOne({
-      where: {
-        uuid: uuid,
-      }
-    });
-    console.log(contact)
-    if (!contact)
-      return res.status(404).send("Contact not found");
-    await contact.update({
-      name: name,
-      email: email,
-      processed: processed,
-    })
-    res.status(200).send("Contact successfully updated");
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal Error");
-  }
+	if (!(name && processed && email && uuid))
+	    return res.status(400).send("Missing value")
+	/*
+	const contact = await Contact.findOne({
+	    where: {
+		uuid: uuid,
+	    }
+	});
+	*/
+	const contact = await prisma.contact.findUnique({
+	    where: {
+		uuid: uuid
+	    }
+	})
+	console.log(contact)
+	if (!contact)
+	    return res.status(404).send("Contact not found");
+	/*
+	await contact.update({
+	    name: name,
+	    email: email,
+	    processed: processed,
+	})
+	*/
+	await prisma.contact.update({
+	    where: {
+		uuid: uuid
+	    },
+	    data: {
+		name: name,
+		email: email,
+		processed: processed
+	    }
+	})
+	res.status(200).send("Contact successfully updated");
+    } catch (error) {
+	console.log(error);
+	res.status(500).send("Internal Error");
+    }
 })
 
 contact_router.get('/', authenticateTokenAdm, async (req, res) => {
   try {
-    const contacts = await Contact.findAll();
-
+    //const contacts = await Contact.findAll();
+      const contacts = await prisma.contact.findMany();
     res.status(200).send(contacts);
   } catch (error) {
     console.log(error);
@@ -216,24 +247,32 @@ contact_router.get('/', authenticateTokenAdm, async (req, res) => {
 })
 
 contact_router.delete('/:uuid', authenticateTokenAdm, async (req, res) => {
-  try {
-    const uuid = req.params.uuid;
+    try {
+	const uuid = req.params.uuid;
 
-    if (!uuid)
-      return res.status(400).send("Missing arguments");
-    const contact = await Contact.findOne({
-      where: {
-        uuid: uuid,
-      }
-    });
-    if (!contact)
-      return res.status(404).send("Contact not found");
-    await contact.destroy();
-    res.status(200).send("Contact successfully deleted");
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal Error");
-  }
+	if (!uuid)
+	    return res.status(400).send("Missing arguments");
+	/*
+	const contact = await Contact.findOne({
+	    where: {
+		uuid: uuid,
+	    }
+	});
+	*/
+	const contact = await prisma.contact.delete({
+	    where: {
+		uuid: uuid
+	    }
+	})
+	if (!contact)
+	    return res.status(404).send("Contact not found");
+
+	//await contact.destroy();
+	res.status(200).send("Contact successfully deleted");
+    } catch (error) {
+	console.log(error);
+	res.status(500).send("Internal Error");
+    }
 })
 
 export default contact_router;
