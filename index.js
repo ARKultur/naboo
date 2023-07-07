@@ -3,6 +3,7 @@
 import express from 'express'
 import cors from 'cors'
 
+import { execSync } from 'child_process'
 //import * as Models from './src/db/models/index.js'
 
 import router from './src/routes/api.js';
@@ -43,6 +44,7 @@ try {
     
     await sequelize.sync({ force: true });
     */
+    execSync('npx prisma migrate deploy', {stdio: 'inherit'})
     const adm = await generateAdm();
 
     console.log("admin info:", adm);

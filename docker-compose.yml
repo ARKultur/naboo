@@ -1,22 +1,5 @@
 version: '3'
 services:
-migrate:
-  build: .
-  env_file: .env
-  volumes:
-    - ./:/app/
-  command: sh -c "npx prisma migrate deploy && sleep 10"
-  depends_on:
-    - db
-  app:
-    build: .
-    env_file: .env
-    ports:
-      - "4000:4000"
-    depends_on:
-      - migrate
-    volumes:
-      - ./:/app/
   db:
     image: postgres:14
     env_file: .env
@@ -24,3 +7,12 @@ migrate:
       - "5432:5432"
     volumes:
       - ./:/db/
+  app:
+    build: .
+    env_file: .env
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    volumes:
+      - ./:/app/
