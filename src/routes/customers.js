@@ -1,6 +1,8 @@
 import express from "express";
 
-import {Customer} from '../db/models/index.js'
+//import {Customer} from '../db/models/index.js'
+
+import prisma from '../db/prisma.js'
 
 import { authenticateToken, authenticateTokenAdm, checkCustomer, generateAccessToken} from '../utils.js';
 
@@ -244,7 +246,8 @@ const customer_router = express.Router();
 customer_router.post("/login", async (req, res) => {
     try {
         const user = await checkCustomer(req.body.email, req.body.password)
-	console.log(user)
+	//console.log(user)
+	
 	if (user)
         {
           const token = generateAccessToken(req.body.email);
@@ -261,13 +264,21 @@ customer_router.post("/login", async (req, res) => {
 
 customer_router.post("/register", async (req, res) => {
     try {
-  
+	/*
         let customer = await Customer.create({
           username: req.body.username,
           password: req.body.password,
           email: req.body.email
-        });
-        res.send(customer.toJSON());
+          });
+	*/
+	const customer = await prisma.customers.create({
+	    data: {
+		username: req.body.username,
+		password: req.body.password,
+		email: req.body.email
+	    }
+	})
+        res.json(customer);
       } catch (err)
       {
         console.log(err);
@@ -276,32 +287,38 @@ customer_router.post("/register", async (req, res) => {
 })
 
 customer_router.get('/admin', authenticateTokenAdm, async (req, res) => {
-    const customers = await Customer.findAll();
-
+    //const customers = await Customer.findAll();
+    const customers = await prisma.customers.findMany();
     res.send(customers)
 })
 
 customer_router.get('/all', authenticateToken, async (req, res) => {
-  const customers = await Customer.findAll();
-
+  //const customers = await Customer.findAll();
+    const customers = await prisma.customers.findMany();
   res.send(customers)
 })
 
 customer_router.get("/", authenticateToken, async (req, res) => {
     try {
-    const {email} = req.query
-    const customer = await Customer.findOne({
-      where: {
-        email: email
-      }
-    })
-  
-    if (customer)
-    {
-      res.send(customer.toJSON())
-    } else {
-      res.status(404).send("Customer not found")
-    }
+	const {email} = req.query
+	/*
+	const customer = await Customer.findOne({
+	    where: {
+		email: email
+	    }
+	})
+	*/
+	const customer = await prisma.customers.findUnique({
+	    where: {
+		email: email
+	    }
+	})
+	if (customer)
+	{
+	    res.json(customer)
+	} else {
+	    res.status(404).send("Customer not found")
+	}
     } catch (error)
     {
 	console.error(error)
@@ -311,13 +328,21 @@ customer_router.get("/", authenticateToken, async (req, res) => {
 
 customer_router.post("/", authenticateTokenAdm, async (req, res) => {
     try {
-        
+        /*
         let customer = await Customer.create({
           username: req.body.username,
           password: req.body.password,
           email: req.body.email
-        });
-        res.send(customer.toJSON());
+          });
+	*/
+	const customer = await prisma.customers.create({
+	    data: {
+		username: req.body.username,
+		password: req.body.password,
+		email: req.body.email
+	    }
+	})
+        res.json(customer);
       } catch (err)
       {
         console.log(err);

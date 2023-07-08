@@ -1,14 +1,22 @@
-import {sequelize} from './src/db/sequelize.js';
+//import {sequelize} from './src/db/sequelize.js';
+
 import express from 'express'
 import cors from 'cors'
-import * as Models from './src/db/models/index.js'
+
+import { execSync } from 'child_process'
+//import * as Models from './src/db/models/index.js'
+
 import router from './src/routes/api.js';
 import { generateAdm } from './src/utils.js';
 import { google } from 'googleapis';
 import session from 'express-session'
-import User from './src/db/models/Users.js';
+
+//import User from './src/db/models/Users.js';
+
 import axios from 'axios';
 import querystring from 'querystring'
+
+import prisma from './src/db/prisma.js'
 
 const app = express()
 const port = 4000
@@ -22,6 +30,7 @@ const oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
 
 console.log(process.env.GOOGLE_CLIENT_ID)
 try {
+    /*
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
 
@@ -34,9 +43,11 @@ try {
     }
     
     await sequelize.sync({ force: true });
+    */
+    execSync('npx prisma migrate deploy', {stdio: 'inherit'})
     const adm = await generateAdm();
 
-    console.log("admin info:", adm.toJSON());
+    console.log("admin info:", adm);
 } catch (error) {
     console.error('Unable to connect to the database:', error);
 }  
@@ -51,7 +62,7 @@ app.use(session({
 app.use(cors());
 app.use(express.json());
 app.use("/api", router);
-
+/*
 app.get('/auth/google', (req, res) => {
   const scopes = ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile'];
 
@@ -60,7 +71,6 @@ app.get('/auth/google', (req, res) => {
     scope: scopes,
     prompt: 'consent', // Add this line to force the consent screen and get a refresh token on each request
   });
-    console.log(authUrl)
   res.redirect(authUrl);
 });
 
@@ -76,14 +86,6 @@ app.get('/auth/google/callback', async (req, res) => {
 	    redirect_uri: REDIRECT_URL,
 	    grant_type: 'authorization_code',
 	};
-	console.log(postData)
-	try {
-	await axios.post('https://httpbin.org/ip')
-	    console.log("test")
-	} catch (err)
-	{
-	    console.error(err)
-	}
 	const info = await axios.post('https://oauth2.googleapis.com/token', querystring.stringify(postData), {
 	    headers: {
 		'Content-Type': 'application/x-www-form-urlencoded',
@@ -91,14 +93,6 @@ app.get('/auth/google/callback', async (req, res) => {
 	});
 	const tokens = info.data
 	console.log(tokens)
-	/*
-	oauth2Client.setCredentials(info.data);
-
-    const oauth2 = google.oauth2({
-      auth: oauth2Client,
-      version: 'v2',
-    });
-	*/
 	const userInfoResponse = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
 	    headers: {
 		'Authorization': `Bearer ${tokens.access_token}`,
@@ -144,7 +138,7 @@ app.get('/auth/google/callback', async (req, res) => {
     res.status(500).send(err);
   }
 });
-
+*/
 
 
 /*
@@ -218,8 +212,27 @@ app.get('/', (req, res) => {
     res.sendStatus(200);
 });
 
-app.listen(port, () => {
-  console.log(`app listening on port ${port}`)
+/*
+async main() => {
+    app.listen(port, () => {
+	console.log(`app listening on port ${port}`)
+    })
+}
+*/
+const main = async () => {
+  return new Promise((resolve, reject) => {
+    const server = app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+      resolve(server);
+    }).on('error', (err) => {
+      reject(err);
+    });
+  });
+};
+
+// Call the function and handle potential errors
+main().catch(console.error).finally(async () => {
+    await prisma.$disconnect()
 })
 
 export default app;

@@ -2,9 +2,18 @@ import {expect} from 'chai'
 import request from 'supertest'
 import app from '../index.js'
 import { isEmpty } from '../src/utils.js'
+import prisma from '../src/db/prisma.js'
 
 describe('test routes', function () {
     before('Mock db connection and load app', async function () {
+	await prisma.user.deleteMany();
+	await prisma.customers.deleteMany();
+	await prisma.organisations.deleteMany();
+	await prisma.nodes.deleteMany();
+	await prisma.guide.deleteMany();
+	await prisma.orb.deleteMany();
+	await prisma.contact.deleteMany();
+	await prisma.adresses.deleteMany();
     })
 
     describe('test utility routes', function () {
@@ -115,6 +124,8 @@ describe('test routes', function () {
     })
 
     describe('test organisation routes', function () {
+	let org_id = 0;
+	
 	it('gets all the organisations', async () => {
 	    const req = {
 		email: process.env.ADMIN_EMAIL,
@@ -140,6 +151,7 @@ describe('test routes', function () {
 	    }
 	    const res = await post(req, '/api/organisations', token)
 	    expect(res.name).to.equal('orga_test')
+	    org_id = res.id;
 	})
 
 	it('fails to create a new organisation', async () => {
@@ -164,7 +176,7 @@ describe('test routes', function () {
 
 	    req = {
 		new_name: 'new_orga_test',
-		id: 1
+		id: org_id
 	    }
 
 	    const res = await patch(req, '/api/organisations', token)
@@ -180,7 +192,8 @@ describe('test routes', function () {
 	    const token = await post(req, '/api/login');
 
 	    req = {
-		name: 'orga_test'
+		name: 'orga_test',
+		id: 787878787
 	    }
 
 	    const res = await patch(req, '/api/organisations', token, 404)
@@ -209,7 +222,7 @@ describe('test routes', function () {
 	    const token = await post(req, '/api/login');
 
 	    req = {
-		id: 1
+		id: org_id
 	    }
 	    const res = await del(req, '/api/organisations', token)
 	    expect(res).to.equal('success')
@@ -252,9 +265,11 @@ describe('test routes', function () {
 	    }
 	    const token_user = await post(req, '/api/login')
 
+
+	    const user = await get(`/api/accounts?email=${req.email}`, token_user)
 	    req = {
 		OrganisationId: orga.id,
-		id: 1
+		id: user.id
 	    }
 	    const res = await patch(req, '/api/accounts/admin', token_adm)
 	})
@@ -339,6 +354,7 @@ describe('test routes', function () {
     })
 
     describe('Test addresses routes', function() {
+	let adr_id = 0;
 	it('fetch all addresses', async () => {
 	    let req = {
 		email: process.env.ADMIN_EMAIL,
@@ -356,13 +372,14 @@ describe('test routes', function () {
 
 	    let req = {
 		country: "France",
-		postcode: 45140,
-		state: "Centre",
-		city: "Ormes",
-		street_address: "26 rue malherbe"
+		postcode: 100,
+		state: "ss",
+		city: "Os",
+		street_address: "26"
 	    }
 	    const res = await post(req, '/api/address', token_user);
-	    expect(res.id).to.equal(1)
+	    adr_id = res.id;
+	    expect(res.id).to.not.equal(0)
 	})
 
 	it('fails to create an address', async () => {
@@ -378,8 +395,8 @@ describe('test routes', function () {
 	it('fetches a specific address', async () => {
 	    const token_user = await log_user();
 
-	    const res = await get('/api/address/1', token_user);
-	    expect(res.id).to.equal(1)
+	    const res = await get(`/api/address/${adr_id}`, token_user);
+	    expect(res.id).to.equal(adr_id)
 	})
 
 	it('fails to fetch a specific address', async () => {
@@ -389,8 +406,88 @@ describe('test routes', function () {
 	    await get('/api/address/test', token_user, 500);
 	    expect(res.error).to.equal('Address not found')
 	})
+
+	it('patches a specific address', async () => {
+	    const token_user = await log_user();
+
+	    let req = {
+		country: "J",
+		postcode: 12,
+		state: "ee",
+		city: "Raaaaa",
+		street_address: "eeeee",
+		id: adr_id
+	    }
+
+	    const res = await patch(req, '/api/address/', token_user);
+	    expect(res.postcode).to.equal(12)
+	})
+
+	it('deletes an address', async () => {
+	    const token_user = await log_user();
+
+	    let req = {
+		id: adr_id
+	    }
+
+	    const res = await del(req, '/api/address/', token_user)
+	    expect(res).to.equal("Address successfully deleted");
+	})
+
+	it('fails to delete an address', async () => {
+	    const token_user = await log_user()
+
+	    let req = {
+		id: "hey"
+	    }
+
+	    const res = await del(req, '/api/address/', token_user, 500)
+	})
     })
 
+    describe('Test guides routes', function() {
+	let token_user;
+	let guide_id;
+	
+	it('fetch all the guides', async () => {
+	    let req = {
+		email: process.env.ADMIN_EMAIL,
+		password: process.env.ADMIN_PASSWORD,
+		username: 'jaj'
+	    }
+	    const token = await post(req, '/api/login');
+
+	    const res = await get('/api/guides/admin', token)
+	    expect(res).to.be.empty
+	})
+	
+	it('creates a guide', async () => {
+	    token_user = await log_user();
+
+	    const req = {
+		text: "something"
+	    }
+
+	    const res = await post(req, '/api/guides', token_user);
+	    guide_id = res.id;
+	    expect(res.text).to.equal('something')
+	})
+
+	it('fetch the guides of an organisation', async () => {
+	    const res = await get('/api/guides', token_user);
+	    expect(res.length).to.equal(1)
+	})
+
+	it('fetch a guide', async () => {
+	    const res = await get(`/api/guides/${guide_id}`, token_user);
+	    expect(res.text).to.equal('something')
+	})
+
+	it('fails to fetch a guide', async () => {
+	    const res = await get('/api/guides/-12', token_user, 404);
+	    expect(res.error).to.equal("Guide not found")
+	})
+    })
     async function log_user(user = 'test', pass = 'fishh', email = 'test@test.com') {
 	let req = {
 		username: user,

@@ -1,5 +1,8 @@
 import express from "express";
-import Adress from "../db/models/Adress.js";
+//import Adress from "../db/models/Adress.js";
+
+import prisma from '../db/prisma.js'
+
 import {authenticateTokenAdm, authenticateToken} from "../utils.js";
 
 const adress_router = express.Router();
@@ -65,7 +68,8 @@ const adress_router = express.Router();
  *                 $ref: '#/components/schemas/Address'
  */
 adress_router.get('/admin', authenticateTokenAdm, async (req, res) => {
-    const addresses = await Adress.findAll();
+    //const addresses = await Adress.findAll();
+    const addresses = await prisma.adresses.findMany();
     res.send(addresses);
 })
 
@@ -98,8 +102,13 @@ adress_router.get('/admin', authenticateTokenAdm, async (req, res) => {
 adress_router.get('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     try {
-	const adr = await Adress.findOne({ where: { id: id}})
-	
+	//const adr = await Adress.findOne({ where: { id: id}})
+	const adr = await prisma.adresses.findUnique({
+            where: {
+                id: parseInt(id)
+            }
+        })
+
 	if (adr)
 	{
 	    res.send(adr)
@@ -159,6 +168,7 @@ adress_router.get('/:id', authenticateToken, async (req, res) => {
 adress_router.post('/', authenticateToken, async (req, res) => {
     try {
 	const { country, postcode, state, city, street_address} = req.body;
+	/*
 	const addr = await Adress.create({
 	    country: country,
 	    postcode: postcode,
@@ -166,6 +176,16 @@ adress_router.post('/', authenticateToken, async (req, res) => {
 	    city: city,
 	    street_address: street_address
 	});
+	*/
+	const addr = await prisma.adresses.create({
+            data: {
+                country: country,
+                postcode: postcode,
+                state: state,
+                city: city,
+                street_address: street_address
+            }
+        });
 
 	res.json({id: addr.id})
     } catch (err)
@@ -217,12 +237,35 @@ adress_router.post('/', authenticateToken, async (req, res) => {
 adress_router.patch('/', authenticateToken, async (req, res) => {
     try {
 	const {id, country, postcode, state, city, street_address} = req.body
+	/*
 	const addr = await Adress.findOne({
 	    where: {
 		id: id
 	    }
 	});
+	*/
+	const addr = await prisma.adresses.findUnique({
+            where: {
+                id: id
+            }
+        });
 
+	if (!addr)
+	    res.status(404).send("Address not found")
+	const up_addr = await prisma.adresses.update({
+	    where: {
+		id: id
+	    },
+	    data: {
+		country: country || addr.country,
+                postcode: postcode || addr.postcode,
+                state: state || addr.state,
+                city: city || addr.city,
+                street_address: street_address || addr.street_address
+	    }
+	})
+	res.json(up_addr)
+	/*
 	if (addr)
 	{
 	    await addr.update({
@@ -236,7 +279,8 @@ adress_router.patch('/', authenticateToken, async (req, res) => {
 	} else
 	{
 	    res.status(404).send("Address not found")
-	}
+	    }
+	*/
     } catch (err)
     {
 	console.error(err)
@@ -270,12 +314,23 @@ adress_router.patch('/', authenticateToken, async (req, res) => {
  */
 adress_router.delete('/', authenticateToken, async (req, res) => {
     try {
+	/*
 	const addr = await Adress.findOne({
 	    where: {
-		id: req.body.id
+		id: req.body.idOA
 	    }
 	})
+	*/
 
+	if (!req.body.id)
+	    res.status(404).send("Address not found")
+	await prisma.adresses.delete({
+                where: {
+                    id: req.body.id
+                }
+            });
+	res.send("Address successfully deleted")
+	/*
 	if (addr)
 	{
 	    await addr.destroy();
@@ -283,7 +338,8 @@ adress_router.delete('/', authenticateToken, async (req, res) => {
 	} else
 	{
 	    res.status(404).send("Address not found")
-	}
+	    }
+	*/
     } catch (err)
     {
 	console.error(err)

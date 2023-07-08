@@ -13,7 +13,7 @@ jobs:
           node-version: 18.7
       - run: npm install nodemon
       - name: launch backend
-        run: docker-compose up --exit-code-from app
+        run: ./launch.sh
       - name: check exit code
         if: steps.script.outputs.exitCode != 0
         run: fail "Exit code is not 0"
