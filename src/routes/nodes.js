@@ -328,6 +328,7 @@ node_router.get('/', authenticateToken, async (req, res) => {
 	res.sendStatus(401)
     } catch (err)
     {
+	console.log(err)
 	res.sendStatus(500)
     }
 })
@@ -354,6 +355,7 @@ node_router.get('/:name', authenticateToken, async (req, res) => {
     }
     } catch (err)
     {
+	console.log(err)
 	res.sendStatus(500)
     }
 })
@@ -361,9 +363,9 @@ node_router.get('/:name', authenticateToken, async (req, res) => {
 node_router.post('/', authenticateToken, async (req, res) => {
     
     try {
-	if (!req.body.name || !req.body.longitude || !req.body.latitude || !req.body.description)
+	if (req.body.name == null || req.body.longitude == null || req.body.latitude == null || !req.body.description == null)
 	    {
-		throw new Error("")
+		throw new Error("Missing inputs")
 	    }
 	/*
 	const user = await User.findOne({
@@ -403,6 +405,7 @@ node_router.post('/', authenticateToken, async (req, res) => {
 	}
 	return res.sendStatus(401)
     } catch (error) {
+	console.log(error)
         res.sendStatus(500);
     }
 })
@@ -410,7 +413,6 @@ node_router.post('/', authenticateToken, async (req, res) => {
 node_router.patch('/', authenticateToken, async (req, res) => {
 
     try {
-
 	/*
 	  const node = await Node.findOne({
           where: {
