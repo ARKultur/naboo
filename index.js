@@ -28,7 +28,19 @@ const REDIRECT_URL = process.env.GOOGLE_REDIRECT_URL;
 const OAuth2 = google.auth.OAuth2;
 const oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
 
-console.log(process.env.GOOGLE_CLIENT_ID)
+//console.log(process.env.GOOGLE_CLIENT_ID)
+
+async function db_init()
+{
+    try {
+	const count = await prisma.admin.count();
+        return count === 0;
+    } catch (error) {
+        return true;
+    }
+}
+
+
 try {
     /*
     await sequelize.authenticate();
@@ -44,6 +56,13 @@ try {
     
     await sequelize.sync({ force: true });
     */
+    const check = await db_init();
+    //console.log(check)
+    if (!check)
+    {
+        execSync('npx prisma db pull', {stdio: 'inherit'})
+        execSync('npx prisma generate', {stdio: 'inherit'})
+    }
     execSync('npx prisma migrate deploy', {stdio: 'inherit'})
     const adm = await generateAdm();
 
