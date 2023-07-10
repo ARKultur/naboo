@@ -653,7 +653,6 @@ account_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
 		    OrganisationId: req.body.OrganisationId || user.OrganisationId
                 }
             })
-
 	    return res.send(updated_user)
 	}
     } catch (err) {
