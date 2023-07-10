@@ -410,6 +410,7 @@ node_router.post('/', authenticateToken, async (req, res) => {
 node_router.patch('/', authenticateToken, async (req, res) => {
 
     try {
+
 	/*
 	  const node = await Node.findOne({
           where: {
