@@ -1,7 +1,9 @@
 import express from "express";
 
+import prisma from '../db/prisma.js'
+
 import { authenticateToken, authenticateTokenAdm} from '../utils.js';
-import {Node, User, Organisation} from '../db/models/index.js'
+//import {Node, User, Organisation} from '../db/models/index.js'
 
 let node_router = express.Router()
 
@@ -233,7 +235,9 @@ let node_router = express.Router()
 
 node_router.get('/all', async (req, res) => {
     try {
-    const nodes = await Node.findAll();
+	//const nodes = await Node.findAll();
+
+	const nodes = await prisma.nodes.findMany();
 	res.send(nodes)
     } catch (error)
     {
@@ -244,18 +248,35 @@ node_router.get('/all', async (req, res) => {
 
 node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
     try {
+	/*
 	const node = await Node.findOne({
             where: {
 		name: req.body.name
             }
 	});
+	*/
 
+	const node = await prisma.nodes.findUnique({
+	    where: {
+		name: req.body.name
+	    }
+	})
 	if (node)
 	{
+	    /*
             await node.update({
 		OrganisationId: req.body.OrganisationId || node.OrganisationId
-            });
-            res.send(node.toJSON())
+		});
+	    */
+	    const new_node = await prisma.nodes.update({
+		where: {
+		    name: node.name
+		},
+		data: {
+		    OrganisationId: req.body.OrganisationId || node.OrganisationId
+		}
+	    })
+            res.json(new_node)
 	}
     } catch (err)
     {
@@ -266,21 +287,40 @@ node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
 
 node_router.get('/', authenticateToken, async (req, res) => {
     try {
+	/*
     const user = await User.findOne({
         where: {
             email: req.email
         }
-    })
+	})
+	*/
+	const user = await prisma.user.findUnique({
+	    where: {
+		email: req.email
+	    }
+	})
     if (user)
     {
-        const orga = await Organisation.findByPk(user.OrganisationId)
-        if (orga)
+        //const orga = await Organisation.findByPk(user.OrganisationId)
+	const orga = await prisma.organisations.findUnique({
+	    where: {
+		id: user.OrganisationId
+	    }
+	})
+	if (orga)
         {
+	    /*
             const nodes = await Node.findAll({
                 where: {
                     OrganisationId: orga.id
                 }
-            });
+		});
+	    */
+	    const nodes = await prisma.nodes.findMany({
+		where: {
+		    OrganisationId: orga.id
+		}
+	    })
             return res.send(nodes)
         } else
 	    return res.status(404).send("This user is not part of any organisations.")
@@ -294,14 +334,21 @@ node_router.get('/', authenticateToken, async (req, res) => {
 
 node_router.get('/:name', authenticateToken, async (req, res) => {
     try {
+	/*
     const node = await Node.findOne({
         where: {
             name: req.params.name
         }
-    });
+	});
+	*/
+	const node = await prisma.nodes.findUnique({
+	    where: {
+		name: req.params.name
+	    }
+	})
     if (node)
     {
-        return res.send(node.toJSON())
+        return res.json(node)
     } else {
         return res.status(404).send("node not found")
     }
@@ -318,23 +365,41 @@ node_router.post('/', authenticateToken, async (req, res) => {
 	    {
 		throw new Error("")
 	    }
+	/*
 	const user = await User.findOne({
         where: {
             email: req.email
         }
 	})
+	*/
+	const user = await prisma.user.findUnique({
+	    where: {
+		email: req.email
+	    }
+	})
 	if (user) {
-		if (user.OrganisationId)
-		{
-		const node = await Node.create({
-		    name: req.body.name,
-		    longitude: req.body.longitude,
-		    latitude: req.body.latitude,
-		    OrganisationId: user.OrganisationId,
-		    description: req.body.description
-		});
-            	return res.send(node.toJSON())
-		}
+	    if (user.OrganisationId)
+	    {
+		/*
+		  const node = await Node.create({
+		  name: req.body.name,
+		  longitude: req.body.longitude,
+		  latitude: req.body.latitude,
+		  OrganisationId: user.OrganisationId,
+		  description: req.body.description
+		  });
+		*/
+		const node = await prisma.nodes.create({
+		    data: {
+			name: req.body.name,
+			longitude: req.body.longitude,
+			latitude: req.body.latitude,
+			OrganisationId: user.OrganisationId,
+			description: req.body.description
+		    }
+		})
+            	return res.json(node)
+	    }
 	}
 	return res.sendStatus(401)
     } catch (error) {
@@ -345,22 +410,42 @@ node_router.post('/', authenticateToken, async (req, res) => {
 node_router.patch('/', authenticateToken, async (req, res) => {
 
     try {
-    const node = await Node.findOne({
-        where: {
-            name: req.body.name
-        }
-    });
 
-    if (node)
-    {
-        await node.update({
-            latitude: req.body.latitude || node.latitude,
-            longitude: req.body.longitude || node.longitude,
-            addressId: req.body.address || node.addressId,
-	    description: req.body.description || node.description
-        });
-        res.send(node.toJSON())
-    }
+	/*
+	  const node = await Node.findOne({
+          where: {
+          name: req.body.name
+          }
+	  });
+	*/
+	const node = await prisma.nodes.findUnique({
+	    where: {
+		name: req.body.name
+	    }
+	})
+	if (node)
+	{
+	    /*
+            await node.update({
+		latitude: req.body.latitude || node.latitude,
+		longitude: req.body.longitude || node.longitude,
+		addressId: req.body.address || node.addressId,
+		description: req.body.description || node.description
+            });
+	    */
+	    const new_node = await prisma.nodes.update({
+		where: {
+		    id: node.id
+		},
+		data: {
+		    latitude: req.body.latitude || node.latitude,
+		    longitude: req.body.longitude || node.longitude,
+		    addressId: req.body.address || node.addressId,
+		    description: req.body.description || node.description
+		}
+	    })
+	    res.json(new_node)
+	}
     } catch (error)
     {
 	console.error(error)
@@ -370,19 +455,24 @@ node_router.patch('/', authenticateToken, async (req, res) => {
 
 node_router.delete('/', authenticateToken, async (req, res) => {
     try {
-    const node = await Node.findOne({
-        where:{
-          name: req.body.name
-        }
-      })
-    
-      if (node)
-      {
-        await node.destroy()
-        res.send("success")
-      } else {
-        res.status(404).send("Node not found");
-      }
+	/*
+	const node = await Node.findOne({
+            where:{
+		name: req.body.name
+            }
+	})
+	*/
+	const node = await prisma.nodes.delete({
+	    where: {
+		name: req.body.name
+	    }
+	})
+	if (node)
+	{
+            res.send("success")
+	} else {
+            res.status(404).send("Node not found");
+	}
     } catch (error)
     {
 	console.error(error)

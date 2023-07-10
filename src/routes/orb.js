@@ -1,6 +1,8 @@
 import express from "express";
-import Orb from "../db/models/Orb.js";
+//import Orb from "../db/models/Orb.js";
 import {authenticateTokenAdm, authenticateToken} from "../utils.js";
+
+import prisma from '../db/prisma.js'
 
 /**
  * @swagger
@@ -120,29 +122,36 @@ const orb_router = express.Router();
  */
 
 orb_router.post('/', authenticateTokenAdm, async (req, res) => {
-  try {
-    const { keypoints, descriptors } = req.body;
+    try {
+	const { keypoints, descriptors } = req.body;
 
-    if (!keypoints || !descriptors) {
-      return res.status(400).json({ error: 'Key points and descriptors are required' });
+	if (!keypoints || !descriptors) {
+	    return res.status(400).json({ error: 'Key points and descriptors are required' });
+	}
+	/*
+	  const orbData = await Orb.create({
+	  keypoints: keypoints,
+	  descriptors: descriptors,
+	  });
+	*/
+	const orbData = await prisma.orb.create({
+	    data: {
+		keypoints: keypoints,
+		descriptors: descriptors
+	    }
+	})
+	res.status(201).json({ image_id: orbData.id });
+    } catch (error) {
+	console.error(error);
+	res.status(500).json({ error: 'Internal server error' });
     }
-
-    const orbData = await Orb.create({
-      keypoints: keypoints,
-      descriptors: descriptors,
-    });
-
-    res.status(201).json({ image_id: orbData.id });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
 });
 
 
 orb_router.get('/admin', async (req, res) => {
     try {
-	const orbs = await Orb.findAll();
+	//const orbs = await Orb.findAll();
+	const orbs = await prisma.orb.findMany();
 	res.send(orbs);
     } catch (error)
     {
@@ -153,51 +162,73 @@ orb_router.get('/admin', async (req, res) => {
 
 orb_router.get('/:id', authenticateTokenAdm, async (req, res) => {
   try {
-    const { id } = req.params;
-    const orbData = await Orb.findByPk(id);
+      const { id } = req.params;
+      
+      //const orbData = await Orb.findByPk(id);
+      const orbData = await prisma.orb.findUnique({
+	  where: {
+	      id: id
+	  }
+      })
+      if (!orbData) {
+	  return res.status(404).json({ error: 'Data not found' });
+      }
 
-    if (!orbData) {
-      return res.status(404).json({ error: 'Data not found' });
-    }
-
-    res.json({
-      image_id: orbData.id,
-      keypoints: JSON.parse(orbData.keypoints),
-      descriptors: JSON.parse(orbData.descriptors),
-    });
+      res.json({
+	  image_id: orbData.id,
+	  keypoints: JSON.parse(orbData.keypoints),
+	  descriptors: JSON.parse(orbData.descriptors),
+      });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 orb_router.delete('/', authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.body;
-    const orbData = await Orb.findByPk(id);
-
-    if (!orbData) {
-      return res.status(404).json({ error: 'Data not found' });
+    try {
+	const { id } = req.body;
+	//const orbData = await Orb.findByPk(id);
+	const orbData = await prisma.orb.delete({
+	    where: {
+		id: id
+	    }
+	})
+	if (!orbData) {
+	    return res.status(404).json({ error: 'Data not found' });
+	}
+	//await orbData.delete();
+	res.json({success: true});
+    } catch (error) {
+	console.error(error);
+	res.status(500).json({ error: 'Internal server error' });
     }
-      await orbData.delete();
-      res.json({success: true});
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
 });
 
 orb_router.patch('/', authenticateToken, async (req, res) => {
-
     try {
 	const {id} = req.body
-	const OrbData = await Orb.findByPk(id);
+	//const OrbData = await Orb.findByPk(id);
+
+	const OrbData = await prisma.orb.findUnique({
+	    where: {
+		id: id
+	    }
+	})
 	if (OrbData) {
+	    /*
 	    await OrbData.update({
 		checkpoints: req.body.checkpoints || user.checkpoints,
 		descriptors: req.body.descriptors || user.descriptors
+		})
+	    */
+	    const new_orb = await prisma.orb.update({
+		data: {
+		    checkpoints: req.body.checkpoints || OrbData.checkpoints,
+		    descriptors: req.body.descriptors || OrbData.descriptors
+		}
 	    })
-	    return res.send(OrbData.toJSON())
+	    return res.json(OrbData)
 	}
     } catch (e) {
 	res.status(500).send("Unexpected error")

@@ -12,6 +12,7 @@
   "author": "SheItoon",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^4.15.0",
     "axios": "^1.4.0",
     "chai": "^4.3.7",
     "cors": "^2.8.5",
@@ -37,6 +38,7 @@
   "devDependencies": {
     "c8": "^7.13.0",
     "nyc": "^15.1.0",
-    "sequelize-cli": "^6.6.0"
+    "prisma": "^4.15.0",
+    "sequelize-cli": "^6.6.1"
   }
 }

@@ -1,6 +1,10 @@
 import express from "express";
+/*
 import User from "../db/models/Users.js"
 import Organisation from "../db/models/Organisations.js";
+*/
+
+import prisma from '../db/prisma.js'
 import { authenticateToken, authenticateTokenAdm} from '../utils.js';
  
 const orga_router = express.Router();
@@ -47,8 +51,6 @@ const orga_router = express.Router();
  *           schema:
  *            required:
  *             - name
- *             - longitude
- *             - latitude 
  *            type: object
  *            properties:
  *              name:
@@ -73,11 +75,11 @@ const orga_router = express.Router();
  *         application/json:
  *           schema:
  *            required:
- *             - name 
+ *             - id 
  *            type: object
  *            properties:
- *              name:
- *                type: string
+ *              id:
+ *                type: number
  *              address:
  *                type: integer
  *              new_name:
@@ -103,11 +105,11 @@ const orga_router = express.Router();
  *         application/json:
  *           schema:
  *            required:
- *             - name 
+ *             - id
  *            type: object
  *            properties:
- *              name:
- *                type: string
+ *              id:
+ *                type: number
  *     responses:
  *       200:
  *         description: Confirmation string
@@ -138,61 +140,85 @@ const orga_router = express.Router();
  */
 
 orga_router.get('/', authenticateTokenAdm, async (req, res) => {
-  const orgas = await Organisation.findAll();  
-  res.send(orgas);
+    //const orgas = await Organisation.findAll();  
+    const orgas = await prisma.organisations.findMany();
+    res.send(orgas);
 })
 
 orga_router.post('/', authenticateTokenAdm, async (req, res) => {
-  
     try {
-      const orga = await Organisation.create({
-        name: req.body.name
-      })
-      res.send(orga);  
+	/*
+	const orga = await Organisation.create({
+            name: req.body.name
+	    })
+	*/
+	const orga = await prisma.organisations.create({
+	    data: {
+		name: req.body.name
+	    }
+	})
+	res.json(orga);  
     } catch (error) {
-      res.status(401).send("name already taken");
+	res.status(401).send("name already taken");
     }
 })
   
 orga_router.patch('/', authenticateTokenAdm, async (req, res) => {
     try {
-    const orga = await Organisation.findOne({
-      where: {
-        name: req.body.name
-      }
-    });
-    if (orga)
-    {
-      await orga.update({
-        name: req.body.new_name || orga.name,
-        addressId: req.body.address || orga.addressId
-      })
-      
-      res.send(orga);
-    } else {
-      res.status(404).send("Organisation not found");
-    }
+	//const orga = await Organisation.findByPk(req.body.id)
+
+	if (!req.body.id)
+	    return res.status(404).send("Organisation not found");
+	const orga = await prisma.organisations.findUnique({
+	    where: {
+		id: req.body.id
+	    }
+	})
+	if (orga)
+	{
+	    /*
+	    await orga.update({
+		name: req.body.new_name || orga.name,
+		addressId: req.body.address || orga.addressId
+	    })
+	    */
+	    const new_orga = await prisma.organisations.update({
+		where: {
+		    id: orga.id
+		},
+		data: {
+		    name: req.body.new_name || orga.name,
+		    addressId: req.body.address || orga.addressId
+		}
+	    })
+	    res.json(new_orga);
+	} else {
+	    res.status(404).send("Organisation not found");
+	}
     } catch (err)
     {
+	console.log(err)
 	res.sendStatus(500);
     }
 })
   
 orga_router.delete('/', authenticateTokenAdm, async (req, res) => {
     try {
-    const orga = await Organisation.findOne({
-      where: {
-        name: req.body.name
-      }
-    })
-  
-    if (orga)
-    {
-      await orga.destroy()
-      res.send("success")
-    } else {
-      res.status(404).send("Organisation not found");
-    }
+	//const orga = await Organisation.findByPk(req.body.id)
+	if (! req.body.id)
+	    return res.status(404).send("Organisation not found");
+	const orga = await prisma.organisations.delete({
+	    where: {
+		id: req.body.id
+	    }
+	})
+	if (orga)
+	{
+	    //await orga.destroy()
+	    res.send("success")
+	} else {
+	    res.status(404).send("Organisation not found");
+	}
     } catch (err)
     {
 	res.sendStatus(500)

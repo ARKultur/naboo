@@ -1,8 +1,10 @@
 import express from "express";
 
-import {Customer} from '../db/models/index.js'
+//import {Customer} from '../db/models/index.js'
 
-import { authenticateToken, authenticateTokenAdm, checkCustomer} from '../utils.js';
+import prisma from '../db/prisma.js'
+
+import { authenticateToken, authenticateTokenAdm, checkCustomer, generateAccessToken} from '../utils.js';
 
 /**
  * @swagger
@@ -137,7 +139,7 @@ const customer_router = express.Router();
  *               $ref: '#/components/schemas/Customer'
  *       401:
  *         description: Email or username already taken
- * /api/customers:
+ * /api/customers/all:
  *   get:
  *     security:
  *       - userBearerAuth: []
@@ -152,7 +154,29 @@ const customer_router = express.Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Customer'
- * 
+ * /api/customers?email={email}:
+ *   get:
+ *     security:
+ *       - userBearerAuth: []
+ *     summary: Get the customer by the email
+ *     tags: [Customers]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The customer's email
+ *     responses:
+ *       200:
+ *        description: The customer's data
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/User'
+ *       404:
+ *         description: customer not found
+ * /api/customers:
  *   post:
  *     security:
  *       - adminBearerAuth: []
@@ -221,30 +245,40 @@ const customer_router = express.Router();
 
 customer_router.post("/login", async (req, res) => {
     try {
-        const user = await checkCustomer(req.body.email, req.body.password) || await checkAdmin(req.body.email, req.body.password)
-        if (user)
+        const user = await checkCustomer(req.body.email, req.body.password)
+	//console.log(user)
+	
+	if (user)
         {
           const token = generateAccessToken(req.body.email);
-        
           res.json(token);
         } else
         {
           res.status(401).send("invalid credentials");  
         }
       } catch (error) {
-        res.status(401).send("invalid credentials");  
+	  console.error(error)
+	  res.sendStatus(500);  
       }
 })
 
 customer_router.post("/register", async (req, res) => {
     try {
-  
+	/*
         let customer = await Customer.create({
           username: req.body.username,
           password: req.body.password,
           email: req.body.email
-        });
-        res.send(customer.toJSON());
+          });
+	*/
+	const customer = await prisma.customers.create({
+	    data: {
+		username: req.body.username,
+		password: req.body.password,
+		email: req.body.email
+	    }
+	})
+        res.json(customer);
       } catch (err)
       {
         console.log(err);
@@ -253,36 +287,62 @@ customer_router.post("/register", async (req, res) => {
 })
 
 customer_router.get('/admin', authenticateTokenAdm, async (req, res) => {
-    const customers = await Customer.findAll();
-
+    //const customers = await Customer.findAll();
+    const customers = await prisma.customers.findMany();
     res.send(customers)
 })
 
-customer_router.get('/', authenticateToken, async (req, res) => {
-  const customers = await Customer.findAll();
-
+customer_router.get('/all', authenticateToken, async (req, res) => {
+  //const customers = await Customer.findAll();
+    const customers = await prisma.customers.findMany();
   res.send(customers)
 })
 
-customer_router.get("/:id", authenticateToken, async (req, res) => {
-    const customer = await Customer.findByPk(req.params.id)
-
-    if (customer)
+customer_router.get("/", authenticateToken, async (req, res) => {
+    try {
+	const {email} = req.query
+	/*
+	const customer = await Customer.findOne({
+	    where: {
+		email: email
+	    }
+	})
+	*/
+	const customer = await prisma.customers.findUnique({
+	    where: {
+		email: email
+	    }
+	})
+	if (customer)
+	{
+	    res.json(customer)
+	} else {
+	    res.status(404).send("Customer not found")
+	}
+    } catch (error)
     {
-        return res.send(customer.toJSON())
+	console.error(error)
+	res.sendStatus(500)
     }
-    res.status(404).send("Customer not found")
 })
 
 customer_router.post("/", authenticateTokenAdm, async (req, res) => {
     try {
-        
+        /*
         let customer = await Customer.create({
           username: req.body.username,
           password: req.body.password,
           email: req.body.email
-        });
-        res.send(customer.toJSON());
+          });
+	*/
+	const customer = await prisma.customers.create({
+	    data: {
+		username: req.body.username,
+		password: req.body.password,
+		email: req.body.email
+	    }
+	})
+        res.json(customer);
       } catch (err)
       {
         console.log(err);
