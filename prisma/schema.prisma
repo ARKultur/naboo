@@ -134,3 +134,10 @@ model user {
   organisations                     organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
   adresses_user_addressIdToadresses adresses?      @relation("user_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
+
+model suggestions {
+  uuid        String  @id @db.Uuid
+  title       String  @db.VarChar(255)
+  description String  @db.VarChar(255)
+  image       String  @db.VarChar(255)
+}
