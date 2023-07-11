@@ -58,7 +58,7 @@ try {
     */
     const check = await db_init();
     //console.log(check)
-    if (!check)
+    if (process.env.VM == true ||!check)
     {
         execSync('npx prisma db pull', {stdio: 'inherit'})
         execSync('npx prisma generate', {stdio: 'inherit'})
