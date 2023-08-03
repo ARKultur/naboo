@@ -277,7 +277,13 @@ node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
 		    name: node.name
 		},
 		data: {
-		    OrganisationId: req.body.OrganisationId || node.OrganisationId
+		    OrganisationId: req.body.OrganisationId || node.OrganisationId,
+		    name: req.body.name,                                                                                                                                                                                                    
+                    longitude: req.body.longitude || node.longitude,
+                    latitude: req.body.latitude || node.latitude,
+                    addressId: req.body.addressId || node.addressId,
+                    description: req.body.description || node.description,
+		    status: req.body.status || node.status
 		}
 	    })
             res.json(new_node)
@@ -286,6 +292,26 @@ node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
     {
 	console.error(err)
 	res.sendStatus(500)
+    }
+})
+
+node_router.delete('/admin', authenticateTokenAdm, async (req, res) => {
+    try {
+	const node = await prisma.nodes.delete({
+	    where: {
+		name: req.body.name
+	    }
+	})
+	if (node)
+	{
+            res.send("success")
+	} else {
+            res.status(404).send("Node not found");
+	}
+    } catch (error)
+    {
+	console.error(error)
+	res.sendStatus(500);
     }
 })
 

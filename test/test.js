@@ -351,6 +351,24 @@ describe('test routes', function () {
 	    const res = await patch(req, '/api/nodes', token_user)
 	    expect(res.name).to.equal('test_node')
 	})
+
+	it('patch a node with admin', async () => {
+	    let req = {
+		email: process.env.ADMIN_EMAIL,
+		password: process.env.ADMIN_PASSWORD,
+		username: 'jaj'
+	    }
+	    const token_adm = await post(req, '/api/login');
+
+	    req = {
+		name: 'test_node',
+		longitude: 15,
+		latitude: 20,
+	    }
+
+	    const res = await patch(req, '/api/nodes/admin', token_adm)
+	    expect(res.longitude).to.equal(15)
+	})
     })
 
     describe('Test addresses routes', function() {

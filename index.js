@@ -59,7 +59,7 @@ try {
     const check = await db_init();
     //console.log(check)
     console.log(process.env.VM)
-    console.log(process.env.VM == true)
+    console.log(process.env.VM === 'true')
     if (process.env.VM == true ||!check)
     {
         execSync('npx prisma db pull', {stdio: 'inherit'})
