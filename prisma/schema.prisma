@@ -134,3 +134,8 @@ model user {
   organisations                     organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
   adresses_user_addressIdToadresses adresses?      @relation("user_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
+
+model newsletter {
+  uuid  String  @id @db.Uuid
+  email String  @unique @db.VarChar(255)
+}
