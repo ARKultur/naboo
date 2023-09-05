@@ -133,9 +133,17 @@ model user {
   adresses_adresses_UserIdTouser    adresses[]     @relation("adresses_UserIdTouser")
   organisations                     organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
   adresses_user_addressIdToadresses adresses?      @relation("user_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  likedSuggestions                  suggestions[]  @relation("UserLikedSuggestions", references: [uuid])
 }
 
 model newsletter {
   uuid  String  @id @db.Uuid
   email String  @unique @db.VarChar(255)
+}
+
+model suggestions {
+  uuid         String  @id @db.Uuid
+  name         String  @unique @db.VarChar(255)
+  description  String  @unique @db.VarChar(255)
+  imageUrl     String  @unique @db.VarChar(255)
 }
