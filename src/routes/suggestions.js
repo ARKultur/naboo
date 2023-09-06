@@ -19,7 +19,7 @@ suggestions_router.post("/", authenticateTokenAdm, async (req, res) => {
   try {
     const { name, description, imageUrl } = req.body;
 
-    if (!name || !description || imageUrl)
+    if (!name || !description || !imageUrl)
       return res.status(400).send("Missing value");
 
     await prisma.suggestions.create({
