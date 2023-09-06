@@ -44,7 +44,7 @@ model adresses {
 }
 
 model contact {
-  uuid        String  @id @default(autoincrement())
+  uuid        Int     @id @default(autoincrement())
   name        String  @db.VarChar(255)
   category    String  @db.VarChar(255)
   description String  @db.VarChar(255)

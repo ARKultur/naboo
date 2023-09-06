@@ -76,6 +76,39 @@ async function generateAdm() {
     }
 }
 
+async function authenticateTokenCustomer(req, res, next) {
+    if (req.session && req.session.userId)
+    {
+	try {
+	    //const user = await User.findByPk(req.session.userId);
+	    const user = await prisma.customers.findUnique({ where: { id: req.session.userId } });
+	    if (!user) {
+		return res.sendStatus(401);
+	    }
+	    req.email = user.email;
+	    return next();
+	} catch (err) {
+	    console.error(err);
+	    return res.sendStatus(401);
+	}
+    } else {
+
+	const authHeader = req.headers['authorization']
+	const token = authHeader && authHeader.split(' ')[1]
+
+	
+	if (token == null) return res.sendStatus(401)
+	
+	jwt.verify(token.toString(), process.env.TOKEN_SECRET, (err, user) => {
+	    
+	    if (err) return res.sendStatus(403)
+	    req.email = user.username
+	    
+	    next()
+	})
+    }
+}
+
 async function authenticateToken(req, res, next) {
     if (req.session && req.session.userId)
     {
@@ -215,4 +248,4 @@ async function checkAdmin(email, password) {
     return undefined
 }
 
-export {generateAccessToken, authenticateToken, checkUser, checkAdmin, authenticateTokenAdm, checkCustomer, generateAdm, isEmpty};
+export {generateAccessToken, authenticateToken, checkUser, checkAdmin, authenticateTokenAdm, checkCustomer, generateAdm, isEmpty, authenticateTokenCustomer};
