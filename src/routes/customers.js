@@ -2,9 +2,15 @@ import express from "express";
 
 //import {Customer} from '../db/models/index.js'
 
-import prisma from '../db/prisma.js'
+import prisma from "../db/prisma.js";
 
-import { authenticateToken, authenticateTokenAdm, checkCustomer, generateAccessToken, authenticateTokenCustomer} from '../utils.js';
+import {
+  authenticateToken,
+  authenticateTokenAdm,
+  checkCustomer,
+  generateAccessToken,
+  authenticateTokenCustomer,
+} from "../utils.js";
 
 /**
  * @swagger
@@ -88,7 +94,7 @@ const customer_router = express.Router();
  *           schema:
  *            required:
  *             - email
- *             - password 
+ *             - password
  *            type: object
  *            properties:
  *              email:
@@ -197,7 +203,7 @@ const customer_router = express.Router();
  *               $ref: '#/components/schemas/Customer'
  *       500:
  *         description: Some server error
- * 
+ *
  * /api/customers/{id}:
  *   get:
  *     security:
@@ -244,169 +250,163 @@ const customer_router = express.Router();
  */
 
 customer_router.post("/login", async (req, res) => {
-    try {
-        const user = await checkCustomer(req.body.email, req.body.password)
-	//console.log(user)
-	
-	if (user)
-        {
-          const token = generateAccessToken(req.body.email);
-          res.json(token);
-        } else
-        {
-          res.status(401).send("invalid credentials");  
-        }
-      } catch (error) {
-	  console.error(error)
-	  res.sendStatus(500);  
-      }
-})
+  try {
+    const user = await checkCustomer(req.body.email, req.body.password);
+    //console.log(user)
+
+    if (user) {
+      const token = generateAccessToken(req.body.email);
+      res.json(token);
+    } else {
+      res.status(401).send("invalid credentials");
+    }
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
 
 customer_router.post("/register", async (req, res) => {
-    try {
-	/*
+  try {
+    /*
         let customer = await Customer.create({
           username: req.body.username,
           password: req.body.password,
           email: req.body.email
           });
 	*/
-	const customer = await prisma.customers.create({
-	    data: {
-		username: req.body.username,
-		password: req.body.password,
-		email: req.body.email
-	    }
-	})
-        res.json(customer);
-      } catch (err)
-      {
-        console.log(err);
-        res.status(401).send("email or username already taken");
-      }
-})
+    const customer = await prisma.customers.create({
+      data: {
+        username: req.body.username,
+        password: req.body.password,
+        email: req.body.email,
+      },
+    });
+    res.json(customer);
+  } catch (err) {
+    console.log(err);
+    res.status(401).send("email or username already taken");
+  }
+});
 
-customer_router.get('/admin', authenticateTokenAdm, async (req, res) => {
-    //const customers = await Customer.findAll();
-    const customers = await prisma.customers.findMany();
-    res.send(customers)
-})
+customer_router.get("/admin", authenticateTokenAdm, async (req, res) => {
+  //const customers = await Customer.findAll();
+  const customers = await prisma.customers.findMany();
+  res.send(customers);
+});
 
-customer_router.patch('/admin/:id', authenticateTokenAdm, async (req , res) => {
-    try {
-	const customer = await prisma.customers.findFirst({
-            where:{
-                id: req.body.id
-            }
-        })
-	if (customer) {
-	    const updated_customer = await prisma.customers.update({
-                where: {
-                    id: customer.id
-                },
-                data: {
-		    username: req.body.username || customer.username,
-		    password: req.body.password || customer.password,
-		    first_name: req.body.first_name || customer.first_name,
-		    last_name: req.body.last_name || customer.last_name,
-		    phone_number: req.body.phone_number || customer.phone_number
-                }
-            })
-	    return res.send(updated_customer)
-	}
-    } catch (err) {
-	res.status(500).send("Unexpected error")
+customer_router.patch("/admin/:id", authenticateTokenAdm, async (req, res) => {
+  try {
+    const customer = await prisma.customers.findFirst({
+      where: {
+        id: req.body.id,
+      },
+    });
+    if (customer) {
+      const updated_customer = await prisma.customers.update({
+        where: {
+          id: customer.id,
+        },
+        data: {
+          username: req.body.username || customer.username,
+          password: req.body.password || customer.password,
+          first_name: req.body.first_name || customer.first_name,
+          last_name: req.body.last_name || customer.last_name,
+          phone_number: req.body.phone_number || customer.phone_number,
+        },
+      });
+      return res.send(updated_customer);
     }
-})
+  } catch (err) {
+    res.status(500).send("Unexpected error");
+  }
+});
 
 /* c8 ignore next 26 */
-customer_router.patch('/', authenticateTokenCustomer, async (req, res) => {
-    try {
-	const customer = await prisma.customers.findFirst({
-            where:{
-                email: req.email
-            }
-        })
-	if (customer) {
-	    const updated_customer = await prisma.customers.update({
-                where: {
-                    id: customer.id
-                },
-                data: {
-		    username: req.body.username || customer.username,
-		    password: req.body.password || customer.password,
-		    first_name: req.body.first_name || customer.first_name,
-		    last_name: req.body.last_name || customer.last_name,
-		    phone_number: req.body.phone_number || customer.phone_number
-                }
-            })
-	    return res.send(updated_customer)
-	}
-    } catch (err) {
-	res.status(500).send("Unexpected error")
+customer_router.patch("/", authenticateTokenCustomer, async (req, res) => {
+  try {
+    const customer = await prisma.customers.findFirst({
+      where: {
+        email: req.email,
+      },
+    });
+    if (customer) {
+      const updated_customer = await prisma.customers.update({
+        where: {
+          id: customer.id,
+        },
+        data: {
+          username: req.body.username || customer.username,
+          password: req.body.password || customer.password,
+          first_name: req.body.first_name || customer.first_name,
+          last_name: req.body.last_name || customer.last_name,
+          phone_number: req.body.phone_number || customer.phone_number,
+          likedSuggestions:
+            req.body.likedSuggestions || customer.likedSuggestions,
+        },
+      });
+      return res.send(updated_customer);
     }
-})
+  } catch (err) {
+    res.status(500).send("Unexpected error");
+  }
+});
 
-customer_router.get('/all', authenticateToken, async (req, res) => {
+customer_router.get("/all", authenticateToken, async (req, res) => {
   //const customers = await Customer.findAll();
-    const customers = await prisma.customers.findMany();
-  res.send(customers)
-})
+  const customers = await prisma.customers.findMany();
+  res.send(customers);
+});
 
 customer_router.get("/", authenticateTokenCustomer, async (req, res) => {
-    try {
-	const email = req.email
-	/*
+  try {
+    const email = req.email;
+    /*
 	const customer = await Customer.findOne({
 	    where: {
 		email: email
 	    }
 	})
 	*/
-	const customer = await prisma.customers.findUnique({
-	    where: {
-		email: email
-	    }
-	})
-	if (customer)
-	{
-	    res.json(customer)
-	} else {
-	    res.status(404).send("Customer not found")
-	}
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500)
+    const customer = await prisma.customers.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (customer) {
+      res.json(customer);
+    } else {
+      res.status(404).send("Customer not found");
     }
-})
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
 
 customer_router.post("/", authenticateTokenAdm, async (req, res) => {
-    try {
-        /*
+  try {
+    /*
         let customer = await Customer.create({
           username: req.body.username,
           password: req.body.password,
           email: req.body.email
           });
 	*/
-	const customer = await prisma.customers.create({
-	    data: {
-		username: req.body.username,
-		password: req.body.password,
-		email: req.body.email
-	    }
-	})
-        res.json(customer);
-      } catch (err)
-      {
-        console.log(err);
-        res.status(401).send("email or username already taken");
-      }
-})
+    const customer = await prisma.customers.create({
+      data: {
+        username: req.body.username,
+        password: req.body.password,
+        email: req.body.email,
+      },
+    });
+    res.json(customer);
+  } catch (err) {
+    console.log(err);
+    res.status(401).send("email or username already taken");
+  }
+});
 
-customer_router.post("/:id", authenticateToken, async (req,res) => {
-
-})
+customer_router.post("/:id", authenticateToken, async (req, res) => {});
 
 export default customer_router;
