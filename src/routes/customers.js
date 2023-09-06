@@ -4,7 +4,7 @@ import express from "express";
 
 import prisma from '../db/prisma.js'
 
-import { authenticateToken, authenticateTokenAdm, checkCustomer, generateAccessToken} from '../utils.js';
+import { authenticateToken, authenticateTokenAdm, checkCustomer, generateAccessToken, authenticateTokenCustomer} from '../utils.js';
 
 /**
  * @swagger
@@ -292,15 +292,70 @@ customer_router.get('/admin', authenticateTokenAdm, async (req, res) => {
     res.send(customers)
 })
 
+customer_router.patch('/admin/:id', authenticateTokenAdm, async (req , res) => {
+    try {
+	const customer = await prisma.customers.findFirst({
+            where:{
+                id: req.body.id
+            }
+        })
+	if (customer) {
+	    const updated_customer = await prisma.customers.update({
+                where: {
+                    id: customer.id
+                },
+                data: {
+		    username: req.body.username || customer.username,
+		    password: req.body.password || customer.password,
+		    first_name: req.body.first_name || customer.first_name,
+		    last_name: req.body.last_name || customer.last_name,
+		    phone_number: req.body.phone_number || customer.phone_number
+                }
+            })
+	    return res.send(updated_customer)
+	}
+    } catch (err) {
+	res.status(500).send("Unexpected error")
+    }
+})
+
+/* c8 ignore next 26 */
+customer_router.patch('/', authenticateTokenCustomer, async (req, res) => {
+    try {
+	const customer = await prisma.customers.findFirst({
+            where:{
+                email: req.email
+            }
+        })
+	if (customer) {
+	    const updated_customer = await prisma.customers.update({
+                where: {
+                    id: customer.id
+                },
+                data: {
+		    username: req.body.username || customer.username,
+		    password: req.body.password || customer.password,
+		    first_name: req.body.first_name || customer.first_name,
+		    last_name: req.body.last_name || customer.last_name,
+		    phone_number: req.body.phone_number || customer.phone_number
+                }
+            })
+	    return res.send(updated_customer)
+	}
+    } catch (err) {
+	res.status(500).send("Unexpected error")
+    }
+})
+
 customer_router.get('/all', authenticateToken, async (req, res) => {
   //const customers = await Customer.findAll();
     const customers = await prisma.customers.findMany();
   res.send(customers)
 })
 
-customer_router.get("/", authenticateToken, async (req, res) => {
+customer_router.get("/", authenticateTokenCustomer, async (req, res) => {
     try {
-	const {email} = req.query
+	const email = req.email
 	/*
 	const customer = await Customer.findOne({
 	    where: {
