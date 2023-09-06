@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
@@ -44,7 +44,7 @@ model adresses {
 }
 
 model contact {
-  uuid        String  @id @db.Uuid
+  uuid        Int     @id @default(autoincrement())
   name        String  @db.VarChar(255)
   category    String  @db.VarChar(255)
   description String  @db.VarChar(255)
@@ -90,7 +90,7 @@ model nodes {
   orbId                              Int?
   description                        String         @db.VarChar(255)
   OrganisationId                     Int?
-  status			     String?
+  status                             String?
   adresses_adresses_NodeIdTonodes    adresses[]     @relation("adresses_NodeIdTonodes")
   data_orb_data_orb_orbIdTonodes     data_orb[]     @relation("data_orb_orbIdTonodes")
   guide                              guide[]
@@ -133,17 +133,19 @@ model user {
   adresses_adresses_UserIdTouser    adresses[]     @relation("adresses_UserIdTouser")
   organisations                     organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
   adresses_user_addressIdToadresses adresses?      @relation("user_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  likedSuggestions                  suggestions[]  @relation("UserLikedSuggestions", references: [uuid])
+  likedSuggestions                  suggestions[]
 }
 
 model newsletter {
-  uuid  String  @id @db.Uuid
-  email String  @unique @db.VarChar(255)
+  uuid  String @id @default(uuid())
+  email String @unique @db.VarChar(255)
 }
 
 model suggestions {
-  uuid         String  @id @db.Uuid
-  name         String  @unique @db.VarChar(255)
-  description  String  @unique @db.VarChar(255)
-  imageUrl     String  @unique @db.VarChar(255)
+  uuid        String @id @default(uuid())
+  name        String @unique @db.VarChar(255)
+  description String @unique @db.VarChar(255)
+  imageUrl    String @unique @db.VarChar(255)
+  user        user?  @relation(fields: [userId], references: [id])
+  userId      Int?
 }
