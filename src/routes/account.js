@@ -656,6 +656,7 @@ account_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
 	    return res.send(updated_user)
 	}
     } catch (err) {
+	console.log(err)
 	res.status(500).send("Unexpected error")
     }
 })
