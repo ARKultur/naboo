@@ -44,12 +44,12 @@ model adresses {
 }
 
 model contact {
-  uuid        Int     @id @default(autoincrement())
   name        String  @db.VarChar(255)
   category    String  @db.VarChar(255)
   description String  @db.VarChar(255)
   email       String  @db.VarChar(255)
   processed   Boolean @default(false)
+  uuid        Int     @id @default(autoincrement())
 }
 
 model customers {
@@ -74,11 +74,29 @@ model data_orb {
   nodes_nodes_orbIdTodata_orb nodes[] @relation("nodes_orbIdTodata_orb")
 }
 
+model review {
+  id       String   @id @default(uuid())
+  stars    Int
+  message  String
+  guideId  Int
+  userId   Int
+  datetime DateTime @default(now())
+  guide    guide    @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  user     user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model guide {
-  id     Int    @id @default(autoincrement())
-  text   String @db.VarChar(255)
-  NodeId Int?
-  nodes  nodes? @relation(fields: [NodeId], references: [id], onDelete: Cascade)
+  id           Int      @id @default(autoincrement())
+  NodeId       Int?
+  description  String   @db.VarChar(255)
+  keywords     String[]
+  openingHours String[]
+  priceDesc    String[]
+  priceValue   Float[]
+  title        String
+  website      String?
+  nodes        nodes?   @relation(fields: [NodeId], references: [id], onDelete: Cascade)
+  reviews      review[]
 }
 
 model nodes {
@@ -131,9 +149,10 @@ model user {
   tokenExpiration                   DateTime?      @db.Timestamptz(6)
   OrganisationId                    Int?
   adresses_adresses_UserIdTouser    adresses[]     @relation("adresses_UserIdTouser")
+  reviews                           review[]
+  likedSuggestions                  suggestions[]
   organisations                     organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
   adresses_user_addressIdToadresses adresses?      @relation("user_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  likedSuggestions                  suggestions[]
 }
 
 model newsletter {
@@ -146,6 +165,6 @@ model suggestions {
   name        String @unique @db.VarChar(255)
   description String @unique @db.VarChar(255)
   imageUrl    String @unique @db.VarChar(255)
-  user        user?  @relation(fields: [userId], references: [id])
   userId      Int?
+  user        user?  @relation(fields: [userId], references: [id])
 }
