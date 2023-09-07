@@ -11,6 +11,7 @@ import orb_router from "./orb.js";
 import adress_router from "./adresses.js";
 import newsletter_router from "./newsletter.js";
 import suggestions_router from "./suggestions.js";
+import review_router from "./review.js";
 
 let router = express.Router();
 
@@ -20,6 +21,7 @@ router
   })
   .use("/accounts", account_router);
 
+router.use("/review", review_router);
 router.use("/guides", guide_router);
 router.use("/nodes", node_router);
 router.use("/organisations", orga_router);

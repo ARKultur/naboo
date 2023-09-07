@@ -49,7 +49,7 @@ let guide_router = express.Router()
  *         application/json:
  *           schema:
  *            required:
- *             - text 
+ *             - text
  *            type: object
  *            properties:
  *              text:
@@ -74,7 +74,7 @@ let guide_router = express.Router()
  *         application/json:
  *           schema:
  *            required:
- *             - id 
+ *             - id
  *            type: object
  *            properties:
  *              text:
@@ -93,7 +93,7 @@ let guide_router = express.Router()
  *               $ref: '#/components/schemas/Guide'
  *       404:
  *         description: Guide not found
- * 
+ *
  *   delete:
  *     security:
  *       - userBearerAuth: []
@@ -105,7 +105,7 @@ let guide_router = express.Router()
  *         application/json:
  *           schema:
  *            required:
- *             - id 
+ *             - id
  *            type: object
  *            properties:
  *              id:
@@ -136,7 +136,7 @@ let guide_router = express.Router()
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Guide'
- * 
+ *
  * /api/guides/{id}:
  *   get:
  *     security:
@@ -249,8 +249,11 @@ guide_router.get("/:id", authenticateToken, async (req, res) => {
     try {
 	const guide = await prisma.guide.findUnique({
 	    where: {
-		id: parseInt(req.params.id)
-	    }
+		    id: parseInt(req.params.id)
+	    },
+        include: {
+            reviews: true
+        }
 	})
 	if (!guide || guide == null)
 	{
@@ -259,7 +262,7 @@ guide_router.get("/:id", authenticateToken, async (req, res) => {
 	res.json(guide)
     } catch (err)
     {
-	console.log('error: ',err)
+	console.log('error: ', err)
 	res.sendStatus(500)
     }
     /*
@@ -281,8 +284,14 @@ guide_router.post("/", authenticateToken, async (req, res) => {
 	*/
 	const guide = await prisma.guide.create({
 	    data: {
-		text: req.body.text
-	    }
+            title: req.body.title,
+            description: req.body.description,
+            keywords: req.body.keywords,
+            openingHours: req.body.openingHours,
+            website: req.body.website,
+            priceDesc: req.body.priceDesc,
+            priceValue: req.body.priceValue,
+	    },
 	})
         res.json(guide);
       } catch (err)
@@ -294,39 +303,45 @@ guide_router.post("/", authenticateToken, async (req, res) => {
 
 guide_router.patch("/", authenticateToken, async (req,res) => {
     try {
-	/*
-	const guide = await Guide.findOne({
-            where: {
-		id: req.body.id
-            }
-	});
-	
-	await guide.update({
-            text: req.body.text || guide.text,
-            NodeId: req.body.node || guide.NodeId
-	})
-	*/
+        /*
+        const guide = await Guide.findOne({
+                where: {
+            id: req.body.id
+                }
+        });
 
-	const guide = await prisma.guide.findUnique({
-	    where: {
-		id: req.body.id
-	    }
-	})
-	
-	if (!guide)
-	    return res.status(404).send("Guide not found")
-	const new_guide = await prisma.guide.update({
-	    where: {
-		id: guide.id
-	    },
-	    data: {
-		text: req.body.text || guide.text,
-		NodeId: req.body.node || guide.NodeId
-	    }
-	}) 
-	res.json(new_guide)
+        await guide.update({
+                text: req.body.text || guide.text,
+                NodeId: req.body.node || guide.NodeId
+        })
+        */
+
+        const guide = await prisma.guide.findUnique({
+            where: {
+                id: req.body.id
+            }
+        })
+
+        if (!guide)
+            return res.status(404).send("Guide not found")
+        const new_guide = await prisma.guide.update({
+            where: {
+                id: guide.id
+            },
+            data: {
+                title: req.body.title || guide.title,
+                description: req.body.description || guide.description,
+                keywords: req.body.keywords || guide.keywords,
+                openingHours: req.body.openingHours || guide.openingHours,
+                website: req.body.website || guide.website,
+                priceDesc: req.body.priceDesc || guide.priceDesc,
+                priceValue: req.body.priceValue || guide.priceValue,
+                NodeId: req.body.node || guide.NodeId
+            }
+        })
+        res.json(new_guide)
     } catch (err) {
-	res.sendStatus(500);
+	    res.sendStatus(500);
     }
 })
 
@@ -337,7 +352,7 @@ guide_router.delete("/", authenticateToken, async (req, res) => {
           id: req.body.id
         }
       })
-    
+
       if (guide)
       {
         await guide.destroy()
