@@ -43,6 +43,9 @@ let node_router = express.Router()
  *         status:
  *           type: string
  *           description: The status of the node
+ *         filter:
+ *           type: string
+ *           description: WIP
  *       example:
  *         id: 12
  *         name: Louvre
@@ -52,6 +55,7 @@ let node_router = express.Router()
  *         longitude: 152
  *         latitude: 35
  *         status: text
+ *         filter: text
  */
 
 /**
