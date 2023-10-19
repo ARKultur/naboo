@@ -9,10 +9,12 @@ suggestions_router.get("/", async (req, res) => {
     const suggestions = await prisma.suggestions.findMany();
 
     res.status(200).send(suggestions);
+    /*c8 ignore start */
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal Error");
   }
+  /* c8 ignore stop */
 });
 
 suggestions_router.post("/", authenticateTokenAdm, async (req, res) => {

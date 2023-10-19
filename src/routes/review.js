@@ -60,7 +60,7 @@ review_router.post("/:guideId", authenticateToken, async (req, res) => {
 
 review_router.get("/:id", authenticateToken, async (req, res) => {
   try {
-    const review = await prisma.review.findUnique({
+    const review = await prisma.review.findFirst({
       where: {
         guideId: parseInt(req.params.id)
       }
@@ -72,7 +72,7 @@ review_router.get("/:id", authenticateToken, async (req, res) => {
     res.json(review)
   }
   catch (err) {
-    console.log('error: ', err)
+    console.log(err)
     res.sendStatus(500)
   }
 })

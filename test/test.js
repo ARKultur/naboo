@@ -5,6 +5,7 @@ import { isEmpty } from '../src/utils.js'
 import prisma from '../src/db/prisma.js'
 
 describe('test routes', function () {
+	let guide_id;
     before('Mock db connection and load app', async function () {
 	await prisma.user.deleteMany();
 	await prisma.customers.deleteMany();
@@ -14,6 +15,8 @@ describe('test routes', function () {
 	await prisma.orb.deleteMany();
 	await prisma.contact.deleteMany();
 	await prisma.adresses.deleteMany();
+	await prisma.newsletter.deleteMany();
+	await prisma.suggestions.deleteMany();
     })
 
     describe('test utility routes', function () {
@@ -465,7 +468,6 @@ describe('test routes', function () {
 
     describe('Test guides routes', function() {
 	let token_user;
-	let guide_id;
 	
 	it('fetch all the guides', async () => {
 	    let req = {
@@ -483,12 +485,17 @@ describe('test routes', function () {
 	    token_user = await log_user();
 
 	    const req = {
-		text: "something"
+		title: "test",
+		description: "test",
+		keywords: "test",
+		openingHours: "jaj",
+		priceDesc: "tesst",
+		priceValue: 12.0
 	    }
 
 	    const res = await post(req, '/api/guides', token_user);
 	    guide_id = res.id;
-	    expect(res.text).to.equal('something')
+	    expect(res.title).to.equal('test')
 	})
 
 	it('fetch the guides of an organisation', async () => {
@@ -498,7 +505,7 @@ describe('test routes', function () {
 
 	it('fetch a guide', async () => {
 	    const res = await get(`/api/guides/${guide_id}`, token_user);
-	    expect(res.text).to.equal('something')
+	    expect(res.title).to.equal('test')
 	})
 
 	it('fails to fetch a guide', async () => {
@@ -506,6 +513,160 @@ describe('test routes', function () {
 	    expect(res.error).to.equal("Guide not found")
 	})
     })
+
+    describe('Test newsletter routes', function () {
+	let token_user;
+
+	it('fetch all the emails registered', async () => {
+	    let req = {
+		email: process.env.ADMIN_EMAIL,
+		password: process.env.ADMIN_PASSWORD,
+		username: 'jaj'
+	    }
+	    const token = await post(req, '/api/login');
+
+	    const res = await get('/api/newsletter/', token)
+	    expect(res).to.be.empty
+	})
+
+	it('register an user to the newsletter', async () => {
+	    //User successfully added to newsletter
+	    let req = {
+		email: process.env.ADMIN_EMAIL,
+		password: process.env.ADMIN_PASSWORD,
+		username: 'jaj'
+	    }
+	    const token = await post(req, '/api/login');
+	    req = {
+		email: "test@test.com"
+	    }
+
+	    const res = await post(req, '/api/newsletter', token)
+	    expect(res).to.equal('User successfully added to newsletter')
+	})
+
+	it('send an email', async () => {
+	    let req = {
+		email: process.env.ADMIN_EMAIL,
+		password: process.env.ADMIN_PASSWORD,
+		username: 'jaj'
+	    }
+	    const token = await post(req, '/api/login');
+
+	    req = {
+		subject: "hello",
+		text: "test"
+	    }
+	    const res = await post(req, "/api/newsletter/create", token)
+	    expect(res).to.equal('Mail successfully sent')
+	})
+
+	it('deletes an email', async () => {
+		let req = {
+			email: process.env.ADMIN_EMAIL,
+			password: process.env.ADMIN_PASSWORD,
+			username: 'jaj'
+			}
+			const token = await post(req, '/api/login');
+			const uuid = await get('/api/newsletter/', token)
+			req = {
+				uuid: uuid[0].uuid
+			}
+		const res = await del(req, `/api/newsletter/${uuid[0].uuid}`, token);
+		expect(res).to.equal('User successfully deleted from newsletter')
+	})
+    })
+
+	describe('Test suggestion routes', function () {
+		it('fetch all suggestions', async () => {
+			const res = await get('/api/suggestion/');
+			expect(res).to.be.empty
+		})
+
+		it('create a suggestion', async () => {
+			let req = {
+			email: process.env.ADMIN_EMAIL,
+			password: process.env.ADMIN_PASSWORD,
+			username: 'jaj'
+			}
+			const token = await post(req, '/api/login');
+			req = {
+				name: 'jaj', 
+				description: 'test', 
+				imageUrl: 'something'
+			}
+			const res = await post(req, '/api/suggestion', token)
+			expect(res).to.equal('Suggestion successfully added')
+		})
+
+		it('fails to create a suggestion', async () => {
+			let req = {
+				email: process.env.ADMIN_EMAIL,
+				password: process.env.ADMIN_PASSWORD,
+				username: 'jaj'
+				}
+				const token = await post(req, '/api/login');
+				req = {
+					name: 'jaj', 
+					description: 'test'
+				}
+				const res = await post(req, '/api/suggestion', token, 400)
+				expect(res).to.equal('Missing value')
+		})
+
+		it('server error during creation', async () => {
+			let req = {
+			email: process.env.ADMIN_EMAIL,
+			password: process.env.ADMIN_PASSWORD,
+			username: 'jaj'
+			}
+			const token = await post(req, '/api/login');
+			req = {
+				name: 'jaj', 
+				description: 'test', 
+				imageUrl: 'something'
+			}
+			const res = await post(req, '/api/suggestion', token, 500)
+			expect(res).to.equal('Internal Error')
+		})
+
+		describe('test review routes', async () => {
+			let review_id;
+			it('creates a review', async () => {
+				let req = {
+					username: 'test',
+					password: 'fishh',
+					email: 'test@test.com'
+					}
+				const token_user = await post(req, '/api/login')
+				
+				const user = await get(`/api/accounts?email=test@test.com`, token_user);
+				req = {
+					stars: 10,
+					message: "test",
+					guideId: guide_id,
+					userId: user.id
+				}
+
+				const res = await post(req, `/api/review/${guide_id}`, token_user);
+				review_id = res.id
+				expect(res.guideId).to.equal(guide_id)
+			})
+
+			it('fetch a review', async () => {
+				let req = {
+					username: 'test',
+					password: 'fishh',
+					email: 'test@test.com'
+					}
+				const token_user = await post(req, '/api/login')
+				console.log(review_id)
+				const res = await get(`/api/review/${guide_id}`, token_user)
+				expect(res.guideId).to.equal(guide_id)
+			})
+		})
+	})
+
     async function log_user(user = 'test', pass = 'fishh', email = 'test@test.com') {
 	let req = {
 		username: user,
