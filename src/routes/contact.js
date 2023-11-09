@@ -166,6 +166,7 @@ contact_router.post('/', async (req, res) => {
 
 	if (!(name && category && description && email))
 	    return res.status(400).send("Missing value")
+
 	/*
 	await Contact.create({
 	    name: name,
@@ -191,7 +192,7 @@ contact_router.post('/', async (req, res) => {
 
 contact_router.patch('/:uuid', authenticateTokenAdm, async (req, res) => {
     try {
-	const uuid = req.params.uuid;
+	const uuid = parseInt(req.params.uuid);
 	const {name, email, processed} = req.body;
 
 	if (!(name && processed && email && uuid))
@@ -208,7 +209,6 @@ contact_router.patch('/:uuid', authenticateTokenAdm, async (req, res) => {
 		uuid: uuid
 	    }
 	})
-	console.log(contact)
 	if (!contact)
 	    return res.status(404).send("Contact not found");
 	/*

@@ -22,7 +22,8 @@ describe('test routes', function () {
     describe('test utility routes', function () {
 	const url_register = '/api/signin'
 	const url_login = '/api/login'
-
+	let user_tok;
+	let admin_tok;
 	it('create a new user', async function () {
 	    const req = {
 		username: 'test',
@@ -57,7 +58,8 @@ describe('test routes', function () {
 		username: 'jaj'
 	    }
 	    const res = await post(req, url_login);
-	    expect(res).to.be.a('string')
+	    admin_tok = res;
+		expect(res).to.be.a('string')
 	})
 
 	it('fails to log in', async () => {
@@ -83,10 +85,29 @@ describe('test routes', function () {
 		username: 'test'
 	    }
 	    const tok = await post(req, url_login)
+		console.log(tok)
 	    const res = await post({}, '/api/logout', tok)
 	    expect(res).to.be.a('string')
 	})
-
+	it('delete an user', async function () {
+	    let req = {
+		username: 'jaj',
+		password: 'jaj',
+		email: 'test@testsqdqsds.com'
+	    }
+	    const user = await post(req, url_register)
+		//user_tok = await post(req, url_login)
+		//const user = await get('/api/accounts', user_tok);
+		//const users = await get('/api/accounts/admin', admin_tok)
+		//console.log(users)
+		//console.log(user)
+		const id = user.id
+		req = {
+			id: id
+		}
+		const res = await del(req, '/api/accounts/admin', admin_tok)
+	    expect(res).to.be.a('string');
+	})
 	it('verify user email', async () => {
 	    const req = {
 		email: 'test@test.com',
@@ -663,6 +684,106 @@ describe('test routes', function () {
 				console.log(review_id)
 				const res = await get(`/api/review/${guide_id}`, token_user)
 				expect(res.guideId).to.equal(guide_id)
+			})
+		})
+	    describe('test orb routes', async () => {
+		let token_adm;
+		let token_user;
+		before('log user and admin account', async function () {
+		   let req = {
+		       username: 'test',
+		       password: 'fishh',
+		       email: 'test@test.com'
+		   }
+		    token_user = await post(req, '/api/login');
+		    req = {
+			email: process.env.ADMIN_EMAIL,
+			password: process.env.ADMIN_PASSWORD,
+			username: 'jaj'
+		    }
+		    token_adm = await post(req, '/api/login');
+		})
+		it('fetch all orbs', async () => {
+		    const res = await get('/api/orb/admin')
+			expect(res).to.be.empty
+		})
+	    })
+		describe('test contact routes', async function () {
+			let token_adm;
+			let contact_id;
+			before('log admin account', async () => {
+				const req = {
+					email: process.env.ADMIN_EMAIL,
+					password: process.env.ADMIN_PASSWORD,
+					username: 'jaj'
+				}
+				token_adm = await post(req, '/api/login')
+			})
+
+			it('fetch all contacts', async () => {
+				const res = await get('/api/contact', token_adm)
+				expect(res).to.be.empty
+			})
+
+			it('create a contact', async () => {
+				const req = {
+					name: 'yolo', 
+					category: 'jaj', 
+					description: 'test', 
+					email: 'smth'
+				}
+
+				const res = await post(req, '/api/contact')
+				expect(res).to.be.a('string')
+			})
+
+			it('patches a contact', async () => {
+				const req = {
+					name: 'yolo', 
+					processed: true, 
+					email: 'smth'
+				}
+				const uuid = 1;
+				const res = await patch(req, `/api/contact/${uuid}`, token_adm)
+				expect(res).to.be.a('string')
+			})
+		})
+
+		describe('test customer routes', async () => {
+			let token_adm;
+			before('log admin account', async () => {
+				const req = {
+					email: process.env.ADMIN_EMAIL,
+					password: process.env.ADMIN_PASSWORD,
+					username: 'jaj'
+				}
+				token_adm = await post(req, '/api/login')
+			})
+
+			it('fetch all customers', async () => {
+				const res = await get('/api/customers/admin', token_adm)
+				expect(res).to.be.empty
+			})
+
+			it('creates a customer', async () => {
+				const req = {
+					username: 'test',
+					password: 'test',
+					email: 'test'
+				}
+
+				const res = await post(req, '/api/customers/register')
+				expect(res.email).to.be.a('string')
+			})
+
+			it('logs in a customer', async () => {
+				const req = {
+					username: 'test',
+					password: 'test',
+					email: 'test'
+				}
+				const res = await post(req, '/api/customers/login')
+				expect(res).to.be.a('string')
 			})
 		})
 	})

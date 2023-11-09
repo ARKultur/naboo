@@ -615,6 +615,7 @@ account_router.delete('/admin', authenticateTokenAdm, async (req, res)=> {
                 id: req.body.id
             }
         })
+	console.log("user to delete: ", user)
 	if (!user)
 	    return res.status(404).send('User not found')
 	//await user.destroy();
