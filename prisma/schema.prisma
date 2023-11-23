@@ -109,7 +109,7 @@ model nodes {
   description                        String         @db.VarChar(255)
   OrganisationId                     Int?
   status                             String?
-  filter			     String?
+  filter                             String?
   adresses_adresses_NodeIdTonodes    adresses[]     @relation("adresses_NodeIdTonodes")
   data_orb_data_orb_orbIdTonodes     data_orb[]     @relation("data_orb_orbIdTonodes")
   guide                              guide[]
@@ -125,6 +125,7 @@ model organisations {
   adresses_adresses_OrganisationIdToorganisations adresses[] @relation("adresses_OrganisationIdToorganisations")
   nodes                                           nodes[]
   adresses_organisations_addressIdToadresses      adresses?  @relation("organisations_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parkour                                         parkour[]
   user                                            user[]
 }
 
@@ -168,4 +169,15 @@ model suggestions {
   imageUrl    String @unique @db.VarChar(255)
   userId      Int?
   user        user?  @relation(fields: [userId], references: [id])
+}
+
+model parkour {
+  name           String         @unique @db.VarChar(255)
+  description    String         @unique @db.VarChar(255)
+  uuid           String         @id @default(uuid())
+  createdAt      DateTime       @default(now()) @db.Timestamptz(2)
+  updatedAt      DateTime       @default(now()) @db.Timestamptz(2)
+  status         String
+  OrganisationId Int?
+  organisations  organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
 }
