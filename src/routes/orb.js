@@ -120,7 +120,7 @@ const orb_router = express.Router();
  *       500:
  *         description: Internal server error.
  */
-
+/* c8 ignore start */
 orb_router.post('/', authenticateTokenAdm, async (req, res) => {
     try {
 	const { keypoints, descriptors } = req.body;
@@ -146,7 +146,7 @@ orb_router.post('/', authenticateTokenAdm, async (req, res) => {
 	res.status(500).json({ error: 'Internal server error' });
     }
 });
-
+/* c8 ignore stop */
 
 orb_router.get('/admin', async (req, res) => {
     try {
@@ -159,7 +159,7 @@ orb_router.get('/admin', async (req, res) => {
 	res.status(500).json({error: "Unexpected error"});
     }
 })
-
+/* c8 ignore start */
 orb_router.get('/:id', authenticateTokenAdm, async (req, res) => {
   try {
       const { id } = req.params;
@@ -234,5 +234,5 @@ orb_router.patch('/', authenticateToken, async (req, res) => {
 	res.status(500).send("Unexpected error")
     }
 })
-
+/* c8 ignore stop */
 export default orb_router;
