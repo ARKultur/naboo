@@ -4,9 +4,24 @@ import { authenticateToken, authenticateTokenAdm} from '../utils.js';
 
 const parkour_router = express.Router();
 
-parkour_router.get("/", async (req, res) => {
+parkour_router.get("/", authenticateTokenAdm, async (req, res) => {
     const parkours = await prisma.parkour.findMany();
     res.send(parkours);
+});
+
+parkour_router.get('/orga/:id', authenticateToken, async (req, res) => {
+  const id = req.params.id;
+  try {
+    const parkours = await prisma.parkour.findMany({
+        where: {
+          organisation_id: id,
+        },
+      });
+      return res.json(parkours)
+} catch (error) {
+    console.error(error)
+    return res.sendStatus(500)
+}
 });
 
 parkour_router.patch("/:id", async (req, res) => {
@@ -45,6 +60,7 @@ parkour_router.post("/", async (req, res) => {
               name: req.body.name,
               description: req.body.description,
               status: req.body.status,
+              node: []
             },
           });
           res.json(parkour);

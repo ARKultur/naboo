@@ -367,15 +367,29 @@ node_router.get('/', authenticateToken, async (req, res) => {
     }
 })
 
+/*
+node_router.get('/parkour/:id', authenticateToken, async (req, res) => {
+	try {
+		const nodes = await prisma.nodes.findMany({
+			where: {
+			pa: req.params.name
+			}
+		})
+		if (nodes)
+		{
+			return res.json(nodes)
+		} else {
+			return res.status(404).send("node not found")
+		}
+		} catch (err)
+		{
+		console.log(err)
+		res.sendStatus(500)
+		}
+})
+*/
 node_router.get('/:name', authenticateToken, async (req, res) => {
     try {
-	/*
-    const node = await Node.findOne({
-        where: {
-            name: req.params.name
-        }
-	});
-	*/
 	const node = await prisma.nodes.findUnique({
 	    where: {
 		name: req.params.name
@@ -431,7 +445,8 @@ node_router.post('/', authenticateToken, async (req, res) => {
 			longitude: req.body.longitude,
 			latitude: req.body.latitude,
 			OrganisationId: user.OrganisationId,
-			description: req.body.description
+			description: req.body.description,
+			parkours: []
 		    }
 		})
             	return res.json(node)

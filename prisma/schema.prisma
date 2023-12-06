@@ -113,6 +113,7 @@ model nodes {
   adresses_adresses_NodeIdTonodes    adresses[]     @relation("adresses_NodeIdTonodes")
   data_orb_data_orb_orbIdTonodes     data_orb[]     @relation("data_orb_orbIdTonodes")
   guide                              guide[]
+  parkours                           parkour[]
   organisations                      organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
   adresses_nodes_addressIdToadresses adresses?      @relation("nodes_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   data_orb_nodes_orbIdTodata_orb     data_orb?      @relation("nodes_orbIdTodata_orb", fields: [orbId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -178,6 +179,7 @@ model parkour {
   createdAt      DateTime       @default(now()) @db.Timestamptz(2)
   updatedAt      DateTime       @default(now()) @db.Timestamptz(2)
   status         String
+  node           nodes[]
   OrganisationId Int?
   organisations  organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
 }
