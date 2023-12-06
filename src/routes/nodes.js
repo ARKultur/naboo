@@ -367,12 +367,15 @@ node_router.get('/', authenticateToken, async (req, res) => {
     }
 })
 
-/*
+
 node_router.get('/parkour/:id', authenticateToken, async (req, res) => {
 	try {
-		const nodes = await prisma.nodes.findMany({
+		const nodes = await prisma.parkour_node.findMany({
 			where: {
-			pa: req.params.name
+				parkourId: req.params.id
+			},
+			include: {
+				node: true
 			}
 		})
 		if (nodes)
@@ -387,7 +390,7 @@ node_router.get('/parkour/:id', authenticateToken, async (req, res) => {
 		res.sendStatus(500)
 		}
 })
-*/
+
 node_router.get('/:name', authenticateToken, async (req, res) => {
     try {
 	const node = await prisma.nodes.findUnique({

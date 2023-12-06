@@ -113,7 +113,7 @@ model nodes {
   adresses_adresses_NodeIdTonodes    adresses[]     @relation("adresses_NodeIdTonodes")
   data_orb_data_orb_orbIdTonodes     data_orb[]     @relation("data_orb_orbIdTonodes")
   guide                              guide[]
-  parkours                           parkour[]
+  parkours parkour_node[]
   organisations                      organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
   adresses_nodes_addressIdToadresses adresses?      @relation("nodes_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   data_orb_nodes_orbIdTodata_orb     data_orb?      @relation("nodes_orbIdTodata_orb", fields: [orbId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -172,6 +172,16 @@ model suggestions {
   user        user?  @relation(fields: [userId], references: [id])
 }
 
+model parkour_node {
+  parkourId String
+  parkour parkour @relation(fields: [parkourId], references: [uuid])
+
+  nodeId Int
+  node nodes @relation(fields: [nodeId], references: [id])
+
+  @@id([parkourId, nodeId])
+}
+
 model parkour {
   name           String         @unique @db.VarChar(255)
   description    String         @unique @db.VarChar(255)
@@ -179,7 +189,7 @@ model parkour {
   createdAt      DateTime       @default(now()) @db.Timestamptz(2)
   updatedAt      DateTime       @default(now()) @db.Timestamptz(2)
   status         String
-  node           nodes[]
+  nodes parkour_node[]
   OrganisationId Int?
   organisations  organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
 }
