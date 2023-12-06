@@ -45,6 +45,15 @@ parkour_router.patch("/:id", async (req, res) => {
                 updatedAt: Date.now()
               },
             });
+            if (req.body.node_id)
+            {
+              await prisma.parkour_node.create({
+                data: {
+                  parkourId: updated_parkour.uuid,
+                  nodeId: req.body.node_id
+                }
+              })
+            }
             return res.json(updated_parkour);
           }
     } catch (error) {

@@ -498,6 +498,16 @@ node_router.patch('/', authenticateToken, async (req, res) => {
 		    description: req.body.description || node.description
 		}
 	    })
+
+		if (req.body.parkour_uuid)
+		{
+			await prisma.parkour_node.create({
+				data: {
+					parkourId: req.body.parkour_uuid,
+					nodeId: new_node.id
+				}
+			})
+		}
 	    res.json(new_node)
 	}
     } catch (error)
