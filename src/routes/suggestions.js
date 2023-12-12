@@ -64,4 +64,24 @@ suggestions_router.post('/map', async (req, res) => {
   }
 });
 
+suggestions_router.delete('/:uuid', authenticateTokenAdm, async (req, res) => {
+  try {
+    const uuid = req.params.uuid;
+
+    if (!uuid) return res.status(400).send('Missing arguments');
+
+    const suggestion = await prisma.suggestions.delete({
+      where: {
+        uuid: uuid,
+      },
+    });
+
+    if (!suggestion) return res.status(404).send('Suggestion not found');
+    res.status(200).send('Suggestion successfully deleted');
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Internal Error');
+  }
+});
+
 export default suggestions_router;
