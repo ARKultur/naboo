@@ -110,13 +110,16 @@ model nodes {
   OrganisationId                     Int?
   status                             String?
   filter                             String?
+  altitude                           Float          @default(0)
+  model                              String?
+  texture                            String?
   adresses_adresses_NodeIdTonodes    adresses[]     @relation("adresses_NodeIdTonodes")
   data_orb_data_orb_orbIdTonodes     data_orb[]     @relation("data_orb_orbIdTonodes")
   guide                              guide[]
-  parkours parkour_node[]
   organisations                      organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
   adresses_nodes_addressIdToadresses adresses?      @relation("nodes_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   data_orb_nodes_orbIdTodata_orb     data_orb?      @relation("nodes_orbIdTodata_orb", fields: [orbId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parkours                           parkour_node[]
 }
 
 model organisations {
@@ -174,10 +177,10 @@ model suggestions {
 
 model parkour_node {
   parkourId String
-  parkour parkour @relation(fields: [parkourId], references: [uuid])
-
-  nodeId Int
-  node nodes @relation(fields: [nodeId], references: [id])
+  nodeId    Int
+  order     Int
+  node      nodes   @relation(fields: [nodeId], references: [id])
+  parkour   parkour @relation(fields: [parkourId], references: [uuid])
 
   @@id([parkourId, nodeId])
 }
@@ -189,7 +192,7 @@ model parkour {
   createdAt      DateTime       @default(now()) @db.Timestamptz(2)
   updatedAt      DateTime       @default(now()) @db.Timestamptz(2)
   status         String
-  nodes parkour_node[]
   OrganisationId Int?
   organisations  organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
+  nodes          parkour_node[]
 }
