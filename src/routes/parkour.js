@@ -2,7 +2,6 @@ import express from "express";
 import prisma from '../db/prisma.js'
 import { authenticateToken, authenticateTokenAdm} from '../utils.js';
 
-<<<<<<< HEAD
 
 /**
  * @swagger
@@ -85,16 +84,10 @@ const parkour_router = express.Router();
  *         description: Internal Server Error
  */
 parkour_router.get("/", authenticateTokenAdm, async (req, res) => {
-=======
-const parkour_router = express.Router();
-
-parkour_router.get("/", async (req, res) => {
->>>>>>> 0c814cb (Migration/docker (#94))
     const parkours = await prisma.parkour.findMany();
     res.send(parkours);
 });
 
-<<<<<<< HEAD
 /**
  * @swagger
  * tags:
@@ -219,8 +212,6 @@ parkour_router.get('/orga/:id', authenticateToken, async (req, res) => {
  *       400:
  *         description: Bad Request - Missing required fields or invalid input
  */
-=======
->>>>>>> 0c814cb (Migration/docker (#94))
 parkour_router.patch("/:id", async (req, res) => {
     const id = req.params.id
     try {
@@ -239,7 +230,6 @@ parkour_router.patch("/:id", async (req, res) => {
                 description: req.body.description || customer.description,
                 status: req.body.status || customer.status,
                 OrganisationId: req.body.organisation_id || customer.OrganisationId,
-<<<<<<< HEAD
                 updatedAt: Date.now(),
                 nodes: {
                   upsert: req.body.node_ids.map((node_id, index) => ({
@@ -274,11 +264,6 @@ parkour_router.patch("/:id", async (req, res) => {
                   },
               });
           }
-=======
-                updatedAt: Date.now()
-              },
-            });
->>>>>>> 0c814cb (Migration/docker (#94))
             return res.json(updated_parkour);
           }
     } catch (error) {
@@ -287,7 +272,6 @@ parkour_router.patch("/:id", async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
 /**
  * @swagger
  * tags:
@@ -422,37 +406,6 @@ parkour_router.delete("/:id", async (req, res) => {
       console.error(error);
       return res.sendStatus(500);
   }
-=======
-parkour_router.post("/", async (req, res) => {
-    try {
-        const parkour = await prisma.parkour.create({
-            data: {
-              name: req.body.name,
-              description: req.body.description,
-              status: req.body.status,
-            },
-          });
-          res.json(parkour);
-    } catch (error) {
-        console.error(error)
-        return res.sendStatus(500)
-    }
-});
-
-parkour_router.delete("/:id", async (req, res) => {
-    const id = req.params.id
-    try {
-        const parkour = await prisma.parkour.delete({
-            where: {
-                id: id
-            }
-        })
-        res.json(parkour)
-    } catch (error) {
-        console.error(error)
-        return res.sendStatus(500)
-    }
->>>>>>> 0c814cb (Migration/docker (#94))
 });
 
 export default parkour_router;

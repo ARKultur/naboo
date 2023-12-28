@@ -15,8 +15,4 @@ services:
 #    depends_on:
 #      - db
 #    volumes:
-<<<<<<< HEAD
 #      - ./:/app/
-=======
-#      - ./:/app/
->>>>>>> 0c814cb (Migration/docker (#94))

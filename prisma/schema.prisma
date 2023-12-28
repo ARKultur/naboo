@@ -110,12 +110,9 @@ model nodes {
   OrganisationId                     Int?
   status                             String?
   filter                             String?
-<<<<<<< HEAD
   altitude                           Float          @default(0)
   model                              String?
   texture                            String?
-=======
->>>>>>> 0c814cb (Migration/docker (#94))
   adresses_adresses_NodeIdTonodes    adresses[]     @relation("adresses_NodeIdTonodes")
   data_orb_data_orb_orbIdTonodes     data_orb[]     @relation("data_orb_orbIdTonodes")
   guide                              guide[]
@@ -178,7 +175,6 @@ model suggestions {
   user        user?  @relation(fields: [userId], references: [id])
 }
 
-<<<<<<< HEAD
 model parkour_node {
   parkourId String
   nodeId    Int
@@ -189,8 +185,6 @@ model parkour_node {
   @@id([parkourId, nodeId])
 }
 
-=======
->>>>>>> 0c814cb (Migration/docker (#94))
 model parkour {
   name           String         @unique @db.VarChar(255)
   description    String         @unique @db.VarChar(255)
@@ -200,8 +194,5 @@ model parkour {
   status         String
   OrganisationId Int?
   organisations  organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
-<<<<<<< HEAD
   nodes          parkour_node[]
-=======
->>>>>>> 0c814cb (Migration/docker (#94))
 }
