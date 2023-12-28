@@ -683,7 +683,6 @@ node_router.patch('/', authenticateToken, async (req, res) => {
 node_router.patch('/', authenticateToken, async (req, res) => {
 
     try {
-
 	const node = await prisma.nodes.findUnique({
 	    where: {
 		name: req.body.name
