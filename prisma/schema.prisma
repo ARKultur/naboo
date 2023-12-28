@@ -172,6 +172,7 @@ model suggestions {
   description String @unique @db.VarChar(255)
   imageUrl    String @unique @db.VarChar(255)
   userId      Int?
+  tag         String @unique @db.VarChar(255)
   user        user?  @relation(fields: [userId], references: [id])
 }
 

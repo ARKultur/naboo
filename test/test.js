@@ -614,7 +614,8 @@ describe('test routes', function () {
 			req = {
 				name: 'jaj', 
 				description: 'test', 
-				imageUrl: 'something'
+				imageUrl: 'something',
+				tag: 'test'
 			}
 			const res = await post(req, '/api/suggestion', token)
 			expect(res).to.equal('Suggestion successfully added')
@@ -647,8 +648,8 @@ describe('test routes', function () {
 				description: 'test', 
 				imageUrl: 'something'
 			}
-			const res = await post(req, '/api/suggestion', token, 500)
-			expect(res).to.equal('Internal Error')
+			const res = await post(req, '/api/suggestion', token, 400)
+			expect(res).to.equal('Bad Request')
 		})
 
 		describe('test review routes', async () => {

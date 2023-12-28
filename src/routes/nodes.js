@@ -1,11 +1,11 @@
-import express from "express";
+import express from 'express';
 
-import prisma from '../db/prisma.js'
+import prisma from '../db/prisma.js';
 
-import { authenticateToken, authenticateTokenAdm} from '../utils.js';
+import { authenticateToken, authenticateTokenAdm } from '../utils.js';
 //import {Node, User, Organisation} from '../db/models/index.js'
 
-let node_router = express.Router()
+let node_router = express.Router();
 
 /**
  * @swagger
@@ -117,7 +117,7 @@ let node_router = express.Router()
  *         application/json:
  *           schema:
  *            required:
- *             - name 
+ *             - name
  *            type: object
  *            properties:
  *              name:
@@ -148,7 +148,7 @@ let node_router = express.Router()
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Node'
- * 
+ *
  * /api/nodes/{names}:
  *   get:
  *     security:
@@ -189,52 +189,49 @@ let node_router = express.Router()
 node_router.get('/all', async (req, res) => {
     try {
 
-	const nodes = await prisma.nodes.findMany();
-	res.send(nodes)
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500)
-    }
-})
+    const nodes = await prisma.nodes.findMany();
+    res.send(nodes);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
 
 node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
     try {
-
-
-	const node = await prisma.nodes.findUnique({
-	    where: {
-		name: req.body.name
-	    }
-	})
-	if (node)
-	{
-	    const new_node = await prisma.nodes.update({
-		where: {
-		    name: node.name
-		},
-		data: {
-		    OrganisationId: req.body.OrganisationId || node.OrganisationId,
-		    name: req.body.name,                                                                                                                                                                                                    
-                    longitude: req.body.longitude || node.longitude,
-                    latitude: req.body.latitude || node.latitude,
-                    addressId: req.body.addressId || node.addressId,
-                    description: req.body.description || node.description,
-		    status: req.body.status || node.status,
-			model: req.body.model || node.model,
-			texture: req.body.texture || node.texture,
-			altitude: req.body.altitude || node.altitude,
-			filter: req.body.filter || node.filter
+		const node = await prisma.nodes.findUnique({
+			where: {
+			name: req.body.name
+			}
+		})
+		if (node)
+		{
+			const new_node = await prisma.nodes.update({
+			where: {
+				name: node.name
+			},
+			data: {
+				OrganisationId: req.body.OrganisationId || node.OrganisationId,
+				name: req.body.name,                                                                                                                                                                                                    
+						longitude: req.body.longitude || node.longitude,
+						latitude: req.body.latitude || node.latitude,
+						addressId: req.body.addressId || node.addressId,
+						description: req.body.description || node.description,
+				status: req.body.status || node.status,
+				model: req.body.model || node.model,
+				texture: req.body.texture || node.texture,
+				altitude: req.body.altitude || node.altitude,
+				filter: req.body.filter || node.filter
+			}
+			})
+				res.json(new_node)
 		}
-	    })
-            res.json(new_node)
-	}
     } catch (err)
     {
-	console.error(err)
-	res.sendStatus(500)
+		console.error(err)
+		res.sendStatus(500)
     }
-})
+});
 
 node_router.delete('/admin', authenticateTokenAdm, async (req, res) => {
     try {
@@ -289,13 +286,12 @@ node_router.get('/', authenticateToken, async (req, res) => {
         } else
 	    return res.status(404).send("This user is not part of any organisations.")
     }
-	res.sendStatus(401)
-    } catch (err)
-    {
-	console.log(err)
-	res.sendStatus(500)
-    }
-})
+    res.sendStatus(401);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
 
 /**
  * @swagger
@@ -368,14 +364,13 @@ node_router.get('/:name', authenticateToken, async (req, res) => {
     {
         return res.json(node)
     } else {
-        return res.status(404).send("node not found")
+      return res.status(404).send('node not found');
     }
-    } catch (err)
-    {
-	console.log(err)
-	res.sendStatus(500)
-    }
-})
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
 
 /**
  * @swagger
