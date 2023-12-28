@@ -1,11 +1,11 @@
-import express from "express";
+import express from 'express';
 
-import prisma from '../db/prisma.js'
+import prisma from '../db/prisma.js';
 
-import { authenticateToken, authenticateTokenAdm} from '../utils.js';
+import { authenticateToken, authenticateTokenAdm } from '../utils.js';
 //import {Node, User, Organisation} from '../db/models/index.js'
 
-let node_router = express.Router()
+let node_router = express.Router();
 
 /**
  * @swagger
@@ -46,17 +46,30 @@ let node_router = express.Router()
  *         filter:
  *           type: string
  *           description: WIP
+ *         altitude:
+ *           type: number
+ *           description: The altitude of the node
+ *         model:
+ *           type: string
+ *           description: The model of the node
+ *         texture:
+ *           type: string
+ *           description: The texture of the node
  *       example:
  *         id: 12
  *         name: Louvre
  *         addressId: 5
  *         OrganisationId: 1
  *         description: A museum
- *         longitude: 152
- *         latitude: 35
+ *         longitude: 152.0
+ *         latitude: 35.0
  *         status: text
  *         filter: text
+ *         altitude: 100.0
+ *         model: example_model
+ *         texture: example_texture
  */
+
 
 /**
  * @swagger
@@ -93,74 +106,6 @@ let node_router = express.Router()
  *       500:
  *         descripton: Internal Server Error
  * /api/nodes:
- *   post:
- *     security:
- *       - userBearerAuth: []
- *     summary: Create a Node
- *     tags: [Nodes]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *            required:
- *             - name
- *             - longitude
- *             - latitude
- *             - description
- *            type: object
- *            properties:
- *              name:
- *                type: string
- *              longitude:
- *                type: number
- *              latitude:
- *                type: number
- *              description:
- *                type: string
- *     responses:
- *       200:
- *         description: The created Node
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Node'
- *       500:
- *         description: Node already existing
- *   patch:
- *     security:
- *       - userBearerAuth: []
- *     summary: Edit a Node
- *     tags: [Nodes]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *            required:
- *             - name 
- *            type: object
- *            properties:
- *              name:
- *                type: string
- *              longitude:
- *                type: number
- *              latitude:
- *                type: number
- *              address:
- *                type: integer
- *              description:
- *                type: string
- *     responses:
- *       200:
- *         description: The edited Node
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Node'
- *       404:
- *         description: Node not found
- * 
  *   delete:
  *     security:
  *       - userBearerAuth: []
@@ -172,7 +117,7 @@ let node_router = express.Router()
  *         application/json:
  *           schema:
  *            required:
- *             - name 
+ *             - name
  *            type: object
  *            properties:
  *              name:
@@ -203,7 +148,7 @@ let node_router = express.Router()
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Node'
- * 
+ *
  * /api/nodes/{names}:
  *   get:
  *     security:
@@ -243,91 +188,81 @@ let node_router = express.Router()
 
 node_router.get('/all', async (req, res) => {
     try {
-	//const nodes = await Node.findAll();
 
-	const nodes = await prisma.nodes.findMany();
-	res.send(nodes)
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500)
-    }
-})
+    const nodes = await prisma.nodes.findMany();
+    res.send(nodes);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
 
 node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
     try {
-	/*
-	const node = await Node.findOne({
-            where: {
-		name: req.body.name
-            }
-	});
-	*/
-
-	const node = await prisma.nodes.findUnique({
-	    where: {
-		name: req.body.name
-	    }
-	})
-	if (node)
-	{
-	    /*
-            await node.update({
-		OrganisationId: req.body.OrganisationId || node.OrganisationId
-		});
-	    */
-	    const new_node = await prisma.nodes.update({
-		where: {
-		    name: node.name
-		},
-		data: {
-		    OrganisationId: req.body.OrganisationId || node.OrganisationId,
-		    name: req.body.name,                                                                                                                                                                                                    
-                    longitude: req.body.longitude || node.longitude,
-                    latitude: req.body.latitude || node.latitude,
-                    addressId: req.body.addressId || node.addressId,
-                    description: req.body.description || node.description,
-		    status: req.body.status || node.status
+		const node = await prisma.nodes.findUnique({
+			where: {
+			name: req.body.name
+			}
+		})
+		if (node)
+		{
+			const new_node = await prisma.nodes.update({
+			where: {
+				name: node.name
+			},
+			data: {
+				OrganisationId: req.body.OrganisationId || node.OrganisationId,
+				name: req.body.name,                                                                                                                                                                                                    
+						longitude: req.body.longitude || node.longitude,
+						latitude: req.body.latitude || node.latitude,
+						addressId: req.body.addressId || node.addressId,
+						description: req.body.description || node.description,
+				status: req.body.status || node.status,
+				model: req.body.model || node.model,
+				texture: req.body.texture || node.texture,
+				altitude: req.body.altitude || node.altitude,
+				filter: req.body.filter || node.filter
+			}
+			})
+				res.json(new_node)
 		}
-	    })
-            res.json(new_node)
-	}
     } catch (err)
     {
-	console.error(err)
-	res.sendStatus(500)
+		console.error(err)
+		res.sendStatus(500)
     }
-})
+});
 
 node_router.delete('/admin', authenticateTokenAdm, async (req, res) => {
     try {
-	const node = await prisma.nodes.delete({
-	    where: {
-		name: req.body.name
-	    }
-	})
-	if (node)
-	{
-            res.send("success")
-	} else {
+        const nodeName = req.body.name;
+
+        await prisma.parkour_node.deleteMany({
+            where: {
+                nodeId: {
+                    name: nodeName,
+                },
+            },
+        });
+        const deletedNode = await prisma.nodes.delete({
+            where: {
+                name: nodeName,
+            },
+        });
+
+        if (deletedNode) {
+            res.send("success");
+        } else {
             res.status(404).send("Node not found");
-	}
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500);
+        }
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
     }
-})
+});
 
 node_router.get('/', authenticateToken, async (req, res) => {
     try {
-	/*
-    const user = await User.findOne({
-        where: {
-            email: req.email
-        }
-	})
-	*/
 	const user = await prisma.user.findUnique({
 	    where: {
 		email: req.email
@@ -335,7 +270,6 @@ node_router.get('/', authenticateToken, async (req, res) => {
 	})
     if (user)
     {
-        //const orga = await Organisation.findByPk(user.OrganisationId)
 	const orga = await prisma.organisations.findUnique({
 	    where: {
 		id: user.OrganisationId
@@ -343,13 +277,6 @@ node_router.get('/', authenticateToken, async (req, res) => {
 	})
 	if (orga)
         {
-	    /*
-            const nodes = await Node.findAll({
-                where: {
-                    OrganisationId: orga.id
-                }
-		});
-	    */
 	    const nodes = await prisma.nodes.findMany({
 		where: {
 		    OrganisationId: orga.id
@@ -359,23 +286,75 @@ node_router.get('/', authenticateToken, async (req, res) => {
         } else
 	    return res.status(404).send("This user is not part of any organisations.")
     }
-	res.sendStatus(401)
-    } catch (err)
-    {
-	console.log(err)
-	res.sendStatus(500)
+    res.sendStatus(401);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
+/**
+ * @swagger
+ * tags:
+ *   name: Nodes
+ *   description: The Nodes managing API
+ * /api/nodes/parkour/{id}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Get nodes associated with a specific parkour
+ *     tags: [Nodes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the parkour
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Nodes associated with the specified parkour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Node'
+ *       404:
+ *         description: Nodes not found for the specified parkour
+ *       401:
+ *         description: Unauthorized - Token is missing or invalid
+ *       500:
+ *         description: Internal Server Error
+ */
+node_router.get('/parkour/:id', authenticateToken, async (req, res) => {
+    try {
+        const nodes = await prisma.parkour_node.findMany({
+            where: {
+                parkourId: req.params.id,
+            },
+            include: {
+                node: true,
+            },
+            orderBy: {
+                order: 'asc',
+            },
+        });
+
+        if (nodes && nodes.length > 0) {
+            return res.json(nodes);
+        } else {
+            return res.status(404).send("Nodes not found for the specified parkour");
+        }
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
     }
-})
+});
+
 
 node_router.get('/:name', authenticateToken, async (req, res) => {
     try {
-	/*
-    const node = await Node.findOne({
-        where: {
-            name: req.params.name
-        }
-	});
-	*/
 	const node = await prisma.nodes.findUnique({
 	    where: {
 		name: req.params.name
@@ -385,15 +364,153 @@ node_router.get('/:name', authenticateToken, async (req, res) => {
     {
         return res.json(node)
     } else {
-        return res.status(404).send("node not found")
+      return res.status(404).send('node not found');
     }
-    } catch (err)
-    {
-	console.log(err)
-	res.sendStatus(500)
-    }
-})
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
 
+/**
+ * @swagger
+ * tags:
+ *   name: Nodes
+ *   description: The Nodes managing API
+ * /api/nodes:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Create a new node with optional parkours
+ *     tags: [Nodes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *             - name
+ *             - longitude
+ *             - latitude
+ *             - description
+ *            properties:
+ *              name:
+ *                type: string
+ *                description: The node's name
+ *              longitude:
+ *                type: number
+ *                description: The longitude of the node
+ *              latitude:
+ *                type: number
+ *                description: The latitude of the node
+ *              description:
+ *                type: string
+ *                description: The node's description
+ *              OrganisationId:
+ *                type: integer
+ *                description: The referenced organisation's id
+ *              addressId:
+ *                type: integer
+ *                description: The referenced address's id
+ *              status:
+ *                type: string
+ *                description: The status of the node
+ *              filter:
+ *                type: string
+ *                description: WIP
+ *              altitude:
+ *                type: number
+ *                description: The altitude of the node
+ *              model:
+ *                type: string
+ *                description: The model of the node
+ *              texture:
+ *                type: string
+ *                description: The texture of the node
+ *              parkours:
+ *                type: array
+ *                items:
+ *                  type: object
+ *                  required:
+ *                    - parkourId
+ *                    - order
+ *                  properties:
+ *                    parkourId:
+ *                      type: string
+ *                      description: The ID of the associated parkour
+ *                    order:
+ *                      type: integer
+ *                      description: The order of the parkour
+ *     responses:
+ *       201:
+ *         description: Successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Node'
+ *       401:
+ *         description: Unauthorized - Token is missing or invalid
+ *       500:
+ *         description: Internal Server Error
+ *       400:
+ *         description: Bad Request - Missing required fields or invalid input
+ */
+node_router.post('/', authenticateToken, async (req, res) => {
+    try {
+		console.log(req.body)
+        if (
+            req.body.name == null ||
+            req.body.longitude == null ||
+            req.body.latitude == null ||
+            req.body.description == null
+        ) {
+			console.error("body is: ", req.body)
+            throw new Error("Missing inputs");
+        }
+
+        const user = await prisma.user.findUnique({
+            where: {
+                email: req.email,
+            },
+        });
+
+        if (user && user.OrganisationId) {
+            const nodeData = {
+                name: req.body.name,
+                longitude: req.body.longitude,
+                latitude: req.body.latitude,
+                OrganisationId: user.OrganisationId,
+                description: req.body.description,
+            };
+
+            if (req.body.parkours && Array.isArray(req.body.parkours) && req.body.parkours.length > 0) {
+                nodeData.parkours = {
+                    create: req.body.parkours.map((parkour) => ({
+                        parkourId: parkour.parkourId,
+						order: parkour.order || 0,
+                    })),
+                };
+            }
+
+            const node = await prisma.nodes.create({
+                data: nodeData,
+                include: {
+                    parkours: true,
+                },
+            });
+
+            return res.json(node);
+        }
+
+        return res.sendStatus(401);
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
+});
+
+/*
 node_router.post('/', authenticateToken, async (req, res) => {
     
     try {
@@ -401,13 +518,11 @@ node_router.post('/', authenticateToken, async (req, res) => {
 	    {
 		throw new Error("Missing inputs")
 	    }
-	/*
-	const user = await User.findOne({
-        where: {
-            email: req.email
-        }
+	const user = await prisma.user.findUnique({
+	    where: {
+		email: req.email
+	    }
 	})
-	*/
 	const user = await prisma.user.findUnique({
 	    where: {
 		email: req.email
@@ -416,22 +531,14 @@ node_router.post('/', authenticateToken, async (req, res) => {
 	if (user) {
 	    if (user.OrganisationId)
 	    {
-		/*
-		  const node = await Node.create({
-		  name: req.body.name,
-		  longitude: req.body.longitude,
-		  latitude: req.body.latitude,
-		  OrganisationId: user.OrganisationId,
-		  description: req.body.description
-		  });
-		*/
 		const node = await prisma.nodes.create({
 		    data: {
 			name: req.body.name,
 			longitude: req.body.longitude,
 			latitude: req.body.latitude,
 			OrganisationId: user.OrganisationId,
-			description: req.body.description
+			description: req.body.description,
+			parkours: []
 		    }
 		})
             	return res.json(node)
@@ -442,18 +549,135 @@ node_router.post('/', authenticateToken, async (req, res) => {
 	console.log(error)
         res.sendStatus(500);
     }
-})
+})*/
 
+
+/**
+ * @swagger
+ * tags:
+ *   name: Nodes
+ *   description: The Nodes managing API
+ * /api/nodes:
+ *   patch:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Update a node and its associated parkours
+ *     tags: [Nodes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *             - name
+ *            properties:
+ *              name:
+ *                type: string
+ *                description: The name of the node to update
+ *              latitude:
+ *                type: number
+ *                description: The updated latitude of the node
+ *              longitude:
+ *                type: number
+ *                description: The updated longitude of the node
+ *              address:
+ *                type: integer
+ *                description: The updated address ID of the node
+ *              description:
+ *                type: string
+ *                description: The updated description of the node
+ *              model:
+ *                type: string
+ *                description: The updated model of the node
+ *              texture:
+ *                type: string
+ *                description: The updated texture of the node
+ *              altitude:
+ *                type: number
+ *                description: The updated altitude of the node
+ *              filter:
+ *                type: string
+ *                description: The updated filter of the node
+ *              parkour_uuid:
+ *                type: string
+ *                description: The UUID of the associated parkour (optional)
+ *     responses:
+ *       200:
+ *         description: Successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Node'
+ *       401:
+ *         description: Unauthorized - Token is missing or invalid
+ *       404:
+ *         description: Not Found - Node not found
+ *       500:
+ *         description: Internal Server Error
+ *       400:
+ *         description: Bad Request - Missing required fields or invalid input
+ */
+node_router.patch('/', authenticateToken, async (req, res) => {
+    try {
+        const node = await prisma.nodes.findUnique({
+            where: {
+                name: req.body.name,
+            },
+        });
+
+        if (node) {
+            const updatedNode = await prisma.nodes.update({
+                where: {
+                    id: node.id,
+                },
+                data: {
+                    latitude: req.body.latitude || node.latitude,
+                    longitude: req.body.longitude || node.longitude,
+                    addressId: req.body.address || node.addressId,
+                    description: req.body.description || node.description,
+					model: req.body.model || node.model,
+					texture: req.body.texture || node.texture,
+					altitude: req.body.altitude || node.altitude,
+					filter: req.body.filter || node.filter	
+                },
+                include: {
+                    parkours: true,
+                },
+            });
+
+            if (req.body.parkour_uuid) {
+                const existingParkourNode = await prisma.parkour_node.findFirst({
+                    where: {
+                        parkourId: req.body.parkour_uuid,
+                        nodeId: updatedNode.id,
+                    },
+                });
+
+                if (!existingParkourNode) {
+                    await prisma.parkour_node.create({
+                        data: {
+                            parkourId: req.body.parkour_uuid,
+                            nodeId: updatedNode.id,
+                        },
+                    });
+                }
+            }
+
+            res.json(updatedNode);
+        } else {
+            res.status(404).send("Node not found");
+        }
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
+});
+
+/*
 node_router.patch('/', authenticateToken, async (req, res) => {
 
     try {
-	/*
-	  const node = await Node.findOne({
-          where: {
-          name: req.body.name
-          }
-	  });
-	*/
 	const node = await prisma.nodes.findUnique({
 	    where: {
 		name: req.body.name
@@ -461,14 +685,6 @@ node_router.patch('/', authenticateToken, async (req, res) => {
 	})
 	if (node)
 	{
-	    /*
-            await node.update({
-		latitude: req.body.latitude || node.latitude,
-		longitude: req.body.longitude || node.longitude,
-		addressId: req.body.address || node.addressId,
-		description: req.body.description || node.description
-            });
-	    */
 	    const new_node = await prisma.nodes.update({
 		where: {
 		    id: node.id
@@ -480,6 +696,16 @@ node_router.patch('/', authenticateToken, async (req, res) => {
 		    description: req.body.description || node.description
 		}
 	    })
+
+		if (req.body.parkour_uuid)
+		{
+			await prisma.parkour_node.create({
+				data: {
+					parkourId: req.body.parkour_uuid,
+					nodeId: new_node.id
+				}
+			})
+		}
 	    res.json(new_node)
 	}
     } catch (error)
@@ -488,16 +714,43 @@ node_router.patch('/', authenticateToken, async (req, res) => {
 	res.sendStatus(500)
     }
 })
+*/
 
 node_router.delete('/', authenticateToken, async (req, res) => {
     try {
-	/*
-	const node = await Node.findOne({
-            where:{
-		name: req.body.name
-            }
-	})
-	*/
+        const nodeName = req.body.name;
+
+        // Delete associated parkour nodes first
+        await prisma.parkour_node.deleteMany({
+            where: {
+                nodeId: {
+                    name: nodeName,
+                },
+            },
+        });
+
+        // Delete the node itself
+        const deletedNode = await prisma.nodes.delete({
+            where: {
+                name: nodeName,
+            },
+        });
+
+        if (deletedNode) {
+            res.send("success");
+        } else {
+            res.status(404).send("Node not found");
+        }
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
+});
+
+/*
+node_router.delete('/', authenticateToken, async (req, res) => {
+    try {
+
 	const node = await prisma.nodes.delete({
 	    where: {
 		name: req.body.name
@@ -515,5 +768,5 @@ node_router.delete('/', authenticateToken, async (req, res) => {
 	res.sendStatus(500);
     }
 })
-
+*/
 export default node_router;
