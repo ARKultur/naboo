@@ -86,9 +86,9 @@ suggestions_router.delete('/:uuid', authenticateTokenAdm, async (req, res) => {
 
 suggestions_router.post('/:uuid', authenticateTokenAdm, async (req, res) => {
   try {
-    const { name, description, imageUrl, tag } = req.body;
+    const { name, description, imageUrl, tag, uuid } = req.body;
 
-    if (!name || !description || !imageUrl || !tag)
+    if (!name || !description || !imageUrl || !tag || !uuid)
       return res.status(400).send('Missing value');
 
     await prisma.suggestions.update({
