@@ -164,6 +164,7 @@ model newsletter {
 
 model suggestions {
   uuid        String @id @default(uuid())
+  tag         String @unique @db.VarChar(255)
   name        String @unique @db.VarChar(255)
   description String @unique @db.VarChar(255)
   imageUrl    String @unique @db.VarChar(255)

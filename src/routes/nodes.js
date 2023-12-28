@@ -1,11 +1,11 @@
-import express from "express";
+import express from 'express';
 
-import prisma from '../db/prisma.js'
+import prisma from '../db/prisma.js';
 
-import { authenticateToken, authenticateTokenAdm} from '../utils.js';
+import { authenticateToken, authenticateTokenAdm } from '../utils.js';
 //import {Node, User, Organisation} from '../db/models/index.js'
 
-let node_router = express.Router()
+let node_router = express.Router();
 
 /**
  * @swagger
@@ -138,7 +138,7 @@ let node_router = express.Router()
  *         application/json:
  *           schema:
  *            required:
- *             - name 
+ *             - name
  *            type: object
  *            properties:
  *              name:
@@ -160,7 +160,7 @@ let node_router = express.Router()
  *               $ref: '#/components/schemas/Node'
  *       404:
  *         description: Node not found
- * 
+ *
  *   delete:
  *     security:
  *       - userBearerAuth: []
@@ -172,7 +172,7 @@ let node_router = express.Router()
  *         application/json:
  *           schema:
  *            required:
- *             - name 
+ *             - name
  *            type: object
  *            properties:
  *              name:
@@ -203,7 +203,7 @@ let node_router = express.Router()
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Node'
- * 
+ *
  * /api/nodes/{names}:
  *   get:
  *     security:
@@ -242,21 +242,20 @@ let node_router = express.Router()
  */
 
 node_router.get('/all', async (req, res) => {
-    try {
-	//const nodes = await Node.findAll();
+  try {
+    //const nodes = await Node.findAll();
 
-	const nodes = await prisma.nodes.findMany();
-	res.send(nodes)
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500)
-    }
-})
+    const nodes = await prisma.nodes.findMany();
+    res.send(nodes);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
 
 node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
-    try {
-	/*
+  try {
+    /*
 	const node = await Node.findOne({
             where: {
 		name: req.body.name
@@ -264,159 +263,154 @@ node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
 	});
 	*/
 
-	const node = await prisma.nodes.findUnique({
-	    where: {
-		name: req.body.name
-	    }
-	})
-	if (node)
-	{
-	    /*
+    const node = await prisma.nodes.findUnique({
+      where: {
+        name: req.body.name,
+      },
+    });
+    if (node) {
+      /*
             await node.update({
 		OrganisationId: req.body.OrganisationId || node.OrganisationId
 		});
 	    */
-	    const new_node = await prisma.nodes.update({
-		where: {
-		    name: node.name
-		},
-		data: {
-		    OrganisationId: req.body.OrganisationId || node.OrganisationId,
-		    name: req.body.name,                                                                                                                                                                                                    
-                    longitude: req.body.longitude || node.longitude,
-                    latitude: req.body.latitude || node.latitude,
-                    addressId: req.body.addressId || node.addressId,
-                    description: req.body.description || node.description,
-		    status: req.body.status || node.status
-		}
-	    })
-            res.json(new_node)
-	}
-    } catch (err)
-    {
-	console.error(err)
-	res.sendStatus(500)
+      const new_node = await prisma.nodes.update({
+        where: {
+          name: node.name,
+        },
+        data: {
+          OrganisationId: req.body.OrganisationId || node.OrganisationId,
+          name: req.body.name,
+          longitude: req.body.longitude || node.longitude,
+          latitude: req.body.latitude || node.latitude,
+          addressId: req.body.addressId || node.addressId,
+          description: req.body.description || node.description,
+          status: req.body.status || node.status,
+        },
+      });
+      res.json(new_node);
     }
-})
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
 
 node_router.delete('/admin', authenticateTokenAdm, async (req, res) => {
-    try {
-	const node = await prisma.nodes.delete({
-	    where: {
-		name: req.body.name
-	    }
-	})
-	if (node)
-	{
-            res.send("success")
-	} else {
-            res.status(404).send("Node not found");
-	}
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500);
+  try {
+    const node = await prisma.nodes.delete({
+      where: {
+        name: req.body.name,
+      },
+    });
+    if (node) {
+      res.send('success');
+    } else {
+      res.status(404).send('Node not found');
     }
-})
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
 
 node_router.get('/', authenticateToken, async (req, res) => {
-    try {
-	/*
+  try {
+    /*
     const user = await User.findOne({
         where: {
             email: req.email
         }
 	})
 	*/
-	const user = await prisma.user.findUnique({
-	    where: {
-		email: req.email
-	    }
-	})
-    if (user)
-    {
-        //const orga = await Organisation.findByPk(user.OrganisationId)
-	const orga = await prisma.organisations.findUnique({
-	    where: {
-		id: user.OrganisationId
-	    }
-	})
-	if (orga)
-        {
-	    /*
+    const user = await prisma.user.findUnique({
+      where: {
+        email: req.email,
+      },
+    });
+    if (user) {
+      //const orga = await Organisation.findByPk(user.OrganisationId)
+      const orga = await prisma.organisations.findUnique({
+        where: {
+          id: user.OrganisationId,
+        },
+      });
+      if (orga) {
+        /*
             const nodes = await Node.findAll({
                 where: {
                     OrganisationId: orga.id
                 }
 		});
 	    */
-	    const nodes = await prisma.nodes.findMany({
-		where: {
-		    OrganisationId: orga.id
-		}
-	    })
-            return res.send(nodes)
-        } else
-	    return res.status(404).send("This user is not part of any organisations.")
+        const nodes = await prisma.nodes.findMany({
+          where: {
+            OrganisationId: orga.id,
+          },
+        });
+        return res.send(nodes);
+      } else
+        return res
+          .status(404)
+          .send('This user is not part of any organisations.');
     }
-	res.sendStatus(401)
-    } catch (err)
-    {
-	console.log(err)
-	res.sendStatus(500)
-    }
-})
+    res.sendStatus(401);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
 
 node_router.get('/:name', authenticateToken, async (req, res) => {
-    try {
-	/*
+  try {
+    /*
     const node = await Node.findOne({
         where: {
             name: req.params.name
         }
 	});
 	*/
-	const node = await prisma.nodes.findUnique({
-	    where: {
-		name: req.params.name
-	    }
-	})
-    if (node)
-    {
-        return res.json(node)
+    const node = await prisma.nodes.findUnique({
+      where: {
+        name: req.params.name,
+      },
+    });
+    if (node) {
+      return res.json(node);
     } else {
-        return res.status(404).send("node not found")
+      return res.status(404).send('node not found');
     }
-    } catch (err)
-    {
-	console.log(err)
-	res.sendStatus(500)
-    }
-})
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
 
 node_router.post('/', authenticateToken, async (req, res) => {
-    
-    try {
-	if (req.body.name == null || req.body.longitude == null || req.body.latitude == null || !req.body.description == null)
-	    {
-		throw new Error("Missing inputs")
-	    }
-	/*
+  try {
+    if (
+      req.body.name == null ||
+      req.body.longitude == null ||
+      req.body.latitude == null ||
+      !req.body.description == null
+    ) {
+      throw new Error('Missing inputs');
+    }
+    /*
 	const user = await User.findOne({
         where: {
             email: req.email
         }
 	})
 	*/
-	const user = await prisma.user.findUnique({
-	    where: {
-		email: req.email
-	    }
-	})
-	if (user) {
-	    if (user.OrganisationId)
-	    {
-		/*
+    const user = await prisma.user.findUnique({
+      where: {
+        email: req.email,
+      },
+    });
+    if (user) {
+      if (user.OrganisationId) {
+        /*
 		  const node = await Node.create({
 		  name: req.body.name,
 		  longitude: req.body.longitude,
@@ -425,43 +419,41 @@ node_router.post('/', authenticateToken, async (req, res) => {
 		  description: req.body.description
 		  });
 		*/
-		const node = await prisma.nodes.create({
-		    data: {
-			name: req.body.name,
-			longitude: req.body.longitude,
-			latitude: req.body.latitude,
-			OrganisationId: user.OrganisationId,
-			description: req.body.description
-		    }
-		})
-            	return res.json(node)
-	    }
-	}
-	return res.sendStatus(401)
-    } catch (error) {
-	console.log(error)
-        res.sendStatus(500);
+        const node = await prisma.nodes.create({
+          data: {
+            name: req.body.name,
+            longitude: req.body.longitude,
+            latitude: req.body.latitude,
+            OrganisationId: user.OrganisationId,
+            description: req.body.description,
+          },
+        });
+        return res.json(node);
+      }
     }
-})
+    return res.sendStatus(401);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+});
 
 node_router.patch('/', authenticateToken, async (req, res) => {
-
-    try {
-	/*
+  try {
+    /*
 	  const node = await Node.findOne({
           where: {
           name: req.body.name
           }
 	  });
 	*/
-	const node = await prisma.nodes.findUnique({
-	    where: {
-		name: req.body.name
-	    }
-	})
-	if (node)
-	{
-	    /*
+    const node = await prisma.nodes.findUnique({
+      where: {
+        name: req.body.name,
+      },
+    });
+    if (node) {
+      /*
             await node.update({
 		latitude: req.body.latitude || node.latitude,
 		longitude: req.body.longitude || node.longitude,
@@ -469,51 +461,66 @@ node_router.patch('/', authenticateToken, async (req, res) => {
 		description: req.body.description || node.description
             });
 	    */
-	    const new_node = await prisma.nodes.update({
-		where: {
-		    id: node.id
-		},
-		data: {
-		    latitude: req.body.latitude || node.latitude,
-		    longitude: req.body.longitude || node.longitude,
-		    addressId: req.body.address || node.addressId,
-		    description: req.body.description || node.description
-		}
-	    })
-	    res.json(new_node)
-	}
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500)
+      const new_node = await prisma.nodes.update({
+        where: {
+          id: node.id,
+        },
+        data: {
+          latitude: req.body.latitude || node.latitude,
+          longitude: req.body.longitude || node.longitude,
+          addressId: req.body.address || node.addressId,
+          description: req.body.description || node.description,
+        },
+      });
+      res.json(new_node);
     }
-})
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
 
 node_router.delete('/', authenticateToken, async (req, res) => {
-    try {
-	/*
+  try {
+    /*
 	const node = await Node.findOne({
             where:{
 		name: req.body.name
             }
 	})
 	*/
-	const node = await prisma.nodes.delete({
-	    where: {
-		name: req.body.name
-	    }
-	})
-	if (node)
-	{
-            res.send("success")
-	} else {
-            res.status(404).send("Node not found");
-	}
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500);
+    const node = await prisma.nodes.delete({
+      where: {
+        name: req.body.name,
+      },
+    });
+    if (node) {
+      res.send('success');
+    } else {
+      res.status(404).send('Node not found');
     }
-})
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
+node_router.get('/filter', async (req, res) => {
+  try {
+    const filter = req.query.filter;
+    const nodes = await prisma.nodes.findMany({
+      where: {
+        name: {
+          contains: filter,
+        },
+      },
+    });
+
+    res.send(nodes);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
 
 export default node_router;
