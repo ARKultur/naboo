@@ -19,9 +19,9 @@ suggestions_router.get('/', async (req, res) => {
 
 suggestions_router.post('/', authenticateTokenAdm, async (req, res) => {
   try {
-    const { name, description, imageUrl, title } = req.body;
+    const { name, description, imageUrl, tag } = req.body;
 
-    if (!name || !description || !imageUrl || !title)
+    if (!name || !description || !imageUrl || !tag)
       return res.status(400).send('Missing value');
 
     await prisma.suggestions.create({
@@ -29,7 +29,7 @@ suggestions_router.post('/', authenticateTokenAdm, async (req, res) => {
         name,
         description,
         imageUrl,
-        title,
+        tag,
       },
     });
     res.status(200).send('Suggestion successfully added');
@@ -78,6 +78,31 @@ suggestions_router.delete('/:uuid', authenticateTokenAdm, async (req, res) => {
 
     if (!suggestion) return res.status(404).send('Suggestion not found');
     res.status(200).send('Suggestion successfully deleted');
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Internal Error');
+  }
+});
+
+suggestions_router.post('/:uuid', authenticateTokenAdm, async (req, res) => {
+  try {
+    const { name, description, imageUrl, tag } = req.body;
+
+    if (!name || !description || !imageUrl || !tag)
+      return res.status(400).send('Missing value');
+
+    await prisma.suggestions.update({
+      where: {
+        uuid: uuid,
+      },
+      data: {
+        name,
+        description,
+        imageUrl,
+        tag,
+      },
+    });
+    res.status(200).send('Suggestion successfully added');
   } catch (error) {
     console.log(error);
     res.status(500).send('Internal Error');
