@@ -528,6 +528,11 @@ node_router.post('/', authenticateToken, async (req, res) => {
 		email: req.email
 	    }
 	})
+	const user = await prisma.user.findUnique({
+	    where: {
+		email: req.email
+	    }
+	})
 	if (user) {
 	    if (user.OrganisationId)
 	    {

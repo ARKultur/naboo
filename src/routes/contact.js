@@ -166,7 +166,6 @@ contact_router.post('/', async (req, res) => {
 
 	if (!(name && category && description && email))
 	    return res.status(400).send("Missing value")
-
 	/*
 	await Contact.create({
 	    name: name,
