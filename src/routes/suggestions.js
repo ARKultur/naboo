@@ -45,9 +45,9 @@ suggestions_router.post('/map', async (req, res) => {
 
     if (!filters || !location) return res.status(400).send('Missing value');
 
-    const tags = prisma.suggestions.findMany({
+    const suggestions = prisma.suggestions.findMany({
       where: {
-        tag: {
+        uuid: {
           in: filters,
         },
       },
