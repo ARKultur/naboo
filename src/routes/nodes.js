@@ -195,6 +195,24 @@ node_router.get('/all', async (req, res) => {
   }
 });
 
+node_router.get('/filter', async (req, res) => {
+  try {
+    const filter = req.query.filter;
+    const nodes = await prisma.nodes.findMany({
+      where: {
+        name: {
+          contains: filter,
+        },
+      },
+    });
+
+    res.send(nodes);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
 node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
   try {
     const node = await prisma.nodes.findUnique({
@@ -766,23 +784,5 @@ node_router.delete('/', authenticateToken, async (req, res) => {
     }
 })
 */
-
-node_router.get('/filter', async (req, res) => {
-  try {
-    const filter = req.query.filter;
-    const nodes = await prisma.nodes.findMany({
-      where: {
-        name: {
-          contains: filter,
-        },
-      },
-    });
-
-    res.send(nodes);
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(500);
-  }
-});
 
 export default node_router;
