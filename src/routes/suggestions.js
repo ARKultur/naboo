@@ -45,9 +45,17 @@ suggestions_router.post('/map', async (req, res) => {
 
     if (!filters || !location) return res.status(400).send('Missing value');
 
+    const tags = prisma.suggestions.findMany({
+      where: {
+        tag: {
+          in: filters,
+        },
+      },
+    });
+
     const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
       location.latitude
-    },${location.longitude}&radius=5000&type=${filters.join('|')}&key=${
+    },${location.longitude}&radius=5000&type=${tags.join('|')}&key=${
       process.env.GOOGLE_API_KEY
     }`;
 
