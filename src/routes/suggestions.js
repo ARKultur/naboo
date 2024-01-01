@@ -53,6 +53,8 @@ suggestions_router.post('/map', async (req, res) => {
       },
     });
 
+    const tags = suggestions.map((suggestion) => suggestion.tag);
+
     const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
       location.latitude
     },${location.longitude}&radius=5000&type=${tags.join('|')}&key=${
