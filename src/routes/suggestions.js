@@ -53,7 +53,14 @@ suggestions_router.post('/map', async (req, res) => {
       },
     });
 
-    const tags = suggestions && suggestions.map((suggestion) => suggestion.tag);
+    let tags = [];
+
+    if (Array.isArray(suggestions)) {
+      const tags =
+        suggestions && suggestions.map((suggestion) => suggestion.tag);
+    } else {
+      const tags = suggestions && suggestions.tag;
+    }
 
     const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
       location.latitude
