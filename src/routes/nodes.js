@@ -743,7 +743,7 @@ node_router.delete('/', authenticateToken, async (req, res) => {
     await prisma.parkour_node.deleteMany({
       where: {
         nodeId: {
-          name: nodeName,
+          name: { OR: [{ nodeName }, 0] },
         },
       },
     });
