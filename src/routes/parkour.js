@@ -123,10 +123,11 @@ parkour_router.get('/', authenticateTokenAdm, async (req, res) => {
  */
 parkour_router.get('/orga/:id', authenticateToken, async (req, res) => {
   const id = req.params.id;
+
   try {
     const parkours = await prisma.parkour.findMany({
       where: {
-        OrganisationId: id,
+        OrganisationId: parseInt(id),
       },
     });
     return res.json(parkours);
