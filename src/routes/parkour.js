@@ -126,7 +126,7 @@ parkour_router.get('/orga/:id', authenticateToken, async (req, res) => {
   try {
     const parkours = await prisma.parkour.findMany({
       where: {
-        organisation_id: id,
+        OrganisationId: id,
       },
     });
     return res.json(parkours);
