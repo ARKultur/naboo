@@ -53,7 +53,7 @@ suggestions_router.post('/map', async (req, res) => {
       },
     });
 
-    const tags = suggestions.map((suggestion) => suggestion.tag);
+    const tags = suggestions && suggestions.map((suggestion) => suggestion.tag);
 
     const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
       location.latitude
@@ -70,7 +70,7 @@ suggestions_router.post('/map', async (req, res) => {
     res.status(200).send(response);
   } catch (error) {
     console.log(error);
-    res.status(500).send('Internal Error');
+    res.status(500).send('Internal Error', error);
   }
 });
 

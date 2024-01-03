@@ -1,7 +1,6 @@
-import express from "express";
-import prisma from '../db/prisma.js'
-import { authenticateToken, authenticateTokenAdm} from '../utils.js';
-
+import express from 'express';
+import prisma from '../db/prisma.js';
+import { authenticateToken, authenticateTokenAdm } from '../utils.js';
 
 /**
  * @swagger
@@ -83,9 +82,9 @@ const parkour_router = express.Router();
  *       500:
  *         description: Internal Server Error
  */
-parkour_router.get("/", authenticateTokenAdm, async (req, res) => {
-    const parkours = await prisma.parkour.findMany();
-    res.send(parkours);
+parkour_router.get('/', authenticateTokenAdm, async (req, res) => {
+  const parkours = await prisma.parkour.findMany();
+  res.send(parkours);
 });
 
 /**
@@ -126,17 +125,16 @@ parkour_router.get('/orga/:id', authenticateToken, async (req, res) => {
   const id = req.params.id;
   try {
     const parkours = await prisma.parkour.findMany({
-        where: {
-          organisation_id: id,
-        },
-      });
-      return res.json(parkours)
-} catch (error) {
-    console.error(error)
-    return res.sendStatus(500)
-}
+      where: {
+        organisation_id: id,
+      },
+    });
+    return res.json(parkours);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
 });
-
 
 /**
  * @swagger
@@ -212,64 +210,63 @@ parkour_router.get('/orga/:id', authenticateToken, async (req, res) => {
  *       400:
  *         description: Bad Request - Missing required fields or invalid input
  */
-parkour_router.patch("/:id", async (req, res) => {
-    const id = req.params.id
-    try {
-        const parkour = await prisma.parkour.findFirst({
-            where: {
-              id: id,
-            },
-          });
-          if (parkour) {
-            const updated_parkour = await prisma.parkour.update({
+parkour_router.patch('/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const parkour = await prisma.parkour.findFirst({
+      where: {
+        id: id,
+      },
+    });
+    if (parkour) {
+      const updated_parkour = await prisma.parkour.update({
+        where: {
+          id: parkour.id,
+        },
+        data: {
+          name: req.body.name || customer.name,
+          description: req.body.description || customer.description,
+          status: req.body.status || customer.status,
+          OrganisationId: req.body.organisation_id || customer.OrganisationId,
+          updatedAt: Date.now(),
+          nodes: {
+            upsert: req.body.node_ids.map((node_id, index) => ({
               where: {
-                id: parkour.id,
-              },
-              data: {
-                name: req.body.name || customer.name,
-                description: req.body.description || customer.description,
-                status: req.body.status || customer.status,
-                OrganisationId: req.body.organisation_id || customer.OrganisationId,
-                updatedAt: Date.now(),
-                nodes: {
-                  upsert: req.body.node_ids.map((node_id, index) => ({
-                      where: {
-                          parkourId_nodeId: {
-                              parkourId: updated_parkour.uuid,
-                              nodeId: node_id,
-                          },
-                      },
-                      create: {
-                          parkourId: updated_parkour.uuid,
-                          nodeId: node_id,
-                          order: req.body.order[index] || 0,
-                      },
-                      update: {
-                          order: req.body.order[index] || 0,
-                      },
-                  })),
+                parkourId_nodeId: {
+                  parkourId: updated_parkour.uuid,
+                  nodeId: node_id,
                 },
-
               },
-            });
-            if (req.body.removed_node_ids && req.body.removed_node_ids.length > 0) {
-              await prisma.parkour_node.deleteMany({
-                  where: {
-                      parkourId_nodeId: {
-                          parkourId: updated_parkour.uuid,
-                          nodeId: {
-                              in: req.body.removed_node_ids,
-                          },
-                      },
-                  },
-              });
-          }
-            return res.json(updated_parkour);
-          }
-    } catch (error) {
-        console.error(error)
-        return res.sendStatus(500)
+              create: {
+                parkourId: updated_parkour.uuid,
+                nodeId: node_id,
+                order: req.body.order[index] || 0,
+              },
+              update: {
+                order: req.body.order[index] || 0,
+              },
+            })),
+          },
+        },
+      });
+      if (req.body.removed_node_ids && req.body.removed_node_ids.length > 0) {
+        await prisma.parkour_node.deleteMany({
+          where: {
+            parkourId_nodeId: {
+              parkourId: updated_parkour.uuid,
+              nodeId: {
+                in: req.body.removed_node_ids,
+              },
+            },
+          },
+        });
+      }
+      return res.json(updated_parkour);
     }
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
 });
 
 /**
@@ -328,29 +325,34 @@ parkour_router.patch("/:id", async (req, res) => {
  *       400:
  *         description: Bad Request - Missing required fields or invalid input
  */
-parkour_router.post("/", async (req, res) => {
+parkour_router.post('/', async (req, res) => {
   try {
-      const parkourData = {
-          name: req.body.name,
-          description: req.body.description,
-          status: req.body.status,
-      };
+    const parkourData = {
+      name: req.body.name,
+      description: req.body.description,
+      status: req.body.status,
+      OrganisationId: req.body.organisationId,
+    };
 
-      if (req.body.nodes && Array.isArray(req.body.nodes) && req.body.nodes.length > 0) {
-          parkourData.nodes = req.body.nodes.map((node) => ({
-              nodeId: node.nodeId,
-              order: node.order || 0,
-          }));
-      }
+    if (
+      req.body.nodes &&
+      Array.isArray(req.body.nodes) &&
+      req.body.nodes.length > 0
+    ) {
+      parkourData.nodes = req.body.nodes.map((node) => ({
+        nodeId: node.nodeId,
+        order: node.order || 0,
+      }));
+    }
 
-      const parkour = await prisma.parkour.create({
-          data: parkourData,
-      });
+    const parkour = await prisma.parkour.create({
+      data: parkourData,
+    });
 
-      res.json(parkour);
+    res.json(parkour);
   } catch (error) {
-      console.error(error);
-      return res.sendStatus(500);
+    console.error(error);
+    return res.sendStatus(500);
   }
 });
 
@@ -386,25 +388,25 @@ parkour_router.post("/", async (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-parkour_router.delete("/:id", async (req, res) => {
+parkour_router.delete('/:id', async (req, res) => {
   const id = req.params.id;
   try {
-      await prisma.parkour_node.deleteMany({
-          where: {
-              parkourId: id,
-          },
-      });
+    await prisma.parkour_node.deleteMany({
+      where: {
+        parkourId: id,
+      },
+    });
 
-      const deletedParkour = await prisma.parkour.delete({
-          where: {
-              id: id,
-          },
-      });
+    const deletedParkour = await prisma.parkour.delete({
+      where: {
+        id: id,
+      },
+    });
 
-      res.json(deletedParkour);
+    res.json(deletedParkour);
   } catch (error) {
-      console.error(error);
-      return res.sendStatus(500);
+    console.error(error);
+    return res.sendStatus(500);
   }
 });
 
