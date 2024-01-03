@@ -213,16 +213,17 @@ parkour_router.get('/orga/:id', authenticateToken, async (req, res) => {
  */
 parkour_router.patch('/:id', async (req, res) => {
   const id = req.params.id;
+
   try {
     const parkour = await prisma.parkour.findFirst({
       where: {
-        id: id,
+        uuid: id,
       },
     });
     if (parkour) {
       const updated_parkour = await prisma.parkour.update({
         where: {
-          id: parkour.id,
+          uuid: parkour.id,
         },
         data: {
           name: req.body.name || customer.name,
