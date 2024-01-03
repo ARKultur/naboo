@@ -57,10 +57,9 @@ suggestions_router.post('/map', async (req, res) => {
     let tags = [];
 
     if (Array.isArray(suggestions)) {
-      const tags =
-        suggestions && suggestions.map((suggestion) => suggestion.tag);
+      tags.push(...suggestions.map((suggestion) => suggestion.tag));
     } else {
-      const tags = suggestions && suggestions.tag;
+      tags.push(suggestions.tag);
     }
 
     const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
