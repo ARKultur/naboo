@@ -332,7 +332,9 @@ parkour_router.post('/', async (req, res) => {
       name: req.body.name,
       description: req.body.description,
       status: req.body.status,
-      OrganisationId: req.body.organisationId,
+      organisations: {
+        connect: { id: req.body.organisationId },
+      },
     };
 
     if (
