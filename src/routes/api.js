@@ -24,7 +24,7 @@ router
 
 router.use("/review", review_router);
 router.use("/guides", guide_router);
-router.use("/parkour", parkour_router)
+router.use("/parkours", parkour_router)
 router.use("/nodes", node_router);
 router.use("/organisations", orga_router);
 router.use("/", utils_router);
