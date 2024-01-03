@@ -494,6 +494,10 @@ node_router.post('/', authenticateToken, async (req, res) => {
         latitude: req.body.latitude,
         OrganisationId: user.OrganisationId,
         description: req.body.description,
+        model: req.body.model,
+        texture: req.body.texture,
+        altitude: req.body.altitude,
+        status: req.body.status,
       };
 
       if (
