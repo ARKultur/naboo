@@ -75,10 +75,10 @@ suggestions_router.post('/map', async (req, res) => {
       },
     });
 
-    res.status(200).send(response);
+    res.status(200).send(response.data && response.data.results);
   } catch (error) {
     console.log(error);
-    res.status(500).send('Internal Error', error);
+    res.status(500).send('Internal Error');
   }
 });
 
