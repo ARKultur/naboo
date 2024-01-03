@@ -400,7 +400,7 @@ parkour_router.delete('/:id', async (req, res) => {
 
     const deletedParkour = await prisma.parkour.delete({
       where: {
-        id: id,
+        uuid: id,
       },
     });
 
