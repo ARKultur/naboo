@@ -220,29 +220,51 @@ node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
         name: req.body.name,
       },
     });
+
     if (node) {
-      const new_node = await prisma.nodes.update({
+      let updatedNode = await prisma.nodes.update({
         where: {
-          name: node.name,
+          id: node.id,
         },
         data: {
-          OrganisationId: req.body.OrganisationId || node.OrganisationId,
-          name: req.body.name,
-          longitude: req.body.longitude || node.longitude,
           latitude: req.body.latitude || node.latitude,
-          addressId: req.body.addressId || node.addressId,
+          longitude: req.body.longitude || node.longitude,
+          addressId: req.body.address || node.addressId,
           description: req.body.description || node.description,
-          status: req.body.status || node.status,
           model: req.body.model || node.model,
           texture: req.body.texture || node.texture,
           altitude: req.body.altitude || node.altitude,
           filter: req.body.filter || node.filter,
         },
+        include: {
+          parkours: true,
+        },
       });
-      res.json(new_node);
+
+      if (req.body.parkour_uuid) {
+        const existingParkourNode = await prisma.parkour_node.findFirst({
+          where: {
+            parkourId: req.body.parkour_uuid,
+            nodeId: updatedNode.id,
+          },
+        });
+
+        if (!existingParkourNode) {
+          await prisma.parkour_node.create({
+            data: {
+              parkourId: req.body.parkour_uuid,
+              nodeId: updatedNode.id,
+            },
+          });
+        }
+      }
+
+      res.json(updatedNode);
+    } else {
+      res.status(404).send('Node not found');
     }
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     res.sendStatus(500);
   }
 });
@@ -671,7 +693,7 @@ node_router.patch('/', authenticateToken, async (req, res) => {
     });
 
     if (node) {
-      const updatedNode = await prisma.nodes.update({
+      let updatedNode = await prisma.nodes.update({
         where: {
           id: node.id,
         },
@@ -718,48 +740,6 @@ node_router.patch('/', authenticateToken, async (req, res) => {
   }
 });
 
-/*
-node_router.patch('/', authenticateToken, async (req, res) => {
-
-    try {
-	const node = await prisma.nodes.findUnique({
-	    where: {
-		name: req.body.name
-	    }
-	})
-	if (node)
-	{
-	    const new_node = await prisma.nodes.update({
-		where: {
-		    id: node.id
-		},
-		data: {
-		    latitude: req.body.latitude || node.latitude,
-		    longitude: req.body.longitude || node.longitude,
-		    addressId: req.body.address || node.addressId,
-		    description: req.body.description || node.description
-		}
-	    })
-
-		if (req.body.parkour_uuid)
-		{
-			await prisma.parkour_node.create({
-				data: {
-					parkourId: req.body.parkour_uuid,
-					nodeId: new_node.id
-				}
-			})
-		}
-	    res.json(new_node)
-	}
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500)
-    }
-})
-*/
-
 node_router.delete('/', authenticateToken, async (req, res) => {
   try {
     const nodeId = req.body.node_id;
@@ -791,28 +771,5 @@ node_router.delete('/', authenticateToken, async (req, res) => {
     res.sendStatus(500);
   }
 });
-
-/*
-node_router.delete('/', authenticateToken, async (req, res) => {
-    try {
-
-	const node = await prisma.nodes.delete({
-	    where: {
-		name: req.body.name
-	    }
-	})
-	if (node)
-	{
-            res.send("success")
-	} else {
-            res.status(404).send("Node not found");
-	}
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500);
-    }
-})
-*/
 
 export default node_router;
