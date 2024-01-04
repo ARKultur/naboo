@@ -261,7 +261,7 @@ orga_router.get('/:id', authenticateTokenAdm, async (req, res) => {
 		const id = req.params.id;
 		const users = await prisma.user.findMany({
 			where: {
-				OrganisationId: id
+				OrganisationId: parseInt(id)
 			}
 		})
 		return res.send(users)
