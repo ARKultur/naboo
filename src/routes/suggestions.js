@@ -65,13 +65,13 @@ suggestions_router.post('/map', async (req, res) => {
     const results = [];
     let nextPageToken = '';
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
       const response = await axios.get(
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
         {
           params: {
             location: `${location.latitude},${location.longitude}`,
-            radius: 15000,
+            radius: 5000,
             type: tags.join('|'),
             key: process.env.GOOGLE_API_KEY,
             pagetoken: nextPageToken,
@@ -81,7 +81,15 @@ suggestions_router.post('/map', async (req, res) => {
 
       const data = response.data;
       const filteredResults = data.results.filter((place) => {
-        const unwantedTypes = ['bar', 'hotel', 'store', 'restaurant'];
+        const unwantedTypes = [
+          'bar',
+          'lodging',
+          'store',
+          'restaurant',
+          'sublocality',
+          'locality',
+          'lodging',
+        ];
         return !place.types.some((type) => unwantedTypes.includes(type));
       });
 
@@ -92,6 +100,7 @@ suggestions_router.post('/map', async (req, res) => {
       if (!nextPageToken) break;
     }
 
+    console.log(results.length);
     res.status(200).send(results);
   } catch (error) {
     console.log(error);
