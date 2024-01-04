@@ -28,6 +28,7 @@ const REDIRECT_URL = process.env.GOOGLE_REDIRECT_URL;
 const OAuth2 = google.auth.OAuth2;
 const oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
 
+console.log(process.env.UT_CI)
 //console.log(process.env.GOOGLE_CLIENT_ID)
 
 async function db_init()
