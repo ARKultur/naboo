@@ -229,14 +229,14 @@ orga_router.delete('/', authenticateTokenAdm, async (req, res) => {
 /**
  * @swagger
  * tags:
- *   name: Organizations
- *   description: The Organizations managing API
- * /api/organizations/{id}:
+ *   name: Organisations
+ *   description: The Organisations managing API
+ * /api/organisations/{id}:
  *   get:
  *     security:
  *       - adminBearerAuth: []
  *     summary: Get users in an organization (admin)
- *     tags: [Organizations]
+ *     tags: [Organisations]
  *     parameters:
  *       - in: path
  *         name: id
