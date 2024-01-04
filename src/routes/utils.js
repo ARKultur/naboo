@@ -117,6 +117,7 @@ utils_router.post('/login', async (req, res) => {
         res.json(token);
 	} else
 	{
+	     console.log(req.body);
 	     throw new Error("bad arguments")
 	}
     } catch (error) {
