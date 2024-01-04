@@ -385,13 +385,18 @@ node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
  */
 node_router.delete('/admin', authenticateTokenAdm, async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = req.body.id
+    const parkourId = req.body.parkourId
 
-    await prisma.parkour_node.deleteMany({
+    await prisma.parkour_node.delete({
       where: {
-        nodeId: id
+        parkourId_nodeId: {
+          parkourId: parkourId,
+          nodeId: nodeId,
+        },
       },
     });
+
     const deletedNode = await prisma.nodes.delete({
       where: {
         id: id,
