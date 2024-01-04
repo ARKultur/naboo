@@ -63,6 +63,7 @@ suggestions_router.post('/map', async (req, res) => {
     }
 
     const results = [];
+    let nextPageToken = '';
 
     for (let i = 0; i < 5; i++) {
       const response = await axios.get(
