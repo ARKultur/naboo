@@ -45,7 +45,7 @@ const utils_router = express.Router();
  *                  type: string
  *       401:
  *         description: Invalid credentials
- * 
+ *
  * /api/signin:
  *   post:
  *     summary: Register as an user
@@ -103,7 +103,6 @@ utils_router.post('/logout', authenticateToken, (req, res, next) => {
 })
 
 utils_router.post('/login', async (req, res) => {
-
     try {
 	if (isEmpty(req.body))
 	    throw new Error("")
@@ -112,7 +111,7 @@ utils_router.post('/login', async (req, res) => {
 	{
 	    //console.log(user)
             const token = generateAccessToken(req.body.email);
-      
+
             res.json(token);
 	} else
 	{
@@ -120,7 +119,7 @@ utils_router.post('/login', async (req, res) => {
 	}
     } catch (error) {
 	console.log(error)
-	res.status(401).send("invalid credentials");  
+	res.status(401).send("invalid credentials");
     }
 })
 

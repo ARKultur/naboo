@@ -11,6 +11,7 @@ describe('test routes', function () {
 	await prisma.organisations.deleteMany();
 	await prisma.nodes.deleteMany();
 	await prisma.guide.deleteMany();
+	await prisma.review.deleteMany();
 	await prisma.orb.deleteMany();
 	await prisma.contact.deleteMany();
 	await prisma.adresses.deleteMany();
@@ -72,7 +73,7 @@ describe('test routes', function () {
 	    const res = await get('/api/whoami', tok);
 	    expect(res.identity).to.equal('test@test.com')
 	})
-	
+
 	it('logs out', async () => {
 	    const req = {
 		email: 'test@test.com',
@@ -125,7 +126,7 @@ describe('test routes', function () {
 
     describe('test organisation routes', function () {
 	let org_id = 0;
-	
+
 	it('gets all the organisations', async () => {
 	    const req = {
 		email: process.env.ADMIN_EMAIL,
@@ -273,7 +274,7 @@ describe('test routes', function () {
 	    }
 	    const res = await patch(req, '/api/accounts/admin', token_adm)
 	})
-	
+
 	it('get all the nodes', async () => {
 	    let req = {
 		email: process.env.ADMIN_EMAIL,
@@ -464,48 +465,240 @@ describe('test routes', function () {
     })
 
     describe('Test guides routes', function() {
-	let token_user;
-	let guide_id;
-	
-	it('fetch all the guides', async () => {
-	    let req = {
-		email: process.env.ADMIN_EMAIL,
-		password: process.env.ADMIN_PASSWORD,
-		username: 'jaj'
-	    }
-	    const token = await post(req, '/api/login');
+        let token_user;
+        let guide_id;
 
-	    const res = await get('/api/guides/admin', token)
-	    expect(res).to.be.empty
-	})
-	
-	it('creates a guide', async () => {
-	    token_user = await log_user();
+        it('fetch all the guides', async () => {
+            let req = {
+            email: process.env.ADMIN_EMAIL,
+            password: process.env.ADMIN_PASSWORD,
+            username: 'jaj'
+            }
+            const token = await post(req, '/api/login');
 
-	    const req = {
-		text: "something"
-	    }
+            const res = await get('/api/guides/admin', token)
+            expect(res).to.be.empty
+        })
 
-	    const res = await post(req, '/api/guides', token_user);
-	    guide_id = res.id;
-	    expect(res.text).to.equal('something')
-	})
+        it('creates a guide', async () => {
+            token_user = await log_user();
 
-	it('fetch the guides of an organisation', async () => {
-	    const res = await get('/api/guides', token_user);
-	    expect(res.length).to.equal(1)
-	})
+            const req = {
+                title: "Guide",
+                description: "C'est un guide",
+                keywords: ["Guide", "TropBien"],
+                openingHours: [
+                    "7:00 - 18:00",
+                    "7:00 - 18:00",
+                    "7:00 - 18:00",
+                    "7:00 - 18:00",
+                    "7:00 - 18:00",
+                    "7:00 - 18:00",
+                    "7:00 - 18:00"
+                ],
+                website: "https://www.fourviere.org/",
+                priceDesc: ["Entrée visiteur", "Entrée -10ans"],
+                priceValue: [10, 8]
+            }
 
-	it('fetch a guide', async () => {
-	    const res = await get(`/api/guides/${guide_id}`, token_user);
-	    expect(res.text).to.equal('something')
-	})
+            const res = await post(req, '/api/guides', token_user);
+            guide_id = res.id;
+            expect(res.title).to.equal('Guide');
+            expect(res.description).to.equal("C'est un guide");
+            expect(res.keywords).to.have.members(["Guide", "TropBien"]);
+            expect(res.openingHours).to.have.members([
+                "7:00 - 18:00",
+                "7:00 - 18:00",
+                "7:00 - 18:00",
+                "7:00 - 18:00",
+                "7:00 - 18:00",
+                "7:00 - 18:00",
+                "7:00 - 18:00"
+            ]);
+            expect(res.website).to.equal("https://www.fourviere.org/");
+            expect(res.priceDesc).to.have.members(["Entrée visiteur", "Entrée -10ans"]);
+            expect(res.priceValue).to.have.members([10, 8]);
+        })
 
-	it('fails to fetch a guide', async () => {
-	    const res = await get('/api/guides/-12', token_user, 404);
-	    expect(res.error).to.equal("Guide not found")
-	})
+		it('Failed to creates a guide', async () => {
+            await post('Wrong Values', '/api/guides', token_user, 500);
+        })
+
+        it('fetch the guides of an organisation', async () => {
+            const res = await get('/api/guides', token_user);
+            expect(res.length).to.equal(1)
+        })
+
+        it('fetch a guide', async () => {
+            const res = await get(`/api/guides/${guide_id}`, token_user);
+            expect(res.title).to.equal('Guide');
+            expect(res.description).to.equal("C'est un guide");
+            expect(res.keywords).to.have.members(["Guide", "TropBien"]);
+            expect(res.openingHours).to.have.members([
+                "7:00 - 18:00",
+                "7:00 - 18:00",
+                "7:00 - 18:00",
+                "7:00 - 18:00",
+                "7:00 - 18:00",
+                "7:00 - 18:00",
+                "7:00 - 18:00"
+            ]);
+            expect(res.website).to.equal("https://www.fourviere.org/");
+            expect(res.priceDesc).to.have.members(["Entrée visiteur", "Entrée -10ans"]);
+            expect(res.priceValue).to.have.members([10, 8]);
+        })
+
+        it('fails to fetch a guide', async () => {
+            const res = await get('/api/guides/12', token_user, 404);
+            expect(res.error).to.equal("Guide not found")
+        })
+
+        it('Update a guide', async () => {
+            const req = {
+                title: "Guide Modifié",
+                description: "C'est un guide modifié",
+                keywords: ["Autre Guide", "TropCool"],
+                openingHours: [
+                    "8:00 - 19:00",
+                    "8:00 - 19:00",
+                    "8:00 - 19:00",
+                    "7:00 - 20:00",
+                    "8:00 - 19:00",
+                    "8:00 - 19:00",
+                    "8:00 - 19:00"
+                ],
+                website: "https://www.fourverie.org/",
+                priceDesc: ["Entrée visiteur", "Entrée -10ans"],
+                priceValue: [12, 10]
+            }
+
+            const res = await patch(req, `/api/guides/${guide_id}`, token_user);
+            expect(res.title).to.equal("Guide Modifié");
+            expect(res.description).to.equal("C'est un guide modifié");
+            expect(res.keywords).to.have.members(["Autre Guide", "TropCool"]);
+            expect(res.openingHours).to.have.members([
+                "8:00 - 19:00",
+                "8:00 - 19:00",
+                "8:00 - 19:00",
+                "7:00 - 20:00",
+                "8:00 - 19:00",
+                "8:00 - 19:00",
+                "8:00 - 19:00"
+            ]);
+            expect(res.website).to.equal("https://www.fourverie.org/");
+            expect(res.priceDesc).to.have.members(["Entrée visiteur", "Entrée -10ans"]);
+            expect(res.priceValue).to.have.members([12, 10]);
+        })
+
+        it('Delete a guide', async () => {
+            let res = await del({}, `/api/guides/${guide_id}`, token_user);
+            expect(res).to.equal("success");
+
+            res = await get('/api/guides', token_user);
+            expect(res.length).to.equal(0);
+        })
+
+		it('Delete a wrong guide', async () => {
+            await del({}, `/api/guides/765`, token_user, 404);
+        })
     })
+
+    describe('Test review routes', function() {
+        let token_user;
+        let guide_id;
+        let review_id;
+
+        it('fetch all the review', async () => {
+            let req = {
+                email: process.env.ADMIN_EMAIL,
+                password: process.env.ADMIN_PASSWORD,
+                username: 'jaj'
+            }
+            const token = await post(req, '/api/login');
+
+            const res = await get('/api/review', token)
+            expect(res).to.be.empty
+        })
+
+        it('creates a review', async () => {
+            token_user = await log_user();
+
+            const guide_req = {
+                title: "Guide",
+                description: "C'est un guide",
+                keywords: ["Guide", "TropBien"],
+                openingHours: [
+                    "7:00 - 18:00",
+                    "7:00 - 18:00",
+                    "7:00 - 18:00",
+                    "7:00 - 18:00",
+                    "7:00 - 18:00",
+                    "7:00 - 18:00",
+                    "7:00 - 18:00"
+                ],
+                website: "https://www.fourviere.org/",
+                priceDesc: ["Entrée visiteur", "Entrée -10ans"],
+                priceValue: [10, 8]
+            }
+
+            const guide_res = await post(guide_req, '/api/guides', token_user);
+            guide_id = guide_res.id;
+
+			const req = {
+				stars: 4,
+				message: "C'était cool"
+			}
+
+            const res = await post(req, `/api/review/${guide_id}`, token_user);
+			review_id = res.id;
+
+            expect(res.stars).to.equal(4);
+            expect(res.message).to.equal("C'était cool");
+        })
+
+		it('Failed creates a review', async () => {
+            await post('Wrong value', `/api/review/${guide_id}`, token_user, 500);
+        })
+
+        it('fetch the review of a guide', async () => {
+            const res = await get(`/api/review/?guideId=${guide_id}`, token_user);
+            expect(res.length).to.equal(1);
+        })
+
+        it('fetch a review', async () => {
+            const res = await get(`/api/review/?id=${review_id}`, token_user);
+            expect(res.length).to.equal(1);
+        })
+
+        it('fails to fetch a review', async () => {
+            const res = await get('/api/review/?id=12', token_user);
+            expect(res.length).to.equal(0);
+        })
+
+        it('Update a review', async () => {
+            const req = {
+                stars: 1,
+				message: "En fait non"
+            }
+
+            const res = await patch(req, `/api/review/${review_id}`, token_user);
+            expect(res.stars).to.equal(1);
+            expect(res.message).to.equal("En fait non");
+        })
+
+        it('Delete a review', async () => {
+            let res = await del({}, `/api/review/${review_id}`, token_user);
+            expect(res).to.equal("success");
+
+            res = await get('/api/review', token_user);
+            expect(res.length).to.equal(0);
+        })
+
+		it('Delete a wrong review', async () => {
+            await del({}, `/api/review/765`, token_user, 404);
+        })
+    })
+
     async function log_user(user = 'test', pass = 'fishh', email = 'test@test.com') {
 	let req = {
 		username: user,
@@ -515,7 +708,7 @@ describe('test routes', function () {
 	const token_user = await post(req, '/api/login')
 	return token_user
     }
-    
+
     //async utility functions for testing
     async function post(req, url, token = '', status = 200) {
 	const {body, text} = await request(app).post(url).set({

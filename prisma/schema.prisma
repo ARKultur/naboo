@@ -80,7 +80,7 @@ model review {
   message  String
   guideId  Int
   userId   Int
-  datetime DateTime @default(now())
+  datetime DateTime @default(now()) @updatedAt
   guide    guide    @relation(fields: [guideId], references: [id], onDelete: Cascade)
   user     user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

@@ -134,7 +134,7 @@ let node_router = express.Router()
  *         application/json:
  *           schema:
  *            required:
- *             - name 
+ *             - name
  *            type: object
  *            properties:
  *              name:
@@ -156,7 +156,7 @@ let node_router = express.Router()
  *               $ref: '#/components/schemas/Node'
  *       404:
  *         description: Node not found
- * 
+ *
  *   delete:
  *     security:
  *       - userBearerAuth: []
@@ -168,7 +168,7 @@ let node_router = express.Router()
  *         application/json:
  *           schema:
  *            required:
- *             - name 
+ *             - name
  *            type: object
  *            properties:
  *              name:
@@ -199,7 +199,7 @@ let node_router = express.Router()
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Node'
- * 
+ *
  * /api/nodes/{names}:
  *   get:
  *     security:
@@ -241,7 +241,11 @@ node_router.get('/all', async (req, res) => {
     try {
 	//const nodes = await Node.findAll();
 
-	const nodes = await prisma.nodes.findMany();
+	const nodes = await prisma.nodes.findMany({
+		include: {
+			guide: true,
+		}
+	});
 	res.send(nodes)
     } catch (error)
     {
@@ -278,7 +282,7 @@ node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
 		},
 		data: {
 		    OrganisationId: req.body.OrganisationId || node.OrganisationId,
-		    name: req.body.name,                                                                                                                                                                                                    
+		    name: req.body.name,
                     longitude: req.body.longitude || node.longitude,
                     latitude: req.body.latitude || node.latitude,
                     addressId: req.body.addressId || node.addressId,
@@ -326,7 +330,7 @@ node_router.get('/', authenticateToken, async (req, res) => {
 	*/
 	const user = await prisma.user.findUnique({
 	    where: {
-		email: req.email
+			email: req.email
 	    }
 	})
     if (user)
@@ -349,6 +353,9 @@ node_router.get('/', authenticateToken, async (req, res) => {
 	    const nodes = await prisma.nodes.findMany({
 		where: {
 		    OrganisationId: orga.id
+		},
+		include: {
+			guide: true,
 		}
 	    })
             return res.send(nodes)
@@ -374,8 +381,11 @@ node_router.get('/:name', authenticateToken, async (req, res) => {
 	*/
 	const node = await prisma.nodes.findUnique({
 	    where: {
-		name: req.params.name
-	    }
+			name: req.params.name
+	    },
+		include: {
+			guide: true,
+		}
 	})
     if (node)
     {
@@ -391,7 +401,7 @@ node_router.get('/:name', authenticateToken, async (req, res) => {
 })
 
 node_router.post('/', authenticateToken, async (req, res) => {
-    
+
     try {
 	if (req.body.name == null || req.body.longitude == null || req.body.latitude == null || !req.body.description == null)
 	    {
