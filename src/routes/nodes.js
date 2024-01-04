@@ -399,7 +399,7 @@ node_router.delete('/admin', authenticateTokenAdm, async (req, res) => {
 
     const deletedNode = await prisma.nodes.delete({
       where: {
-        id: id,
+        id: nodeId,
       },
     });
 
