@@ -90,6 +90,7 @@ async function sendEmailToMultipleRecipients(subject, text, recipients) {
         pass: process.env.GMAIL_PASSWORD,
       },
     });
+    console.log(recipients);
     const info = await transporter.sendMail({
       from: process.env.GMAIL_EMAIL,
       to: recipients.join(', '),
