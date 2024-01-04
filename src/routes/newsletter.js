@@ -114,7 +114,8 @@ newsletter_router.post('/create', authenticateTokenAdm, async (req, res) => {
     if (!newsletter) return res.status(404).send('No user in newsletter');
 
       if (process.env.UT_CI == false) {
-	  sendEmailToMultipleRecipients(subject, text, newsletter);
+	  const ret = await sendEmailToMultipleRecipients(subject, text, newsletter);
+	  console.log(ret);
       }
     res.status(200).send('Mail successfully sent');
   } catch (error) {
