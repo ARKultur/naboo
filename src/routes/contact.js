@@ -184,7 +184,7 @@ contact_router.post('/', async (req, res) => {
 	const contact = await prisma.contact.create({
 	    data: {
 		name: name,
-		category: category,
+		category: category.toString(),
 		description: description,
 		email: email
 	    }
