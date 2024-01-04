@@ -97,7 +97,7 @@ async function sendEmailToMultipleRecipients(subject, text, recipients) {
         pass: process.env.GMAIL_PASSWORD,
       },
     });
-    console.log(recipients);
+    console.log(exclude(recipients, ["uuid"]));
 	  
     const info = await transporter.sendMail({
       from: process.env.GMAIL_EMAIL,
