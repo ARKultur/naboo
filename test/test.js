@@ -5,6 +5,7 @@ import { isEmpty } from '../src/utils.js'
 import prisma from '../src/db/prisma.js'
 
 describe('test routes', function () {
+	let guide_id;
     before('Mock db connection and load app', async function () {
 	await prisma.user.deleteMany();
 	await prisma.customers.deleteMany();
@@ -15,12 +16,15 @@ describe('test routes', function () {
 	await prisma.orb.deleteMany();
 	await prisma.contact.deleteMany();
 	await prisma.adresses.deleteMany();
+	await prisma.newsletter.deleteMany();
+	await prisma.suggestions.deleteMany();
     })
 
     describe('test utility routes', function () {
 	const url_register = '/api/signin'
 	const url_login = '/api/login'
-
+	let user_tok;
+	let admin_tok;
 	it('create a new user', async function () {
 	    const req = {
 		username: 'test',
@@ -55,7 +59,8 @@ describe('test routes', function () {
 		username: 'jaj'
 	    }
 	    const res = await post(req, url_login);
-	    expect(res).to.be.a('string')
+	    admin_tok = res;
+		expect(res).to.be.a('string')
 	})
 
 	it('fails to log in', async () => {
@@ -74,6 +79,20 @@ describe('test routes', function () {
 	    expect(res.identity).to.equal('test@test.com')
 	})
 
+	it('modify user info', async() => {
+	    let req = {
+		email: 'test@test.com',
+		password: 'fish',
+		username: 'test'
+	    }
+	    const tok = await post(req, url_login)
+		req.password = "fishe"
+	    const res = await patch(req, '/api/accounts', tok);
+	    expect(res.password).to.equal('fishe')
+		req.password = 'fish'
+		await patch(req, '/api/accounts', tok);
+	})
+
 	it('logs out', async () => {
 	    const req = {
 		email: 'test@test.com',
@@ -81,10 +100,29 @@ describe('test routes', function () {
 		username: 'test'
 	    }
 	    const tok = await post(req, url_login)
+		console.log(tok)
 	    const res = await post({}, '/api/logout', tok)
 	    expect(res).to.be.a('string')
 	})
-
+	it('delete an user', async function () {
+	    let req = {
+		username: 'jaj',
+		password: 'jaj',
+		email: 'test@testsqdqsds.com'
+	    }
+	    const user = await post(req, url_register)
+		//user_tok = await post(req, url_login)
+		//const user = await get('/api/accounts', user_tok);
+		//const users = await get('/api/accounts/admin', admin_tok)
+		//console.log(users)
+		//console.log(user)
+		const id = user.id
+		req = {
+			id: id
+		}
+		const res = await del(req, '/api/accounts/admin', admin_tok)
+	    expect(res).to.be.a('string');
+	})
 	it('verify user email', async () => {
 	    const req = {
 		email: 'test@test.com',
@@ -698,6 +736,308 @@ describe('test routes', function () {
             await del({}, `/api/review/765`, token_user, 404);
         })
     })
+
+    describe('Test newsletter routes', function () {
+	let token_user;
+
+	it('fetch all the emails registered', async () => {
+	    let req = {
+		email: process.env.ADMIN_EMAIL,
+		password: process.env.ADMIN_PASSWORD,
+		username: 'jaj'
+	    }
+	    const token = await post(req, '/api/login');
+
+	    const res = await get('/api/newsletter/', token)
+	    expect(res).to.be.empty
+	})
+
+	it('register an user to the newsletter', async () => {
+	    //User successfully added to newsletter
+	    let req = {
+		email: process.env.ADMIN_EMAIL,
+		password: process.env.ADMIN_PASSWORD,
+		username: 'jaj'
+	    }
+	    const token = await post(req, '/api/login');
+	    req = {
+		email: "test@test.com"
+	    }
+
+	    const res = await post(req, '/api/newsletter', token)
+	    expect(res).to.equal('User successfully added to newsletter')
+	})
+
+	it('send an email', async () => {
+	    let req = {
+		email: process.env.ADMIN_EMAIL,
+		password: process.env.ADMIN_PASSWORD,
+		username: 'jaj'
+	    }
+	    const token = await post(req, '/api/login');
+
+	    req = {
+		subject: "hello",
+		text: "test"
+	    }
+	    const res = await post(req, "/api/newsletter/create", token)
+	    expect(res).to.equal('Mail successfully sent')
+	})
+
+	it('deletes an email', async () => {
+		let req = {
+			email: process.env.ADMIN_EMAIL,
+			password: process.env.ADMIN_PASSWORD,
+			username: 'jaj'
+			}
+			const token = await post(req, '/api/login');
+			const uuid = await get('/api/newsletter/', token)
+			req = {
+				uuid: uuid[0].uuid
+			}
+		const res = await del(req, `/api/newsletter/${uuid[0].uuid}`, token);
+		expect(res).to.equal('User successfully deleted from newsletter')
+	})
+    })
+
+	describe('Test suggestion routes', function () {
+		it('fetch all suggestions', async () => {
+			const res = await get('/api/suggestion/');
+			expect(res).to.be.empty
+		})
+
+		it('create a suggestion', async () => {
+			let req = {
+			email: process.env.ADMIN_EMAIL,
+			password: process.env.ADMIN_PASSWORD,
+			username: 'jaj'
+			}
+			const token = await post(req, '/api/login');
+			req = {
+				name: 'jaj',
+				description: 'test',
+				imageUrl: 'something',
+				tag: 'test'
+			}
+			const res = await post(req, '/api/suggestion', token)
+			expect(res).to.equal('Suggestion successfully added')
+		})
+
+		it('fails to create a suggestion', async () => {
+			let req = {
+				email: process.env.ADMIN_EMAIL,
+				password: process.env.ADMIN_PASSWORD,
+				username: 'jaj'
+				}
+				const token = await post(req, '/api/login');
+				req = {
+					name: 'jaj',
+					description: 'test'
+				}
+				const res = await post(req, '/api/suggestion', token, 400)
+				expect(res).to.equal('Missing value')
+		})
+
+		it('server error during creation', async () => {
+			let req = {
+			email: process.env.ADMIN_EMAIL,
+			password: process.env.ADMIN_PASSWORD,
+			username: 'jaj'
+			}
+			const token = await post(req, '/api/login');
+			req = {
+				name: 'jaj',
+				description: 'test',
+				imageUrl: 'something'
+			}
+			const res = await post(req, '/api/suggestion', token, 400)
+			expect(res).to.equal('Missing value')
+		})
+
+		describe('test review routes', async () => {
+			let review_id;
+			it('creates a review', async () => {
+				let req = {
+					username: 'test',
+					password: 'fishh',
+					email: 'test@test.com'
+					}
+				const token_user = await post(req, '/api/login')
+
+				const user = await get(`/api/accounts?email=test@test.com`, token_user);
+				req = {
+					stars: 10,
+					message: "test",
+					guideId: guide_id,
+					userId: user.id
+				}
+
+				const res = await post(req, `/api/review/${guide_id}`, token_user);
+				review_id = res.id
+				expect(res.guideId).to.equal(guide_id)
+			})
+
+			it('fetch a review', async () => {
+				let req = {
+					username: 'test',
+					password: 'fishh',
+					email: 'test@test.com'
+					}
+				const token_user = await post(req, '/api/login')
+				console.log(review_id)
+				const res = await get(`/api/review/${guide_id}`, token_user)
+				expect(res.guideId).to.equal(guide_id)
+			})
+		})
+	    describe('test orb routes', async () => {
+		let token_adm;
+		let token_user;
+		before('log user and admin account', async function () {
+		   let req = {
+		       username: 'test',
+		       password: 'fishh',
+		       email: 'test@test.com'
+		   }
+		    token_user = await post(req, '/api/login');
+		    req = {
+			email: process.env.ADMIN_EMAIL,
+			password: process.env.ADMIN_PASSWORD,
+			username: 'jaj'
+		    }
+		    token_adm = await post(req, '/api/login');
+		})
+		it('fetch all orbs', async () => {
+		    const res = await get('/api/orb/admin')
+			expect(res).to.be.empty
+		})
+	    })
+		describe('test contact routes', async function () {
+			let token_adm;
+			let contact_id;
+			before('log admin account', async () => {
+				const req = {
+					email: process.env.ADMIN_EMAIL,
+					password: process.env.ADMIN_PASSWORD,
+					username: 'jaj'
+				}
+				token_adm = await post(req, '/api/login')
+			})
+
+			it('fetch all contacts', async () => {
+				const res = await get('/api/contact', token_adm)
+				expect(res).to.be.empty
+			})
+
+			it('create a contact', async () => {
+				const req = {
+					name: 'yolo',
+					category: 'jaj',
+					description: 'test',
+					email: 'smth'
+				}
+
+				const res = await post(req, '/api/contact')
+				expect(res.name).to.equal(req.name)
+				contact_id = res.uuid
+			})
+
+			it('patches a contact', async () => {
+				const req = {
+					name: 'yolo',
+					processed: true,
+					email: 'smth'
+				}
+				const res = await patch(req, `/api/contact/${contact_id}`, token_adm)
+				expect(res).to.be.a('string')
+			})
+		})
+
+		describe('test customer routes', async () => {
+			let token_adm;
+			before('log admin account', async () => {
+				const req = {
+					email: process.env.ADMIN_EMAIL,
+					password: process.env.ADMIN_PASSWORD,
+					username: 'jaj'
+				}
+				token_adm = await post(req, '/api/login')
+			})
+
+			it('fetch all customers', async () => {
+				const res = await get('/api/customers/admin', token_adm)
+				expect(res).to.be.empty
+			})
+
+			it('creates a customer', async () => {
+				const req = {
+					username: 'test',
+					password: 'test',
+					email: 'test'
+				}
+
+				const res = await post(req, '/api/customers/register')
+				expect(res.email).to.be.a('string')
+			})
+
+			it('logs in a customer', async () => {
+				const req = {
+					username: 'test',
+					password: 'test',
+					email: 'test'
+				}
+				const res = await post(req, '/api/customers/login')
+				expect(res).to.be.a('string')
+			})
+		})
+
+		describe('test parkours routes', async () => {
+			let token_adm;
+			let parkour_uuid;
+			before('log admin account', async () => {
+				const req = {
+					email: process.env.ADMIN_EMAIL,
+					password: process.env.ADMIN_PASSWORD,
+					username: 'jaj'
+				}
+				token_adm = await post(req, '/api/login')
+			})
+
+			it('creates a parkour', async () => {
+				const req = {
+					name: "test",
+					description: "fake parkour",
+					status: "fake status"
+				}
+
+				const res = await post(req, '/api/parkours')
+				expect(res.name).to.equal(req.name)
+				parkour_uuid = res.uuid
+				console.log('parkour: ', res)
+			})
+
+			it ('patches a parkour', async () => {
+				const req = {
+					name: 'test edited',
+					description: 'fake parkour edited',
+					status: 'fake status edited',
+					nodes: [
+						{nodeId: 1, order: 0}
+					]
+				}
+
+				const test = await get('/api/nodes/all', token_adm)
+				console.log("nodes: ", test)
+				const res = await patch(req, `/api/parkours/${parkour_uuid}`)
+				expect(res.uuid).to.equal(parkour_uuid)
+				console.log('edited parkour: ', res)
+			})
+
+			it ('deletes a parkour', async () => {
+				const res = await del({}, `/api/parkours/${parkour_uuid}`)
+				expect(res.uuid).to.equal(parkour_uuid)
+			})
+		})
+	})
 
     async function log_user(user = 'test', pass = 'fishh', email = 'test@test.com') {
 	let req = {

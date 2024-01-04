@@ -11,129 +11,30 @@ let review_router = express.Router()
  *     Review:
  *       type: object
  *       required:
- *        - stars
- *        - message
- *        - guideId
- *        - userId
+ *        - title
+ *        - description
  *       properties:
- *         stars:
- *           type: int
- *           description: The review note (between 1 and 5)
- *         message:
+ *         title:
  *           type: string
- *           description: The review text
- *         guideId:
- *           type: int
- *           description: The review's target guide
- *         userId:
- *           type: int
- *           description: The review's editor
- */
-
-/**
- * @swagger
- * tags:
- *   name: Guides
- *   description: The Guides managing API
- * /api/review/:guideId:
- *   post:
- *     security:
- *       - userBearerAuth: []
- *     summary: Create a review
- *     tags: [Review]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *            required:
- *              - stars
- *              - message
- *              - guideId
- *              - userId
- *            type: object
- *            properties:
- *              stars:
- *                type: int
- *              message:
- *                type: string
- *              userId:
- *                type: int
- *     responses:
- *       200:
- *         description: The created review
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Review'
- *       500:
- *         description: Unexpected error
- *
- * /api/review:
- *   get:
- *     security:
- *       - userBearerAuth: []
- *     summary: Create a review
- *     tags: [Review]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *            type: object
- *            properties:
- *              stars:
- *                type: int
- *              message:
- *                type: string
- *              guideId:
- *                type: int
- *              userId:
- *                type: int
- *     responses:
- *       200:
- *         description: The created review
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Review'
- *       500:
- *         description: Unexpected error
- *
- *   patch:
- *     security:
- *       - userBearerAuth: []
- *     summary: Create a review
- *     tags: [Review]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *            required:
- *              - stars
- *              - message
- *              - guideId
- *              - userId
- *            type: object
- *            properties:
- *              stars:
- *                type: int
- *              message:
- *                type: string
- *              guideId:
- *                type: int
- *              userId:
- *                type: int
- *     responses:
- *       200:
- *         description: The created review
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Review'
- *       500:
- *         description: Unexpected error
+ *           description: The guide's title
+ *         description:
+ *           type: string
+ *           description: The guide's description
+ *         keywords:
+ *           type: string[]
+ *           description: The guide's keywords
+ *         openingHours:
+ *           type: string[]
+ *           description: The guide's opening hours
+ *         website:
+ *           type: string
+ *           description: The guide's website
+ *         priceDesc:
+ *           type: string[]
+ *           description: List of the guide's price title (need value)
+ *         priceValue:
+ *           type: string[]
+ *           description: List of the guide's price value (need description)
  */
 
 review_router.post("/:guideId", authenticateToken, async (req, res) => {
@@ -198,6 +99,25 @@ review_router.delete("/:id", authenticateToken, async (req, res) => {
   if (!deleted)
       return res.status(404).send("Review not found")
   res.send("success")
+})
+
+review_router.get("/:id", authenticateToken, async (req, res) => {
+  try {
+    const review = await prisma.review.findFirst({
+      where: {
+        guideId: parseInt(req.params.id)
+      }
+    })
+    if (!review || review == null)
+    {
+        return res.status(404).json({error: "Review not found"})
+    }
+    res.json(review)
+  }
+  catch (err) {
+    console.log(err)
+    res.sendStatus(500)
+  }
 })
 
 export default review_router;

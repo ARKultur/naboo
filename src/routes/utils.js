@@ -105,17 +105,19 @@ utils_router.post('/logout', authenticateToken, (req, res, next) => {
 utils_router.post('/login', async (req, res) => {
     try {
 	if (isEmpty(req.body))
-	    throw new Error("")
+	    throw new Error("empty arguments")
 	const user = await checkUser(req.body.email, req.body.password) || await checkAdmin(req.body.email, req.body.password)
 	if (!isEmpty(user))
 	{
-	    //console.log(user)
-            const token = generateAccessToken(req.body.email);
+        if (process.env.NPM_COMMAND === 'test')
+	        console.log("user to log in: ", user)
+        const token = generateAccessToken(req.body.email);
 
-            res.json(token);
+        res.json(token);
 	} else
 	{
-	     throw new Error("")
+	     console.log(req.body);
+	     throw new Error("bad arguments")
 	}
     } catch (error) {
 	console.log(error)

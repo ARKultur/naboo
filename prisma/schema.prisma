@@ -109,12 +109,17 @@ model nodes {
   description                        String         @db.VarChar(255)
   OrganisationId                     Int?
   status                             String?
+  filter                             String?
+  altitude                           Float          @default(0)
+  model                              String?
+  texture                            String?
   adresses_adresses_NodeIdTonodes    adresses[]     @relation("adresses_NodeIdTonodes")
   data_orb_data_orb_orbIdTonodes     data_orb[]     @relation("data_orb_orbIdTonodes")
   guide                              guide[]
   organisations                      organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
   adresses_nodes_addressIdToadresses adresses?      @relation("nodes_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   data_orb_nodes_orbIdTodata_orb     data_orb?      @relation("nodes_orbIdTodata_orb", fields: [orbId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parkours                           parkour_node[]
 }
 
 model organisations {
@@ -124,6 +129,7 @@ model organisations {
   adresses_adresses_OrganisationIdToorganisations adresses[] @relation("adresses_OrganisationIdToorganisations")
   nodes                                           nodes[]
   adresses_organisations_addressIdToadresses      adresses?  @relation("organisations_addressIdToadresses", fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parkour                                         parkour[]
   user                                            user[]
 }
 
@@ -166,5 +172,28 @@ model suggestions {
   description String @unique @db.VarChar(255)
   imageUrl    String @unique @db.VarChar(255)
   userId      Int?
+  tag         String @unique @db.VarChar(255)
   user        user?  @relation(fields: [userId], references: [id])
+}
+
+model parkour_node {
+  parkourId String
+  nodeId    Int
+  order     Int
+  node      nodes   @relation(fields: [nodeId], references: [id])
+  parkour   parkour @relation(fields: [parkourId], references: [uuid])
+
+  @@id([parkourId, nodeId])
+}
+
+model parkour {
+  name           String         @unique @db.VarChar(255)
+  description    String         @unique @db.VarChar(255)
+  uuid           String         @id @unique @default(uuid())
+  createdAt      DateTime       @default(now()) @db.Timestamptz(2)
+  updatedAt      DateTime       @default(now()) @db.Timestamptz(2)
+  status         String
+  OrganisationId Int?
+  organisations  organisations? @relation(fields: [OrganisationId], references: [id], onDelete: Cascade)
+  nodes          parkour_node[]
 }

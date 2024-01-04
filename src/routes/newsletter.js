@@ -37,7 +37,7 @@ newsletter_router.post('/', async (req, res) => {
 newsletter_router.delete('/:uuid', authenticateTokenAdm, async (req, res) => {
   try {
     const uuid = req.params.uuid;
-
+    console.log(uuid)
     if (!uuid) return res.status(400).send('Missing arguments');
 
     const newsletter = await prisma.newsletter.delete({
@@ -54,14 +54,7 @@ newsletter_router.delete('/:uuid', authenticateTokenAdm, async (req, res) => {
   }
 });
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_EMAIL,
-    pass: process.env.GMAIL_PASSWORD,
-  },
-});
-
+/* c8 ignore start */
 const getEmailTemplate = (text) => `
 <!DOCTYPE html>
 <html>
@@ -88,11 +81,30 @@ const getEmailTemplate = (text) => `
 </html>
 `;
 
-export async function sendEmailToMultipleRecipients(subject, text, recipients) {
+function exclude(array, keys) {
+  return array.map(item => {
+    const newItem = { ...item };
+    for (const key of keys) {
+      delete newItem[key];
+    }
+    return newItem;
+  });
+}
+
+
+async function sendEmailToMultipleRecipients(subject, text, recipients) {
   try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_EMAIL,
+        pass: process.env.GMAIL_PASSWORD,
+      },
+    });
+	  
     const info = await transporter.sendMail({
       from: process.env.GMAIL_EMAIL,
-      to: recipients.join(', '),
+      to: exclude(recipients, ["uuid"]).map(obj => `${obj.email}`).join(', '),
       subject,
       html: getEmailTemplate(),
     });
@@ -104,6 +116,7 @@ export async function sendEmailToMultipleRecipients(subject, text, recipients) {
     throw error;
   }
 }
+/* c8 ignore stop */
 
 newsletter_router.post('/create', authenticateTokenAdm, async (req, res) => {
   try {
@@ -111,8 +124,11 @@ newsletter_router.post('/create', authenticateTokenAdm, async (req, res) => {
     const { subject, text } = req.body;
 
     if (!newsletter) return res.status(404).send('No user in newsletter');
-
-    sendEmailToMultipleRecipients(subject, text, newsletter);
+      console.log((process.env.UT_CI == 'false'));
+      if (process.env.UT_CI == 'false') {
+	  const ret = await sendEmailToMultipleRecipients(subject, text, newsletter);
+	  console.log(ret);
+      }
     res.status(200).send('Mail successfully sent');
   } catch (error) {
     console.log(error);

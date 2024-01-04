@@ -225,4 +225,50 @@ orga_router.delete('/', authenticateTokenAdm, async (req, res) => {
     }
 })
 
+
+/**
+ * @swagger
+ * tags:
+ *   name: Organisations
+ *   description: The Organisations managing API
+ * /api/organisations/{id}:
+ *   get:
+ *     security:
+ *       - adminBearerAuth: []
+ *     summary: Get users in an organization (admin)
+ *     tags: [Organisations]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the organization
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Users in the organization
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Internal Server Error
+ */
+orga_router.get('/:id', authenticateTokenAdm, async (req, res) => {
+	try {
+		const id = req.params.id;
+		const users = await prisma.user.findMany({
+			where: {
+				OrganisationId: id
+			}
+		})
+		return res.send(users)
+	} catch (error) {
+		console.error(error)
+		return res.sendStatus(500)
+	}
+})
+
 export default orga_router;

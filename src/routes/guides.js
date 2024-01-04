@@ -365,6 +365,50 @@ guide_router.post("/", authenticateToken, async (req, res) => {
     {
         console.log(err);
         res.status(500).send("unexpected error");
+      }
+})
+
+guide_router.patch("/", authenticateToken, async (req,res) => {
+    try {
+        /*
+        const guide = await Guide.findOne({
+                where: {
+            id: req.body.id
+                }
+        });
+
+        await guide.update({
+                text: req.body.text || guide.text,
+                NodeId: req.body.node || guide.NodeId
+        })
+        */
+
+        const guide = await prisma.guide.findUnique({
+            where: {
+                id: req.body.id
+            }
+        })
+
+        if (!guide)
+            return res.status(404).send("Guide not found")
+        const new_guide = await prisma.guide.update({
+            where: {
+                id: guide.id
+            },
+            data: {
+                title: req.body.title || guide.title,
+                description: req.body.description || guide.description,
+                keywords: req.body.keywords || guide.keywords,
+                openingHours: req.body.openingHours || guide.openingHours,
+                website: req.body.website || guide.website,
+                priceDesc: req.body.priceDesc || guide.priceDesc,
+                priceValue: req.body.priceValue || guide.priceValue,
+                NodeId: req.body.node || guide.NodeId
+            }
+        })
+        res.json(new_guide)
+    } catch (err) {
+	    res.sendStatus(500);
     }
 })
 
