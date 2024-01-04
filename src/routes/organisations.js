@@ -225,4 +225,19 @@ orga_router.delete('/', authenticateTokenAdm, async (req, res) => {
     }
 })
 
+orga_router.get('/:id', authenticateTokenAdm, async (req, res) => {
+	try {
+		const id = req.params.id;
+		const users = await prisma.user.findMany({
+			where: {
+				OrganisationId: id
+			}
+		})
+		return res.send(users)
+	} catch (error) {
+		console.error(error)
+		return res.sendStatus(500)
+	}
+})
+
 export default orga_router;

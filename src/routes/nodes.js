@@ -275,6 +275,31 @@ node_router.delete('/admin', authenticateTokenAdm, async (req, res) => {
   }
 });
 
+node_router.get('/admin/parkour/:id', authenticateTokenAdm, async (req, res) => {
+  try {
+    const nodes = await prisma.parkour_node.findMany({
+      where: {
+        parkourId: req.params.id,
+      },
+      include: {
+        node: true,
+      },
+      orderBy: {
+        order: 'asc',
+      },
+    });
+
+    if (nodes && nodes.length > 0) {
+      return res.json(nodes);
+    } else {
+      return res.status(404).send('Nodes not found for the specified parkour');
+    }
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+})
+
 node_router.get('/', authenticateToken, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
