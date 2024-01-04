@@ -737,20 +737,16 @@ node_router.patch('/', authenticateToken, async (req, res) => {
 
 node_router.delete('/', authenticateToken, async (req, res) => {
   try {
+    const nodeId = req.body.node_id;
     const nodeName = req.body.name;
+    const parkourId = req.body.parkour_id;
 
     // Delete associated parkour nodes first
-    await prisma.parkour_node.deleteMany({
+    await prisma.parkour_node.delete({
       where: {
-        nodeId: {
-          OR: [
-            {
-              name: nodeName,
-            },
-            {
-              id: [0],
-            },
-          ],
+        parkourId_nodeId: {
+          parkourId: parkourId,
+          nodeId: nodeId,
         },
       },
     });

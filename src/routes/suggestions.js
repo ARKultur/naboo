@@ -66,7 +66,7 @@ suggestions_router.post('/map', async (req, res) => {
       location.latitude
     },${location.longitude}&radius=15000&type=${tags.join(
       '|'
-    )}&keyword-store&key=${process.env.GOOGLE_API_KEY}`;
+    )}&keyword-store-lodging-sublocality&key=${process.env.GOOGLE_API_KEY}`;
 
     const response = await axios.get(url, {
       headers: {
