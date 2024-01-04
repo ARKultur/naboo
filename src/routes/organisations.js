@@ -225,6 +225,37 @@ orga_router.delete('/', authenticateTokenAdm, async (req, res) => {
     }
 })
 
+
+/**
+ * @swagger
+ * tags:
+ *   name: Organizations
+ *   description: The Organizations managing API
+ * /api/organizations/{id}:
+ *   get:
+ *     security:
+ *       - adminBearerAuth: []
+ *     summary: Get users in an organization (admin)
+ *     tags: [Organizations]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the organization
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Users in the organization
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Internal Server Error
+ */
 orga_router.get('/:id', authenticateTokenAdm, async (req, res) => {
 	try {
 		const id = req.params.id;
