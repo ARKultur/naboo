@@ -354,22 +354,29 @@ customer_router.patch("/", authenticateTokenCustomer, async (req, res) => {
 
 customer_router.delete("/", authenticateTokenCustomer, async (req, res) => {
   try {
-    const custormer = await prisma.custormer.findFirst({
+    /*
+      const customer = await User.findOne({
+      where:{
+      email: req.email
+      }
+      })
+    */
+    const customer = await prisma.customers.findFirst({
       where: {
         email: req.email
       }
     })
 
-    if (custormer) {
-      //await custormer.destroy()
-      await prisma.custormer.delete({
+    if (customer) {
+      //await customer.destroy()
+      await prisma.customer.delete({
         where: {
-          id: custormer.id
+          id: customer.id
         }
       });
       res.send("succesfully deleted")
     } else {
-      res.status(404).send("custormer not found");
+      res.status(404).send("customer not found");
     }
   } catch (error) {
     console.error(error)
