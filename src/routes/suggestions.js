@@ -62,19 +62,36 @@ suggestions_router.post('/map', async (req, res) => {
       tags.push(suggestions.tag);
     }
 
-    const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
-      location.latitude
-    },${location.longitude}&radius=15000&type=${tags.join(
-      '|'
-    )}&keyword-store-lodging-sublocality&key=${process.env.GOOGLE_API_KEY}`;
+    const results = [];
 
-    const response = await axios.get(url, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    for (i = 0; i < 5; i++) {
+      const response = await axios.get(
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
+        {
+          params: {
+            location: `${location.latitude},${location.longitude}`,
+            radius: 15000,
+            type: tags.join('|'),
+            key: process.env.GOOGLE_API_KEY,
+            pagetoken: nextPageToken,
+          },
+        }
+      );
 
-    res.status(200).send(response.data && response.data.results);
+      const data = response.data;
+      const filteredResults = data.results.filter((place) => {
+        const unwantedTypes = ['bar', 'hotel', 'shop'];
+        return !place.types.some((type) => unwantedTypes.includes(type));
+      });
+
+      results.push(...filteredResults);
+
+      nextPageToken = data.next_page_token;
+
+      if (!nextPageToken) break;
+    }
+
+    res.status(200).send(results);
   } catch (error) {
     console.log(error);
     res.status(500).send('Internal Error');
