@@ -93,6 +93,12 @@ const contact_router = express.Router();
  *     responses:
  *       200:
  *         description: Contact request successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               items:
+ *                 $ref: '#/components/schemas/Contact'
  *       400:
  *         description: Missing argument(s)
  *       500:
@@ -175,7 +181,7 @@ contact_router.post('/', async (req, res) => {
 	    email: email,
 	    })
 	*/
-	await prisma.contact.create({
+	const contact = await prisma.contact.create({
 	    data: {
 		name: name,
 		category: category,
@@ -183,7 +189,7 @@ contact_router.post('/', async (req, res) => {
 		email: email
 	    }
 	})
-	res.status(200).send("Contact successfully created");
+	res.status(200).send(contact);
     } catch (error) {
 	console.log(error);
 	res.status(500).send("Internal Error");
