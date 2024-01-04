@@ -25,7 +25,7 @@ suggestions_router.post('/', authenticateTokenAdm, async (req, res) => {
     if (!name || !description || !imageUrl || !tag)
       return res.status(400).send('Missing value');
 
-    await prisma.suggestions.create({
+    const suggestion = await prisma.suggestions.create({
       data: {
         name,
         description,
@@ -33,7 +33,7 @@ suggestions_router.post('/', authenticateTokenAdm, async (req, res) => {
         tag,
       },
     });
-    res.status(200).send('Suggestion successfully added');
+    res.status(200).send(suggestion);
   } catch (error) {
     console.log(error);
     res.status(500).send('Internal Error');
