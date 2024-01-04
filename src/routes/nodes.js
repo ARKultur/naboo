@@ -195,6 +195,34 @@ node_router.get('/all', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * tags:
+ *   name: Nodes
+ *   description: The Nodes managing API
+ * /api/nodes/filter:
+ *   get:
+ *     summary: Get nodes filtered by name
+ *     parameters:
+ *       - in: query
+ *         name: filter
+ *         required: true
+ *         description: The filter string to match against node names
+ *         schema:
+ *           type: string
+ *     tags: [Nodes]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved filtered nodes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Node'
+ *       500:
+ *         description: Internal Server Error
+ */
 node_router.get('/filter', async (req, res) => {
   try {
     const filter = req.query.filter;
@@ -213,6 +241,58 @@ node_router.get('/filter', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * tags:
+ *   name: Nodes
+ *   description: The Nodes managing API
+ * /api/nodes/admin:
+ *   patch:
+ *     security:
+ *       - adminBearerAuth: []
+ *     summary: Modify node information (admin)
+ *     tags: [Nodes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             required:
+ *               - name
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               latitude:
+ *                 type: number
+ *               longitude:
+ *                 type: number
+ *               address:
+ *                 type: integer
+ *               description:
+ *                 type: string
+ *               model:
+ *                 type: string
+ *               texture:
+ *                 type: string
+ *               altitude:
+ *                 type: number
+ *               filter:
+ *                 type: string
+ *               parkour_uuid:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successfully modified Node
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Node'
+ *       404:
+ *         description: Node not found
+ *       500:
+ *         description: Internal Server Error
+ */
 node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
   try {
     const node = await prisma.nodes.findUnique({
@@ -220,33 +300,85 @@ node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
         name: req.body.name,
       },
     });
+
     if (node) {
-      const new_node = await prisma.nodes.update({
+      let updatedNode = await prisma.nodes.update({
         where: {
-          name: node.name,
+          id: node.id,
         },
         data: {
-          OrganisationId: req.body.OrganisationId || node.OrganisationId,
-          name: req.body.name,
-          longitude: req.body.longitude || node.longitude,
           latitude: req.body.latitude || node.latitude,
-          addressId: req.body.addressId || node.addressId,
+          longitude: req.body.longitude || node.longitude,
+          addressId: req.body.address || node.addressId,
           description: req.body.description || node.description,
-          status: req.body.status || node.status,
           model: req.body.model || node.model,
           texture: req.body.texture || node.texture,
           altitude: req.body.altitude || node.altitude,
           filter: req.body.filter || node.filter,
         },
+        include: {
+          parkours: true,
+        },
       });
-      res.json(new_node);
+
+      if (req.body.parkour_uuid) {
+        const existingParkourNode = await prisma.parkour_node.findFirst({
+          where: {
+            parkourId: req.body.parkour_uuid,
+            nodeId: updatedNode.id,
+          },
+        });
+
+        if (!existingParkourNode) {
+          await prisma.parkour_node.create({
+            data: {
+              parkourId: req.body.parkour_uuid,
+              nodeId: updatedNode.id,
+            },
+          });
+        }
+      }
+
+      res.json(updatedNode);
+    } else {
+      res.status(404).send('Node not found');
     }
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     res.sendStatus(500);
   }
 });
 
+/**
+ * @swagger
+ * tags:
+ *   name: Nodes
+ *   description: The Nodes managing API
+ * /api/nodes/admin:
+ *   delete:
+ *     security:
+ *       - adminBearerAuth: []
+ *     summary: Delete a node (admin)
+ *     tags: [Nodes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *             - name
+ *            properties:
+ *              name:
+ *                type: string
+ *     responses:
+ *       200:
+ *         description: Node successfully deleted
+ *       404:
+ *         description: Node not found
+ *       500:
+ *         description: Internal Server Error
+ */
 node_router.delete('/admin', authenticateTokenAdm, async (req, res) => {
   try {
     const nodeName = req.body.name;
@@ -274,6 +406,63 @@ node_router.delete('/admin', authenticateTokenAdm, async (req, res) => {
     res.sendStatus(500);
   }
 });
+
+/**
+ * @swagger
+ * tags:
+ *   name: Nodes
+ *   description: The Nodes managing API
+ * /api/nodes/admin/parkour/{id}:
+ *   get:
+ *     security:
+ *       - adminBearerAuth: []
+ *     summary: Get nodes associated with a parkour (admin)
+ *     tags: [Nodes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the parkour
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of nodes associated with the parkour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Node'
+ *       404:
+ *         description: Nodes not found for the specified parkour
+ *       500:
+ *         description: Internal Server Error
+ */
+node_router.get('/admin/parkour/:id', authenticateTokenAdm, async (req, res) => {
+  try {
+    const nodes = await prisma.parkour_node.findMany({
+      where: {
+        parkourId: req.params.id,
+      },
+      include: {
+        node: true,
+      },
+      orderBy: {
+        order: 'asc',
+      },
+    });
+
+    if (nodes && nodes.length > 0) {
+      return res.json(nodes);
+    } else {
+      return res.status(404).send('Nodes not found for the specified parkour');
+    }
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+})
 
 node_router.get('/', authenticateToken, async (req, res) => {
   try {
@@ -530,47 +719,6 @@ node_router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-/*
-node_router.post('/', authenticateToken, async (req, res) => {
-    
-    try {
-	if (req.body.name == null || req.body.longitude == null || req.body.latitude == null || !req.body.description == null)
-	    {
-		throw new Error("Missing inputs")
-	    }
-	const user = await prisma.user.findUnique({
-	    where: {
-		email: req.email
-	    }
-	})
-	const user = await prisma.user.findUnique({
-	    where: {
-		email: req.email
-	    }
-	})
-	if (user) {
-	    if (user.OrganisationId)
-	    {
-		const node = await prisma.nodes.create({
-		    data: {
-			name: req.body.name,
-			longitude: req.body.longitude,
-			latitude: req.body.latitude,
-			OrganisationId: user.OrganisationId,
-			description: req.body.description,
-			parkours: []
-		    }
-		})
-            	return res.json(node)
-	    }
-	}
-	return res.sendStatus(401)
-    } catch (error) {
-	console.log(error)
-        res.sendStatus(500);
-    }
-})*/
-
 /**
  * @swagger
  * tags:
@@ -646,7 +794,7 @@ node_router.patch('/', authenticateToken, async (req, res) => {
     });
 
     if (node) {
-      const updatedNode = await prisma.nodes.update({
+      let updatedNode = await prisma.nodes.update({
         where: {
           id: node.id,
         },
@@ -693,62 +841,56 @@ node_router.patch('/', authenticateToken, async (req, res) => {
   }
 });
 
-/*
-node_router.patch('/', authenticateToken, async (req, res) => {
-
-    try {
-	const node = await prisma.nodes.findUnique({
-	    where: {
-		name: req.body.name
-	    }
-	})
-	if (node)
-	{
-	    const new_node = await prisma.nodes.update({
-		where: {
-		    id: node.id
-		},
-		data: {
-		    latitude: req.body.latitude || node.latitude,
-		    longitude: req.body.longitude || node.longitude,
-		    addressId: req.body.address || node.addressId,
-		    description: req.body.description || node.description
-		}
-	    })
-
-		if (req.body.parkour_uuid)
-		{
-			await prisma.parkour_node.create({
-				data: {
-					parkourId: req.body.parkour_uuid,
-					nodeId: new_node.id
-				}
-			})
-		}
-	    res.json(new_node)
-	}
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500)
-    }
-})
-*/
-
+/**
+ * @swagger
+ * tags:
+ *   name: Nodes
+ *   description: The Nodes managing API
+ * /api/nodes:
+ *   delete:
+ *     summary: Delete a node and its association with a parkour
+ *     security:
+ *       - bearerAuth: []
+ *     tags: [Nodes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               node_id:
+ *                 type: integer
+ *                 description: The ID of the node to delete
+ *               name:
+ *                 type: string
+ *                 description: The name of the node to delete
+ *               parkour_id:
+ *                 type: string
+ *                 description: The ID of the parkour associated with the node
+ *     responses:
+ *       200:
+ *         description: success
+ *       404:
+ *         description: Node not found
+ *       500:
+ *         description: Internal Server Error
+ */
 node_router.delete('/', authenticateToken, async (req, res) => {
   try {
+    const nodeId = req.body.node_id;
     const nodeName = req.body.name;
+    const parkourId = req.body.parkour_id;
 
-    // Delete associated parkour nodes first
-    await prisma.parkour_node.deleteMany({
+    await prisma.parkour_node.delete({
       where: {
-        nodeId: {
-          name: { OR: [{ nodeName }, 0] },
+        parkourId_nodeId: {
+          parkourId: parkourId,
+          nodeId: nodeId,
         },
       },
     });
 
-    // Delete the node itself
     const deletedNode = await prisma.nodes.delete({
       where: {
         name: nodeName,
@@ -765,28 +907,5 @@ node_router.delete('/', authenticateToken, async (req, res) => {
     res.sendStatus(500);
   }
 });
-
-/*
-node_router.delete('/', authenticateToken, async (req, res) => {
-    try {
-
-	const node = await prisma.nodes.delete({
-	    where: {
-		name: req.body.name
-	    }
-	})
-	if (node)
-	{
-            res.send("success")
-	} else {
-            res.status(404).send("Node not found");
-	}
-    } catch (error)
-    {
-	console.error(error)
-	res.sendStatus(500);
-    }
-})
-*/
 
 export default node_router;

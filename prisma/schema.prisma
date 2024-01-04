@@ -189,7 +189,7 @@ model parkour_node {
 model parkour {
   name           String         @unique @db.VarChar(255)
   description    String         @unique @db.VarChar(255)
-  uuid           String         @id @default(uuid())
+  uuid           String         @id @unique @default(uuid())
   createdAt      DateTime       @default(now()) @db.Timestamptz(2)
   updatedAt      DateTime       @default(now()) @db.Timestamptz(2)
   status         String

@@ -685,7 +685,7 @@ account_router.patch('/', authenticateToken, async (req, res) => {
 		addressId: req.body.address || user.addressId
 		})
 	    */
-	    await prisma.user.update({
+	    const updated_user = await prisma.user.update({
                 where: {
                     id: user.id
                 },
@@ -696,7 +696,7 @@ account_router.patch('/', authenticateToken, async (req, res) => {
                 }
             })
 
-	    return res.send(user)
+	    return res.send(updated_user)
 	}
     } catch (err) {
 	res.status(500).send("Unexpected error")

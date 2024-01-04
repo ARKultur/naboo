@@ -242,6 +242,7 @@ async main() => {
 */
 const main = async () => {
   return new Promise((resolve, reject) => {
+    console.log("UT_CI: ", process.env.UT_CI)
     const server = app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
       resolve(server);

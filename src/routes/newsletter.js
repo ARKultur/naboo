@@ -81,6 +81,17 @@ const getEmailTemplate = (text) => `
 </html>
 `;
 
+function exclude(array, keys) {
+  return array.map(item => {
+    const newItem = { ...item };
+    for (const key of keys) {
+      delete newItem[key];
+    }
+    return newItem;
+  });
+}
+
+
 async function sendEmailToMultipleRecipients(subject, text, recipients) {
   try {
     const transporter = nodemailer.createTransport({
@@ -90,9 +101,10 @@ async function sendEmailToMultipleRecipients(subject, text, recipients) {
         pass: process.env.GMAIL_PASSWORD,
       },
     });
+	  
     const info = await transporter.sendMail({
       from: process.env.GMAIL_EMAIL,
-      to: recipients.join(', '),
+      to: exclude(recipients, ["uuid"]).map(obj => `${obj.email}`).join(', '),
       subject,
       html: getEmailTemplate(),
     });
@@ -112,9 +124,10 @@ newsletter_router.post('/create', authenticateTokenAdm, async (req, res) => {
     const { subject, text } = req.body;
 
     if (!newsletter) return res.status(404).send('No user in newsletter');
-
-      if (process.env.UT_CI == false) {
-	  sendEmailToMultipleRecipients(subject, text, newsletter);
+      console.log((process.env.UT_CI == 'false'));
+      if (process.env.UT_CI == 'false') {
+	  const ret = await sendEmailToMultipleRecipients(subject, text, newsletter);
+	  console.log(ret);
       }
     res.status(200).send('Mail successfully sent');
   } catch (error) {

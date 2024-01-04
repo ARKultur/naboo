@@ -78,6 +78,20 @@ describe('test routes', function () {
 	    expect(res.identity).to.equal('test@test.com')
 	})
 	
+	it('modify user info', async() => {
+	    let req = {
+		email: 'test@test.com',
+		password: 'fish',
+		username: 'test'
+	    }
+	    const tok = await post(req, url_login)
+		req.password = "fishe"
+	    const res = await patch(req, '/api/accounts', tok);
+	    expect(res.password).to.equal('fishe')
+		req.password = 'fish'
+		await patch(req, '/api/accounts', tok);
+	})
+
 	it('logs out', async () => {
 	    const req = {
 		email: 'test@test.com',
@@ -649,7 +663,7 @@ describe('test routes', function () {
 				imageUrl: 'something'
 			}
 			const res = await post(req, '/api/suggestion', token, 400)
-			expect(res).to.equal('Bad Request')
+			expect(res).to.equal('Missing value')
 		})
 
 		describe('test review routes', async () => {
@@ -735,7 +749,8 @@ describe('test routes', function () {
 				}
 
 				const res = await post(req, '/api/contact')
-				expect(res).to.be.a('string')
+				expect(res.name).to.equal(req.name)
+				contact_id = res.uuid
 			})
 
 			it('patches a contact', async () => {
@@ -744,8 +759,7 @@ describe('test routes', function () {
 					processed: true, 
 					email: 'smth'
 				}
-				const uuid = 1;
-				const res = await patch(req, `/api/contact/${uuid}`, token_adm)
+				const res = await patch(req, `/api/contact/${contact_id}`, token_adm)
 				expect(res).to.be.a('string')
 			})
 		})
@@ -785,6 +799,54 @@ describe('test routes', function () {
 				}
 				const res = await post(req, '/api/customers/login')
 				expect(res).to.be.a('string')
+			})
+		})
+
+		describe('test parkours routes', async () => {
+			let token_adm;
+			let parkour_uuid;
+			before('log admin account', async () => {
+				const req = {
+					email: process.env.ADMIN_EMAIL,
+					password: process.env.ADMIN_PASSWORD,
+					username: 'jaj'
+				}
+				token_adm = await post(req, '/api/login')
+			})
+
+			it('creates a parkour', async () => {
+				const req = {
+					name: "test",
+					description: "fake parkour",
+					status: "fake status"
+				}
+
+				const res = await post(req, '/api/parkours')
+				expect(res.name).to.equal(req.name)
+				parkour_uuid = res.uuid
+				console.log('parkour: ', res)
+			})
+
+			it ('patches a parkour', async () => {
+				const req = {
+					name: 'test edited',
+					description: 'fake parkour edited',
+					status: 'fake status edited',
+					nodes: [
+						{nodeId: 1, order: 0}
+					]
+				}
+
+				const test = await get('/api/nodes/all', token_adm)
+				console.log("nodes: ", test)
+				const res = await patch(req, `/api/parkours/${parkour_uuid}`)
+				expect(res.uuid).to.equal(parkour_uuid)
+				console.log('edited parkour: ', res)
+			})
+
+			it ('deletes a parkour', async () => {
+				const res = await del({}, `/api/parkours/${parkour_uuid}`)
+				expect(res.uuid).to.equal(parkour_uuid)
 			})
 		})
 	})
