@@ -81,6 +81,13 @@ const getEmailTemplate = (text) => `
 </html>
 `;
 
+function exclude(arr, keys) {
+  return Object.fromEntries(
+    Object.entries(arr).filter(([key]) => !keys.includes(key))
+  );
+}
+
+
 async function sendEmailToMultipleRecipients(subject, text, recipients) {
   try {
     const transporter = nodemailer.createTransport({
@@ -91,9 +98,10 @@ async function sendEmailToMultipleRecipients(subject, text, recipients) {
       },
     });
     console.log(recipients);
+	  
     const info = await transporter.sendMail({
       from: process.env.GMAIL_EMAIL,
-      to: recipients.join(', '),
+      to: exclude(recipients, ["uuid"]).join(', '),
       subject,
       html: getEmailTemplate(),
     });
