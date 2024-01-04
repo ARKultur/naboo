@@ -64,7 +64,7 @@ suggestions_router.post('/map', async (req, res) => {
 
     const results = [];
 
-    for (i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
       const response = await axios.get(
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
         {
