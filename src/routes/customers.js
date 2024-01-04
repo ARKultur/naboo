@@ -369,7 +369,7 @@ customer_router.delete("/", authenticateTokenCustomer, async (req, res) => {
 
     if (customer) {
       //await customer.destroy()
-      await prisma.customer.delete({
+      await prisma.customers.delete({
         where: {
           id: customer.id
         }
