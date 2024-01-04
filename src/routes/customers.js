@@ -274,7 +274,7 @@ customer_router.post("/register", async (req, res) => {
           password: req.body.password,
           email: req.body.email
           });
-	*/
+  */
     const customer = await prisma.customers.create({
       data: {
         username: req.body.username,
@@ -352,6 +352,31 @@ customer_router.patch("/", authenticateTokenCustomer, async (req, res) => {
   }
 });
 
+customer_router.delete("/", authenticateTokenCustomer, async (req, res) => {
+  try {
+    const custormer = await prisma.custormer.findFirst({
+      where: {
+        email: req.email
+      }
+    })
+
+    if (custormer) {
+      //await custormer.destroy()
+      await prisma.custormer.delete({
+        where: {
+          id: custormer.id
+        }
+      });
+      res.send("succesfully deleted")
+    } else {
+      res.status(404).send("custormer not found");
+    }
+  } catch (error) {
+    console.error(error)
+    res.sendStatus(500)
+  }
+})
+
 customer_router.get("/all", authenticateToken, async (req, res) => {
   //const customers = await Customer.findAll();
   const customers = await prisma.customers.findMany();
@@ -362,12 +387,12 @@ customer_router.get("/", authenticateTokenCustomer, async (req, res) => {
   try {
     const email = req.email;
     /*
-	const customer = await Customer.findOne({
-	    where: {
-		email: email
-	    }
-	})
-	*/
+  const customer = await Customer.findOne({
+      where: {
+    email: email
+      }
+  })
+  */
     const customer = await prisma.customers.findUnique({
       where: {
         email: email,
@@ -392,7 +417,7 @@ customer_router.post("/", authenticateTokenAdm, async (req, res) => {
           password: req.body.password,
           email: req.body.email
           });
-	*/
+  */
     const customer = await prisma.customers.create({
       data: {
         username: req.body.username,
@@ -407,6 +432,6 @@ customer_router.post("/", authenticateTokenAdm, async (req, res) => {
   }
 });
 
-customer_router.post("/:id", authenticateToken, async (req, res) => {});
+customer_router.post("/:id", authenticateToken, async (req, res) => { });
 
 export default customer_router;
