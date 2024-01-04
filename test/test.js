@@ -78,6 +78,20 @@ describe('test routes', function () {
 	    expect(res.identity).to.equal('test@test.com')
 	})
 	
+	it('modify user info', async() => {
+	    let req = {
+		email: 'test@test.com',
+		password: 'fish',
+		username: 'test'
+	    }
+	    const tok = await post(req, url_login)
+		req.password = "fishe"
+	    const res = await patch(req, '/api/accounts', tok);
+	    expect(res.password).to.equal('fishe')
+		req.password = 'fish'
+		await patch(req, '/api/accounts', tok);
+	})
+
 	it('logs out', async () => {
 	    const req = {
 		email: 'test@test.com',
@@ -633,7 +647,7 @@ describe('test routes', function () {
 					description: 'test'
 				}
 				const res = await post(req, '/api/suggestion', token, 400)
-				expect(res).to.equal('Bad Request')
+				expect(res).to.equal('Missing value')
 		})
 
 		it('server error during creation', async () => {
@@ -649,7 +663,7 @@ describe('test routes', function () {
 				imageUrl: 'something'
 			}
 			const res = await post(req, '/api/suggestion', token, 400)
-			expect(res).to.equal('Bad Request')
+			expect(res).to.equal('Missing value')
 		})
 
 		describe('test review routes', async () => {
