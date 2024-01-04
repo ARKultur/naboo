@@ -81,10 +81,14 @@ const getEmailTemplate = (text) => `
 </html>
 `;
 
-function exclude(arr, keys) {
-  return Object.fromEntries(
-    Object.entries(arr).filter(([key]) => !keys.includes(key))
-  );
+function exclude(array, keys) {
+  return array.map(item => {
+    const newItem = { ...item };
+    for (const key of keys) {
+      delete newItem[key];
+    }
+    return newItem;
+  });
 }
 
 
