@@ -633,7 +633,7 @@ describe('test routes', function () {
 					description: 'test'
 				}
 				const res = await post(req, '/api/suggestion', token, 400)
-				expect(res).to.equal('Missing value')
+				expect(res).to.equal('Bad Request')
 		})
 
 		it('server error during creation', async () => {
