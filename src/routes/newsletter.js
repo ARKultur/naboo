@@ -101,11 +101,10 @@ async function sendEmailToMultipleRecipients(subject, text, recipients) {
         pass: process.env.GMAIL_PASSWORD,
       },
     });
-    console.log(exclude(recipients, ["uuid"]));
 	  
     const info = await transporter.sendMail({
       from: process.env.GMAIL_EMAIL,
-      to: exclude(recipients, ["uuid"]).join(', '),
+      to: exclude(recipients, ["uuid"]).map(obj => `${obj.email}`).join(', '),
       subject,
       html: getEmailTemplate(),
     });
