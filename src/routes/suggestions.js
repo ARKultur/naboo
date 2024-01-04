@@ -65,7 +65,7 @@ suggestions_router.post('/map', async (req, res) => {
     const results = [];
     let nextPageToken = '';
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 10; i++) {
       const response = await axios.get(
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
         {
@@ -81,7 +81,7 @@ suggestions_router.post('/map', async (req, res) => {
 
       const data = response.data;
       const filteredResults = data.results.filter((place) => {
-        const unwantedTypes = ['bar', 'hotel', 'shop'];
+        const unwantedTypes = ['bar', 'hotel', 'store', 'restaurant'];
         return !place.types.some((type) => unwantedTypes.includes(type));
       });
 
