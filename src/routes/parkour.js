@@ -192,14 +192,73 @@ parkour_router.delete('/admin/:id', authenticateTokenAdm, async (req, res) => {
   }
 })
 
+/**
+ * @swagger
+ * tags:
+ *   name: Parkours
+ *   description: The Parkours managing API
+ * /api/parkours/{id}:
+ *   patch:
+ *     security:
+ *       - adminbearerAuth: []
+ *     summary: Update a parkour and its associated nodes
+ *     tags: [Parkours]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the parkour to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *               organisation_id:
+ *                 type: integer
+ *               nodes:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     nodeId:
+ *                       type: integer
+ *                     order:
+ *                       type: integer
+ *               removed_node_ids:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       200:
+ *         description: Successfully updated the parkour and its associated nodes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Parkour'
+ *       500:
+ *         description: Internal Server Error
+ */
 parkour_router.patch('/admin/:id', authenticateTokenAdm, async (req, res) => {
-  try {
   const id = req.params.id;
 
-    const parkour = await prisma.parkour.findFirst({
+  try {
+    const parkour = await prisma.parkour.findUnique({
       where: {
         uuid: id,
       },
+      include: {
+        nodes: true
+      }
     });
     if (parkour) {
       let updated_parkour = await prisma.parkour.update({
@@ -212,30 +271,50 @@ parkour_router.patch('/admin/:id', authenticateTokenAdm, async (req, res) => {
           status: req.body.status || parkour.status,
           OrganisationId: req.body.organisation_id || parkour.OrganisationId,
           updatedAt: new Date(),
-          /*nodes: {
-            createMany: {
-              data:
-            }
-            /*
-            upsert: req.body.node_ids.map((node_id, index) => ({
-              where: {
-                parkourId_nodeId: {
-                  parkourId: parkour.uuid,
-                  nodeId: node_id || 0
-                },
-              },
-              create: {
-                nodeId: node_id,
-                order: req.body.order[index] || 0,
-              },
-              update: {
-                order: req.body.order[index] || 0,
-              },
-            })),
-          },
-          */
         },
+        include: {
+          nodes: true
+        }
       });
+
+      if (req.body.nodes && Array.isArray(req.body.nodes) && req.body.nodes.length > 0) {
+        await Promise.all(
+          req.body.nodes.map(async (node) => {
+            const existingParkourNode = parkour.nodes.find((n) => n.nodeId === node.nodeId);
+    
+            if (existingParkourNode) {
+              await prisma.parkour_node.update({
+                where: {
+                  parkourId_nodeId: {
+                    parkourId: updated_parkour.uuid,
+                    nodeId: node.nodeId,
+                  },
+                },
+                data: {
+                  order: node.order || existingParkourNode.order || 0,
+                },
+              });
+            } else {
+              await prisma.parkour_node.create({
+                data: {
+                  parkourId: updated_parkour.uuid,
+                  nodeId: node.nodeId,
+                  order: node.order || 0,
+                },
+              });
+            }
+          })
+        );
+
+        updated_parkour = await prisma.parkour.findUnique({
+          where: {
+            uuid: parkour.uuid
+          },
+          include: {
+            nodes: true 
+          }
+        })
+      }
       if (req.body.removed_node_ids && req.body.removed_node_ids.length > 0) {
         await prisma.parkour_node.deleteMany({
           where: {
@@ -313,8 +392,6 @@ parkour_router.get('/orga/:id', authenticateToken, async (req, res) => {
  *   description: The Parkours managing API
  * /api/parkours/{id}:
  *   patch:
- *     security:
- *       - bearerAuth: []
  *     summary: Update a parkour and its associated nodes
  *     tags: [Parkours]
  *     parameters:
@@ -329,65 +406,50 @@ parkour_router.get('/orga/:id', authenticateToken, async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *            type: object
- *            required:
- *             - name
- *             - description
- *             - status
- *             - organisation_id
- *             - node_ids
- *            properties:
- *              name:
- *                type: string
- *                description: The updated name of the parkour
- *              description:
- *                type: string
- *                description: The updated description of the parkour
- *              status:
- *                type: string
- *                description: The updated status of the parkour
- *              organisation_id:
- *                type: integer
- *                description: The updated ID of the associated organisation
- *              node_ids:
- *                type: array
- *                items:
- *                  type: integer
- *                description: An array of node IDs associated with the parkour
- *              order:
- *                type: array
- *                items:
- *                  type: integer
- *                description: An array of order values corresponding to the node IDs
- *              removed_node_ids:
- *                type: array
- *                items:
- *                  type: integer
- *                description: An array of node IDs to be removed from the parkour
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *               organisation_id:
+ *                 type: integer
+ *               nodes:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     nodeId:
+ *                       type: integer
+ *                     order:
+ *                       type: integer
+ *               removed_node_ids:
+ *                 type: array
+ *                 items:
+ *                   type: integer
  *     responses:
  *       200:
- *         description: Successfully updated
+ *         description: Successfully updated the parkour and its associated nodes
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Parkour'
- *       401:
- *         description: Unauthorized - Token is missing or invalid
- *       404:
- *         description: Not Found - Parkour not found
  *       500:
  *         description: Internal Server Error
- *       400:
- *         description: Bad Request - Missing required fields or invalid input
  */
 parkour_router.patch('/:id', async (req, res) => {
   const id = req.params.id;
 
   try {
-    const parkour = await prisma.parkour.findFirst({
+    const parkour = await prisma.parkour.findUnique({
       where: {
         uuid: id,
       },
+      include: {
+        nodes: true
+      }
     });
     if (parkour) {
       let updated_parkour = await prisma.parkour.update({
@@ -400,30 +462,50 @@ parkour_router.patch('/:id', async (req, res) => {
           status: req.body.status || parkour.status,
           OrganisationId: req.body.organisation_id || parkour.OrganisationId,
           updatedAt: new Date(),
-          /*nodes: {
-            createMany: {
-              data:
-            }
-            /*
-            upsert: req.body.node_ids.map((node_id, index) => ({
-              where: {
-                parkourId_nodeId: {
-                  parkourId: parkour.uuid,
-                  nodeId: node_id || 0
-                },
-              },
-              create: {
-                nodeId: node_id,
-                order: req.body.order[index] || 0,
-              },
-              update: {
-                order: req.body.order[index] || 0,
-              },
-            })),
-          },
-          */
         },
+        include: {
+          nodes: true
+        }
       });
+
+      if (req.body.nodes && Array.isArray(req.body.nodes) && req.body.nodes.length > 0) {
+        await Promise.all(
+          req.body.nodes.map(async (node) => {
+            const existingParkourNode = parkour.nodes.find((n) => n.nodeId === node.nodeId);
+    
+            if (existingParkourNode) {
+              await prisma.parkour_node.update({
+                where: {
+                  parkourId_nodeId: {
+                    parkourId: updated_parkour.uuid,
+                    nodeId: node.nodeId,
+                  },
+                },
+                data: {
+                  order: node.order || existingParkourNode.order || 0,
+                },
+              });
+            } else {
+              await prisma.parkour_node.create({
+                data: {
+                  parkourId: updated_parkour.uuid,
+                  nodeId: node.nodeId,
+                  order: node.order || 0,
+                },
+              });
+            }
+          })
+        );
+
+        updated_parkour = await prisma.parkour.findUnique({
+          where: {
+            uuid: parkour.uuid
+          },
+          include: {
+            nodes: true 
+          }
+        })
+      }
       if (req.body.removed_node_ids && req.body.removed_node_ids.length > 0) {
         await prisma.parkour_node.deleteMany({
           where: {

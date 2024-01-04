@@ -832,8 +832,9 @@ describe('test routes', function () {
 					name: 'test edited',
 					description: 'fake parkour edited',
 					status: 'fake status edited',
-					node_ids: [1],
-					order: [0]
+					nodes: [
+						{nodeId: 1, order: 0}
+					]
 				}
 
 				const test = await get('/api/nodes/all', token_adm)
