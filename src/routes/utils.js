@@ -155,7 +155,7 @@ utils_router.post('/signin', async (req, res) => {
 
 utils_router.get('/apk', (req, res) => {
     try {
-    const filePath = `${__dirname}/files/example.txt`;
+    const filePath = `${__dirname}/files/app-debug.apk`;
     res.download(filePath, (err) => {
         if (err) {
             console.log('Error:', err);

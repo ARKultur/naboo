@@ -372,6 +372,7 @@ node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
  *            type: object
  *            required:
  *             - id
+ *             - parkourId
  *            properties:
  *              name:
  *                type: number
