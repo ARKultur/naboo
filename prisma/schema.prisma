@@ -8,6 +8,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model File {
+  id       Int    @id @default(autoincrement())
+  filename String
+  content  Bytes
+  guideId  Int
+}
+
 model Orb {
   id          Int    @id @default(autoincrement())
   keypoints   String

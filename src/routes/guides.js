@@ -178,108 +178,89 @@ let guide_router = express.Router()
  *                 $ref: '#/components/schemas/Guide'
  */
 
-let upload = multer({dest: '/tmp'});
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-guide_router.post('/:id/images', upload.single('file'), authenticateToken, async (req, res) => {
-    const user = await prisma.user.findUnique({
-        where: {
-            email: req.email
-        }
-    })
+guide_router.post('/:guideId/images', upload.single('file'), authenticateToken, async (req, res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                email: req.email
+            }
+        })
 
-    if (!req.params.id) {
-        return res.status(400).send('You need to provide a correct guide id.');
-    }
-
-    const guide = await prisma.guide.findUnique({
-        where: {
-            id: parseInt(req.params.id)
-        }
-    })
-
-    if (!guide || !user || !user.OrganisationId) {
-        return res.status(401).send("You can't upload file without user account link to an organization");
-    }
-
-    if (!req.file) {
-        return res.status(400).send('No files were uploaded.');
-    }
-
-    let filePath = req.file.path;
-    const destinationPath = `/uploaded-files/${guide.id}`;
-    const destinationFile = `${destinationPath}/${req.file.originalname}`;
-
-    fs.mkdirSync(destinationPath, { recursive: true })
-    fs.rename(filePath, destinationFile, function (err) {
-        if (err) {
-            return res.status(500).send(err);
+        if (!req.params.guideId) {
+            return res.status(400).send('You need to provide a correct guide id.');
         }
 
-        res.status(200).send('File uploaded!');
-    });
+        const guide = await prisma.guide.findUnique({
+            where: {
+                id: parseInt(req.params.guideId)
+            }
+        })
+
+        if (!guide || !user || !user.OrganisationId) {
+            return res.status(401).send("You can't upload file without user account link to an organization");
+        }
+
+        console.log(`file : ${JSON.stringify(req.file.filename, null, 2)}`);
+
+        const file = await prisma.file.create({
+          data: {
+            guideId: guide.id,
+            filename: req.file.originalname,
+            content: req.file.buffer,
+          },
+        });
+
+        console.log(`File saved in database: ${JSON.stringify(file.filename, null, 2)}`);
+        res.send('File uploaded and saved in database');
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        res.status(500).send('Internal Server Error');
+      }
 });
 
-guide_router.get('/:id/images/:name', async (req, res) => {
-    console.log("DOWNLOAD IMAGES")
-    console.log(`id : ${JSON.stringify(req.params.id, null, 2)}`)
-    console.log(`name : ${JSON.stringify(req.params.name, null, 2)}`)
+guide_router.get('/:guideId/images/:id', async (req, res) => {
+    try {
+        const fileId = parseInt(req.params.id);
 
-    if (!req.params.id) {
-        return res.status(400).send('You need to provide a correct guide id.');
-    }
+        const file = await prisma.file.findUnique({
+            where: {
+                id: fileId,
+            },
+        });
 
-    const guide = await prisma.guide.findUnique({
-        where: {
-            id: parseInt(req.params.id)
+        if (!file) {
+            return res.status(404).send('File not found');
         }
-    })
 
-    if (!guide) {
-        return res.status(404).send('Guide not found, provide a correct guide id.');
+        res.set({
+            'Content-Type': 'application/octet-stream',
+            'Content-Disposition': `attachment; filename=${file.filename}`,
+        });
+
+        res.send(Buffer.from(file.content, 'utf8'));
+    } catch (error) {
+        console.error('Error retrieving file:', error);
+        res.status(500).send('Internal Server Error');
     }
-
-    const destinationPath = `/uploaded-files/${guide.id}`;
-    const destinationFile = `${destinationPath}/${req.params.name}`;
-
-    if (!fs.existsSync(destinationPath)) {
-        return res.status(404).send('Image not found.');
-    }
-
-    res.download(destinationFile);
 });
 
-guide_router.get('/:id/images', async (req, res) => {
-    console.log("GET IMAGES NAME")
-    console.log(`id : ${JSON.stringify(req.params.id, null, 2)}`)
+guide_router.get('/:guideId/images', async (req, res) => {
+    const guideId = parseInt(req.params.guideId);
 
-    if (!req.params.id) {
-        return res.status(400).send('You need to provide a correct guide id.');
-    }
-
-    const guide = await prisma.guide.findUnique({
+    const files = await prisma.file.findMany({
         where: {
-            id: parseInt(req.params.id)
+            guideId: guideId,
+        },
+        select: {
+            id: true,
+            filename: true,
         }
-    })
-
-    if (!guide) {
-        return res.status(404).send('Guide not found, provide a correct guide id.');
-    }
-
-    const destinationPath = `/uploaded-files/${guide.id}`;
-
-    if (!fs.existsSync(destinationPath)) {
-        return res.status(200).send([]);
-    }
-    fs.readdir(destinationPath, (err, files) => {
-        if (err) {
-            console.error('Error trying to read directory :', err);
-            return;
-        }
-
-        console.log('Liste des fichiers dans le dossier :', files);
-        res.status(200).send(JSON.stringify(files));
     });
+
+    res.send(files);
 });
 
 guide_router.get("/admin", authenticateTokenAdm, async (req,res) => {
