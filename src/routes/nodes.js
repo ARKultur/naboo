@@ -371,10 +371,11 @@ node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
  *           schema:
  *            type: object
  *            required:
- *             - name
+ *             - id
+ *             - parkourId
  *            properties:
  *              name:
- *                type: string
+ *                type: number
  *     responses:
  *       200:
  *         description: Node successfully deleted
@@ -385,18 +386,21 @@ node_router.patch('/admin', authenticateTokenAdm, async (req, res) => {
  */
 node_router.delete('/admin', authenticateTokenAdm, async (req, res) => {
   try {
-    const nodeName = req.body.name;
+    const nodeId = req.body.id
+    const parkourId = req.body.parkourId
 
-    await prisma.parkour_node.deleteMany({
+    await prisma.parkour_node.delete({
       where: {
-        nodeId: {
-          name: nodeName,
+        parkourId_nodeId: {
+          parkourId: parkourId,
+          nodeId: nodeId,
         },
       },
     });
+
     const deletedNode = await prisma.nodes.delete({
       where: {
-        name: nodeName,
+        id: nodeId,
       },
     });
 

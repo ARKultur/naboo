@@ -55,6 +55,32 @@ import { authenticateToken, authenticateTokenAdm } from '../utils.js';
  *             order: 1
  */
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     ParkourNode:
+ *       type: object
+ *       required:
+ *         - parkourId
+ *         - nodeId
+ *         - order
+ *       properties:
+ *         parkourId:
+ *           type: string
+ *           description: The ID of the associated parkour
+ *         nodeId:
+ *           type: integer
+ *           description: The ID of the associated node
+ *         order:
+ *           type: integer
+ *           description: The order of the node in the parkour
+ *       example:
+ *         parkourId: "abc123"
+ *         nodeId: 1
+ *         order: 2
+ */
+
 const parkour_router = express.Router();
 
 /**
